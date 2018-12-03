@@ -2,6 +2,12 @@ local slc = SL.Global.ActiveColorIndex
 
 local af = Def.ActorFrame{}
 
+-- - - - - - - - - - -
+-- Constants defining UI element position depending on horizontal or vertical screen
+local is_horizontal =	GetScreenAspectRatio() > 1
+local arrow_zoom =	(is_horizontal and 0.1 or 0.07)
+local arrow_x =		(is_horizontal and 50 or 35)
+
 af[#af+1] = Def.Quad{
 	InitCommand=cmd(zoomto,_screen.w,0; diffuse, Color.Black; Center),
 	OnCommand=cmd( accelerate,0.3; zoomtoheight,128; diffusealpha,0.9; sleep,2.5; linear,0.25),
@@ -14,11 +20,11 @@ for i=1,7 do
 		InitCommand=function(self) self:Center() end,
 
 		LoadActor("white_logo.png")..{
-			InitCommand=cmd(zoom, 0.1; diffuse, GetHexColor(slc-i-3); diffusealpha,0; x, (i-4)*50 ),
+			InitCommand=cmd(zoom, arrow_zoom; diffuse, GetHexColor(slc-i-3); diffusealpha,0; x, (i-4) * arrow_x ),
 			OnCommand=cmd(sleep, i*0.1 + 0.2; linear,0.75; diffusealpha,1; linear,0.75;diffusealpha,0)
 		},
 		LoadActor("highlight.png")..{
-			InitCommand=cmd(zoom,0.1; diffusealpha,0; x, (i-4)*50),
+			InitCommand=cmd(zoom, arrow_zoom; diffusealpha,0; x, (i-4) * arrow_x),
 			OnCommand=cmd(sleep, i*0.1 + 0.2; linear,0.75; diffusealpha,0.75; linear,0.75;diffusealpha,0)
 		}
 	}
