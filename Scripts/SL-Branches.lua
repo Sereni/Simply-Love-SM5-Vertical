@@ -53,6 +53,9 @@ end
 
 Branch.AfterScreenSelectColor = function()
 	local preferred_style = ThemePrefs.Get("AutoStyle")
+	
+	-- Force single player on vertical screens
+	if IsVerticalScreen() then preferred_style = "single" end
 
 	if preferred_style ~= "none"
 	-- AutoStyle should not be possible in pay mode
