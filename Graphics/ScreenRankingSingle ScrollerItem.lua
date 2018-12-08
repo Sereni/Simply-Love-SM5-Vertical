@@ -1,3 +1,11 @@
+-- Variables for horizontal/vertical mode
+local is_horizontal = GetScreenAspectRatio() > 1
+local banner_x =	(is_horizontal and WideScale(-280,-320) or 20)
+local text_wrap =	(is_horizontal and 264 or 150)
+local text_width =	(is_horizontal and 280 or 170)
+local score_x = 	(is_horizontal and WideScale(140,40) or 0)
+	
+	
 local HighScoreRow = Def.ActorFrame{
 	-- setting ztest to true allows masking
 	InitCommand=cmd(ztest, true),
@@ -8,7 +16,7 @@ local HighScoreRow = Def.ActorFrame{
 	},
 
 	Def.Banner{
-		InitCommand=cmd(x,WideScale(-280,-320); halign,0; scaletoclipped,102,40; diffusealpha,0.2 ),
+		InitCommand=cmd(x,banner_x; halign,0; scaletoclipped,102,40; diffusealpha,0.2 ),
 		SetCommand=function(self, params)
 			if params.Song and params.Song:GetBannerPath() then
 				self:LoadFromCachedBanner( params.Song:GetBannerPath() )
@@ -18,7 +26,7 @@ local HighScoreRow = Def.ActorFrame{
 
 	--the name of the song, on top of the graphical banner
 	LoadFont("_miso")..{
-		InitCommand=cmd(x,WideScale(-220,-280); halign,0; shadowlength,1; wrapwidthpixels,264; maxheight,58; maxwidth,280),
+		InitCommand=cmd(x,WideScale(-220,-280); halign,0; shadowlength,1; wrapwidthpixels,text_wrap; maxheight,58; maxwidth,text_width),
 		SetCommand=function(self, params)
 			if params.Song then
 				self:settext( params.Song:GetDisplayFullTitle() )
@@ -78,7 +86,7 @@ for key, difficulty in ipairs(DifficultiesToShow) do
 	HighScore[#HighScore+1] = Def.BitmapText{
 		Font="_miso",
 		Name="HighScore_"..difficulty,
-		InitCommand=cmd(x,WideScale(140,40) + (key-1)*100; zoom,0.8; horizalign, center)
+		InitCommand=cmd(x,score_x + (key-1)*100; zoom,0.8; horizalign, center)
 	}
 
 end
