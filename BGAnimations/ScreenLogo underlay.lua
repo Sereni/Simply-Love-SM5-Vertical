@@ -4,6 +4,15 @@ if game ~= "dance" and game ~= "pump" then
 	game = "techno"
 end
 
+-- - - - - - - - - - - - - - - - - - - - -
+-- Constants defining UI element positions depending on horizontal or vertical mode.
+local is_horizontal = GetScreenAspectRatio() > 1
+local logos_x			= (is_horizontal and 0 or 2)
+local logos_y			= (is_horizontal and -16 or -10)
+local logos_zoom_itg		= (is_horizontal and 0.2 or 0.114)
+local logos_zoom_pump		= (is_horizontal and 0.205 or 0.125)
+local title_zoom		= (is_horizontal and 0.7 or 0.4)
+
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:y( image == "Hearts" and _screen.cy or _screen.cy+10 )		
@@ -11,7 +20,7 @@ local t = Def.ActorFrame{
 		
 	LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
 		InitCommand=function(self)
-			self:xy(_screen.cx, -16):zoom( game=="pump" and 0.2 or 0.205 ):cropright(1)
+			self:xy(_screen.cx+logos_x, logos_y):zoom( game=="pump" and logos_zoom_itg or logos_zoom_pump ):cropright(1)
 		end,
 		OnCommand=function(self)
 			self:linear(0.33):cropright(0)
@@ -20,7 +29,7 @@ local t = Def.ActorFrame{
 
 	LoadActor(THEME:GetPathB("ScreenTitleMenu","underlay/Simply".. image .." (doubleres).png"))..{
 		InitCommand=function(self)
-			self:x(_screen.cx+2):diffusealpha(0):zoom(0.7)
+			self:x(_screen.cx+2):diffusealpha(0):zoom(title_zoom)
 				:shadowlength(1)
 		end,
 		OnCommand=cmd(linear,0.5; diffusealpha, 1)
@@ -39,7 +48,6 @@ local af = Def.ActorFrame{
 		self:effectcolor2(1,1,1,1)
 	end,
 	OffCommand=cmd(visible,false),
-
 
 	LoadFont("_wendy small")..{
 		Text=THEME:GetString("ScreenLogo", "EnterCreditsToPlay"),
