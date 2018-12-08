@@ -1,9 +1,8 @@
 -- Variables for horizontal/vertical mode
-local is_horizontal = GetScreenAspectRatio() > 1
-local banner_x =	(is_horizontal and WideScale(-280,-320) or 20)
-local text_wrap =	(is_horizontal and 264 or 150)
-local text_width =	(is_horizontal and 280 or 170)
-local score_x = 	(is_horizontal and WideScale(140,40) or 0)
+local banner_x =	(IsVerticalScreen() and 20 or WideScale(-280,-320))
+local text_wrap =	(IsVerticalScreen() and 150 or 264)
+local text_width =	(IsVerticalScreen() and 170 or 280)
+local score_x = 	(IsVerticalScreen() and 0 or WideScale(140,40))
 	
 	
 local HighScoreRow = Def.ActorFrame{

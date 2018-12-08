@@ -6,12 +6,11 @@ end
 
 -- - - - - - - - - - - - - - - - - - - - -
 -- Constants defining UI element positions depending on horizontal or vertical mode.
-local is_horizontal = GetScreenAspectRatio() > 1
-local logos_x			= (is_horizontal and 0 or 2)
-local logos_y			= (is_horizontal and -16 or -10)
-local logos_zoom_itg		= (is_horizontal and 0.2 or 0.114)
-local logos_zoom_pump		= (is_horizontal and 0.205 or 0.125)
-local title_zoom		= (is_horizontal and 0.7 or 0.4)
+local logos_x			= (IsVerticalScreen() and 2 or 0)
+local logos_y			= (IsVerticalScreen() and -10 or -16)
+local logos_zoom_itg		= (IsVerticalScreen() and 0.114 or 0.2)
+local logos_zoom_pump		= (IsVerticalScreen() and 0.125 or 0.205)
+local title_zoom		= (IsVerticalScreen() and 0.4 or 0.7)
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)

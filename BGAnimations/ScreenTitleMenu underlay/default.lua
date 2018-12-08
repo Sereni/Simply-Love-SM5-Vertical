@@ -29,17 +29,16 @@ else
 end
 -- - - - - - - - - - - - - - - - - - - - -
 -- Constants defining UI element positions depending on horizontal or vertical mode.
-local is_horizontal = GetScreenAspectRatio() > 1
-local song_stats_zoom		= (is_horizontal and 0.8 or 0.67)
-local song_stats_y		= (is_horizontal and -120 or -75)
-local logos_x			= (is_horizontal and 0 or 2)
-local logos_y			= (is_horizontal and -16 or -10)
-local logos_zoom_itg		= (is_horizontal and 0.2 or 0.114)
-local logos_zoom_pump		= (is_horizontal and 0.205 or 0.125)
-local title_zoom		= (is_horizontal and 0.7 or 0.4)
-local hat_x			= (is_horizontal and 130 or 74)
-local hat_decelerate_rate	= (is_horizontal and 1.333 or 1.1)
-local hat_decelerate_y		= (is_horizontal and -110 or -65)
+local song_stats_zoom		= (IsVerticalScreen() and 0.67 or 0.8)
+local song_stats_y		= (IsVerticalScreen() and -75 or -120)
+local logos_x			= (IsVerticalScreen() and 2 or 0)
+local logos_y			= (IsVerticalScreen() and -10 or -16)
+local logos_zoom_itg		= (IsVerticalScreen() and 0.114 or 0.2)
+local logos_zoom_pump		= (IsVerticalScreen() and 0.125 or 0.205)
+local title_zoom		= (IsVerticalScreen() and 0.4 or 0.7)
+local hat_x			= (IsVerticalScreen() and 74 or 130)
+local hat_decelerate_rate	= (IsVerticalScreen() and 1.1 or 1.333)
+local hat_decelerate_y		= (IsVerticalScreen() and -65 or -110)
 
 -- - - - - - - - - - - - - - - - - - - - -
 local image = ThemePrefs.Get("VisualTheme")

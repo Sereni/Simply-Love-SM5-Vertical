@@ -303,3 +303,7 @@ function GetJudgmentGraphics(mode)
 
 	return judgment_graphics
 end
+
+function IsVerticalScreen()
+	return GetScreenAspectRatio() <=1
+end

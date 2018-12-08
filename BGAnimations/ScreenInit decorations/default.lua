@@ -4,9 +4,8 @@ local af = Def.ActorFrame{}
 
 -- - - - - - - - - - -
 -- Constants defining UI element position depending on horizontal or vertical screen
-local is_horizontal =	GetScreenAspectRatio() > 1
-local arrow_zoom =	(is_horizontal and 0.1 or 0.07)
-local arrow_x =		(is_horizontal and 50 or 35)
+local arrow_zoom =	(IsVerticalScreen() and 0.07 or 0.1)
+local arrow_x =		(IsVerticalScreen() and 35 or 50)
 
 af[#af+1] = Def.Quad{
 	InitCommand=cmd(zoomto,_screen.w,0; diffuse, Color.Black; Center),
