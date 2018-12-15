@@ -4,12 +4,6 @@
 -- SelectProfileFrames for both PLAYER_1 and PLAYER_2, but only the MasterPlayerNumber
 local AutoStyle = ThemePrefs.Get("AutoStyle")
 
--- Force single player on vertical screens.
--- FIXME this doesn't prevent P2 from joining, and if you join one player and then the other, crashes weirdly.
-if IsVerticalScreen() then
-	AutoStyle = "single"
-end
-
 -- retrieve the MasterPlayerNumber now, at initialization, so that if AutoStyle is set
 -- to "single" or "double" and that singular player unjoins, we still have a handle on
 -- which PlayerNumber they're supposed to be...
@@ -199,12 +193,10 @@ local t = Def.ActorFrame {
 	}
 }
 
-local player_frame_x = (IsVerticalScreen() and 0 or (160*(player==PLAYER_1 and -1 or 1)))
-
 local PlayerFrame = function(player)
 	return Def.ActorFrame {
 		Name=ToEnumShortString(player) .. "Frame",
-		InitCommand=function(self) self:xy(_screen.cx+player_frame_x, _screen.cy) end,
+		InitCommand=function(self) self:xy(_screen.cx+(160*(player==PLAYER_1 and -1 or 1)), _screen.cy) end,
 		OffCommand=function(self)
 			if GAMESTATE:IsSideJoined(player) then
 				self:bouncebegin(0.35):zoom(0)
@@ -285,6 +277,7 @@ end
 if AutoStyle=="none" or AutoStyle=="versus" then
 	t.children[#t.children+1] = PlayerFrame(PLAYER_1)
 	t.children[#t.children+1] = PlayerFrame(PLAYER_2)
+
 -- load only for the MasterPlayerNumber
 else
 	t.children[#t.children+1] = PlayerFrame(mpn)
