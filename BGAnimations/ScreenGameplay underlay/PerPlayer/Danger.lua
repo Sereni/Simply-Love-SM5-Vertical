@@ -33,7 +33,7 @@ if SL.Global.GameMode ~= "Casual" and SL.Global.GameMode ~= "StomperZ" then
 				self:visible(not SL[ToEnumShortString(Player)].ActiveModifiers.HideLifebar)
 				self:diffusealpha(0)
 
-				if IsPlayingDouble or PREFSMAN:GetPreference("Center1Player") and GAMESTATE:GetNumSidesJoined() == 1 then
+				if IsPlayingDouble or IsVerticalScreen() or PREFSMAN:GetPreference("Center1Player") and GAMESTATE:GetNumSidesJoined() == 1 then
 					self:stretchto(0,0,_screen.w,_screen.h)
 				elseif not IsPlayingDouble and Player == PLAYER_1 then
 					self:faderight(0.1):stretchto(0,0,_screen.cx,_screen.h)
