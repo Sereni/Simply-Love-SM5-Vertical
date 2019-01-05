@@ -1,8 +1,8 @@
 local player = ...
 
-local meterFillLength = 136
+local meterFillLength = (IsVerticalScreen() and 102 or 136)
 local meterFillHeight = 18
-local meterXOffset = _screen.cx + (player==PLAYER_1 and -1 or 1) * WideScale(238, 288)
+local meterXOffset = Positions.ScreenGameplay.LifeMeterStandardX(player)
 
 local newBPS, oldBPS
 local swoosh, move

@@ -2,7 +2,7 @@ local player = ...
 
 local width = 16
 local height = 250
-local _x = width * WideScale(1, 3.5)
+local _x = (IsVerticalScreen() and width or width * WideScale(1, 3.5))
 
 if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
 	_x = width * WideScale(2,8)

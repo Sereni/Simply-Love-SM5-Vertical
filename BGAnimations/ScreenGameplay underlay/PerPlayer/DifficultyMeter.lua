@@ -2,16 +2,8 @@ local player = ...
 
 return Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy( WideScale(27,84), 56 )
-		if player == PLAYER_2 then
-			self:x( _screen.w-WideScale(27,84) )
-		end
-
-		if SL.Global.GameMode == "StomperZ" then
-			self:y( 20 )
-		end
+		self:xy( Positions.ScreenGameplay.DifficultyMeterX(player), Positions.ScreenGameplay.DifficultyMeterY() )
 	end,
-
 
 	-- colored background for player's chart's difficulty meter
 	Def.Quad{
