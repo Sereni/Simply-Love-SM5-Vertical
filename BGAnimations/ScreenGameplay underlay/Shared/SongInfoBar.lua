@@ -1,24 +1,27 @@
-return Def.ActorFrame{
+local xOffset = _screen.cx-15
+local yOffset = 20
+local barLength = _screen.w-45
 
+return Def.ActorFrame{
 	-- Song Completion Meter
 	Def.ActorFrame{
 		Name="SongMeter",
-		InitCommand=cmd(xy, _screen.cx-17, 20 ),
+		InitCommand=cmd(xy, xOffset, yOffset ),
 
 		Def.SongMeterDisplay{
-			StreamWidth=_screen.w-50,
+			StreamWidth=barLength,
 			Stream=Def.Quad{ 
 				InitCommand=cmd(zoomy,18; diffuse,DifficultyIndexColor(2))
 			}
 		},
 
-		Border( _screen.w-50, 22, 2 ),
+		Border( barLength, 22, 2 ),
 	},
 
 	-- Song Title
 	LoadFont("_miso")..{
 		Name="SongTitle",
-		InitCommand=cmd(zoom,0.8; shadowlength,0.6; maxwidth, _screen.w - 50; xy, _screen.cx-17, 20 ),
+		InitCommand=cmd(zoom,0.8; shadowlength,0.6; maxwidth, barLength; xy, xOffset, yOffset ),
 		CurrentSongChangedMessageCommand=cmd(playcommand, "Update"),
 		UpdateCommand=function(self)
 			local song = GAMESTATE:GetCurrentSong()
