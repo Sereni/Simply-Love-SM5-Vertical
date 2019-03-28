@@ -1,4 +1,4 @@
-local xOffset = _screen.cx-15
+local xOffset = _screen.cx-14.5
 local yOffset = 20
 local barLength = _screen.w-45
 
