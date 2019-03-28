@@ -81,7 +81,7 @@ end
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy(_screen.cx, 52):valign(1)
+		self:xy(_screen.cx + 15, 57):valign(1)
 
 		if SL.Global.GameMode == "StomperZ" then
 			self:zoom(1)
