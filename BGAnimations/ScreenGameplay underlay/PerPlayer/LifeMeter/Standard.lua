@@ -22,7 +22,7 @@ local meter = Def.ActorFrame{
 
 	InitCommand=function(self)
 		self:SetUpdateFunction(Update)
-			:y(20)
+			:y(57)
 	end,
 
 	-- frame
