@@ -9,7 +9,7 @@ local af = Def.ActorFrame{
 
 	-- song/course title text
 	LoadFont("_miso")..{
-		InitCommand=cmd(xy,_screen.cx,54; maxwidth, 209 ),
+		InitCommand=cmd(xy,_screen.cx,54; maxwidth, 209; zoom, 0.8 ),
 		OnCommand=function(self)
 			local songtitle = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse():GetDisplayFullTitle()) or GAMESTATE:GetCurrentSong():GetDisplayFullTitle()
 
