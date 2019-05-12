@@ -56,11 +56,8 @@ for index, window in ipairs(TapNoteScores.Types) do
 end
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(xy, 50, _screen.cy-24),
+	InitCommand=cmd(xy, 45, _screen.cy-38; zoom, 0.7),
 	OnCommand=function(self)
-		if player == PLAYER_2 then
-			self:x( self:GetX() * -1)
-		end
 	end
 }
 
@@ -74,7 +71,7 @@ for index, window in ipairs(TapNoteScores.Types) do
 		Text=(nice and scores_table[window] == 69) and 'NICE' or label:upper();
 		InitCommand=cmd(zoom,0.833; horizalign,right; maxwidth, 76),
 		BeginCommand=function(self)
-			self:x( (player == PLAYER_1 and 28) or -28 )
+			self:x(2)
 			self:y((index-1)*28 -16)
 
 			-- if StomperZ, diffuse the JudgmentLabel the StomperZ colors
@@ -111,8 +108,8 @@ for index, label in ipairs(RadarCategories) do
 		Text=(nice and (performance == 69 or possible == 69)) and 'nice' or label,
 		InitCommand=cmd(NoStroke;zoom,0.833; horizalign,right ),
 		BeginCommand=function(self)
-			self:x( (player == PLAYER_1 and -160) or 90 )
-			self:y((index-1)*28 + 41)
+			self:x( -170 )
+			self:y((index-1)*28 + 38)
 		end
 	}
 end

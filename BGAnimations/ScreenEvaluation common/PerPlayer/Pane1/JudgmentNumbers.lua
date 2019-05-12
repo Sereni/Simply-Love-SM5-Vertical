@@ -7,24 +7,18 @@ local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local TapNoteScores = {
 	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
 	-- x values for P1 and P2
-	x = { 64, 94 }
+	x = { 42, 42 }
 }
 
 local RadarCategories = {
 	Types = { 'Holds', 'Mines', 'Hands', 'Rolls' },
 	-- x values for P1 and P2
-	x = { -180, 218 }
+	x = { -200, -200 }
 }
 
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(zoom, 0.8; xy,90,_screen.cy-24),
-	OnCommand=function(self)
-		-- shift the x position of this ActorFrame to -90 for PLAYER_2
-		if player == PLAYER_2 then
-			self:x( self:GetX() * -1 )
-		end
-	end
+	InitCommand=cmd(zoom, 0.56; xy,72,_screen.cy-27),
 }
 
 -- do "regular" TapNotes first
@@ -70,7 +64,7 @@ for index, window in ipairs(TapNoteScores.Types) do
 		end,
 		BeginCommand=function(self)
 			self:x( TapNoteScores.x[pn] )
-			self:y((index-1)*35 -20)
+			self:y((index-1)*35 - 40)
 			self:targetnumber(number)
 		end
 	}
@@ -80,6 +74,9 @@ end
 -- then handle holds, mines, hands, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
 
+	local y_position = (index-1)*35 + 30
+	local x_position = RadarCategories.x[pn]
+
 	local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..RCType )
 	local possible = stats:GetRadarPossible():GetValue( "RadarCategory_"..RCType )
 
@@ -88,8 +85,8 @@ for index, RCType in ipairs(RadarCategories.Types) do
 		Font="_ScreenEvaluation numbers",
 		InitCommand=cmd(zoom,0.5; horizalign, right; Load, "RollingNumbersEvaluationB"),
 		BeginCommand=function(self)
-			self:y((index-1)*35 + 53)
-			self:x( RadarCategories.x[pn] )
+			self:y(y_position)
+			self:x( x_position )
 			self:targetnumber(performance)
 		end
 	}
@@ -99,8 +96,8 @@ for index, RCType in ipairs(RadarCategories.Types) do
 		Text="/",
 		InitCommand=cmd(diffuse,color("#5A6166"); zoom, 1.25; horizalign, right),
 		BeginCommand=function(self)
-			self:y((index-1)*35 + 53)
-			self:x( ((player == PLAYER_1) and -168) or 230 )
+			self:y(y_position)
+			self:x(x_position + 12)
 		end
 	}
 
@@ -108,8 +105,8 @@ for index, RCType in ipairs(RadarCategories.Types) do
 	t[#t+1] = LoadFont("_ScreenEvaluation numbers")..{
 		InitCommand=cmd(zoom,0.5; horizalign, right),
 		BeginCommand=function(self)
-			self:y((index-1)*35 + 53)
-			self:x( ((player == PLAYER_1) and -114) or 286 )
+			self:y(y_position)
+			self:x( x_position + 65 )
 			self:settext(("%03.0f"):format(possible))
 			local leadingZeroAttr = { Length=3-tonumber(tostring(possible):len()); Diffuse=color("#5A6166") }
 			self:AddAttribute(0, leadingZeroAttr )

@@ -43,11 +43,7 @@ for player in ivalues(Players) do
 	t[#t+1] = Def.ActorFrame{
 		Name=ToEnumShortString(player).."_AF_Upper",
 		OnCommand=function(self)
-			if player == PLAYER_1 then
-				self:x(_screen.cx - 155)
-			elseif player == PLAYER_2 then
-				self:x(_screen.cx + 155)
-			end
+                        self:x(_screen.cx)
 		end,
 
 		-- store player stats for later retrieval on EvaluationSummary and NameEntryTraditional
@@ -70,19 +66,14 @@ for player in ivalues(Players) do
 	local lower = Def.ActorFrame{
 		Name=ToEnumShortString(player).."_AF_Lower",
 		OnCommand=function(self)
-			-- if double style, center the gameplay stats
-			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-				self:x(_screen.cx)
-			else
-				self:x(_screen.cx + (player==PLAYER_1 and -155 or 155))
-			end
+                    self:x(_screen.cx)
 		end,
 
 		-- background quad for player stats
 		Def.Quad{
 			Name="LowerQuad",
 			InitCommand=function(self)
-				self:diffuse(color("#1E282F")):y(_screen.cy+34):zoomto( 300,180 )
+				self:diffuse(color("#1E282F")):y(_screen.cy):zoomto( 210,130 )
 				if ThemePrefs.Get("RainbowMode") then
 					self:diffusealpha(0.9)
 				end
@@ -91,7 +82,7 @@ for player in ivalues(Players) do
 			-- and need more space to accommodate more columns of arrows;  these commands
 			-- are queued as needed from the InputHandler
 			ShrinkCommand=function(self)
-				self:zoomto(300,180):x(0)
+				self:zoomto(210,130):x(0)
 			end,
 			ExpandCommand=function(self)
 				self:zoomto(520,180):x(3)
