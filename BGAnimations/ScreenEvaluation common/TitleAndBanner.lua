@@ -1,4 +1,5 @@
 local banner_directory = { Hearts="Hearts", Arrows="Arrows" }
+local set_banner_position = cmd(xy, _screen.cx, 105.5; setsize,418,164; zoom, 0.5 )
 
 local af = Def.ActorFrame{
 
@@ -33,12 +34,12 @@ if SongOrCourse and SongOrCourse:HasBanner() then
 				self:LoadFromSong( GAMESTATE:GetCurrentSong() )
 			end
 		end,
-		OnCommand=cmd(xy, _screen.cx, 105.5; setsize,418,164; zoom, 0.5 )
+		OnCommand=set_banner_position
 	}
 else
 	--fallback banner
 	af[#af+1] = LoadActor( THEME:GetPathB("ScreenSelectMusic", "overlay/colored_banners/" .. (banner_directory[ThemePrefs.Get("VisualTheme")] or "Hearts") .. "/banner" .. SL.Global.ActiveColorIndex .. " (doubleres).png"))..{
-		InitCommand=function(self) self:xy( _screen.cx, 121.5):zoom(0.5) end
+		InitCommand=set_banner_position
 	}
 end
 
