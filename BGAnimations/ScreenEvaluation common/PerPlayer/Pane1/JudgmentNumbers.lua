@@ -7,18 +7,19 @@ local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local TapNoteScores = {
 	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
 	-- x values for P1 and P2
-	x = { 42, 42 }
+	x = { 0, 0 }
 }
 
 local RadarCategories = {
 	Types = { 'Holds', 'Mines', 'Hands', 'Rolls' },
-	-- x values for P1 and P2
-	x = { -200, -200 }
+	-- x values for P1 and P2, offset relatively to TapNoteScores to fit judgment labels.
+	x = { -242, -242 }
 }
 
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(zoom, 0.56; xy,72,_screen.cy-27),
+	InitCommand=cmd(zoom, 0.56; x, 50),
+
 }
 
 -- do "regular" TapNotes first
@@ -64,7 +65,7 @@ for index, window in ipairs(TapNoteScores.Types) do
 		end,
 		BeginCommand=function(self)
 			self:x( TapNoteScores.x[pn] )
-			self:y((index-1)*35 - 40)
+			self:y((index-1)*35)
 			self:targetnumber(number)
 		end
 	}
@@ -74,7 +75,7 @@ end
 -- then handle holds, mines, hands, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
 
-	local y_position = (index-1)*35 + 30
+	local y_position = (index-1)*35 + 70
 	local x_position = RadarCategories.x[pn]
 
 	local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..RCType )
@@ -106,7 +107,7 @@ for index, RCType in ipairs(RadarCategories.Types) do
 		InitCommand=cmd(zoom,0.5; horizalign, right),
 		BeginCommand=function(self)
 			self:y(y_position)
-			self:x( x_position + 65 )
+			self:x(x_position + 65)
 			self:settext(("%03.0f"):format(possible))
 			local leadingZeroAttr = { Length=3-tonumber(tostring(possible):len()); Diffuse=color("#5A6166") }
 			self:AddAttribute(0, leadingZeroAttr )
