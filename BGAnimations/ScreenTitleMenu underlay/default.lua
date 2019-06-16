@@ -5,11 +5,19 @@ SongStats = SongStats .. SONGMAN:GetNumSongGroups() .. " groups, "
 SongStats = SongStats .. #SONGMAN:GetAllCourses(PREFSMAN:GetPreference("AutogenGroupCourses")) .. " courses"
 
 -- - - - - - - - - - - - - - - - - - - - -
-
 local game = GAMESTATE:GetCurrentGame():GetName();
 if game ~= "dance" and game ~= "pump" then
 	game = "techno"
 end
+
+-- - - - - - - - - - - - - - - - - - - - -
+-- People commonly have multiple copies of SL installed – sometimes different forks with unique features
+-- sometimes due to concern that an update will cause them to lose data, sometimes accidentally, etc.
+
+-- It is important to display the current theme's name to help users quickly assess what version of SL
+-- they are using right now.  THEME:GetCurThemeName() provides the name of the theme folder from the
+-- filesystem, so we'll show that.  It is guaranteed to be unique and users are likely to recognize it.
+local sl_name = THEME:GetCurThemeName()
 
 -- - - - - - - - - - - - - - - - - - - - -
 local sm_version = ""
@@ -39,12 +47,13 @@ local title_zoom		= (IsVerticalScreen() and 0.4 or 0.7)
 local hat_x			= (IsVerticalScreen() and 74 or 130)
 local hat_decelerate_rate	= (IsVerticalScreen() and 1.1 or 1.333)
 local hat_decelerate_y		= (IsVerticalScreen() and -65 or -110)
-
 -- - - - - - - - - - - - - - - - - - - - -
-local image = ThemePrefs.Get("VisualTheme")
 
-if image == "Spooky" then  --SSHHHH dont tell anyone ;)
-	image = (math.random(1,100) > 11 and "Spooky" or "Spoopy")
+local style = ThemePrefs.Get("VisualTheme")
+local image = "TitleMenu"
+--SSHHHH dont tell anyone ;)
+if style=="Spooky" and math.random(1,100) > 11 then
+	image="TitleMenuAlt"
 end
 
 local af = Def.ActorFrame{
@@ -61,13 +70,11 @@ local af = Def.ActorFrame{
 		InitCommand=function(self) self:zoom(song_stats_zoom):y(song_stats_y):diffusealpha(0) end,
 		OnCommand=function(self) self:sleep(0.2):linear(0.4):diffusealpha(1) end,
 
-		Def.BitmapText{
-			Font="_miso",
-			Text=sm_version .. (sl_version and ("       Simply Love v"..sl_version) or ""),
+		LoadFont("_miso")..{
+			Text=sm_version .. "       " .. sl_name .. (sl_version and (" v" .. sl_version) or ""),
 			InitCommand=function(self) self:y(-20):diffuse(TextColor) end,
 		},
-		Def.BitmapText{
-			Font="_miso",
+		LoadFont("_miso")..{
 			Text=SongStats,
 			InitCommand=function(self) self:diffuse(TextColor) end,
 		}
@@ -81,7 +88,7 @@ local af = Def.ActorFrame{
 	},
 
 	-- Large SIMPLY LOVE title
-	LoadActor("Simply".. image .." (doubleres).png") .. {
+	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/"..image.." (doubleres).png"))..{
 		InitCommand=function(self) self:x(2):zoom(title_zoom):shadowlength(0.75) end,
 		OffCommand=function(self) self:linear(0.5):shadowlength(0) end
 	}

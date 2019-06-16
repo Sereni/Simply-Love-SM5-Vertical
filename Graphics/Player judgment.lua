@@ -9,15 +9,15 @@ local kids, JudgmentSet
 -- If that fails too, fail gracefully and do nothing
 local mode = SL.Global.GameMode
 if mode == 'Casual' then mode = 'Competitive' end -- copied out of PlayerOptions ...
-local graphics = GetJudgmentGraphics(SL.Global.GameMode)
-local wanted_graphics = mods.JudgmentGraphic
-if not FindInTable(wanted_graphics, graphics) then
-	wanted_graphics = graphics[1] or "None"
+local available_judgments = GetJudgmentGraphics(SL.Global.GameMode)
+
+local file_to_load = (FindInTable(mods.JudgmentGraphic, available_judgments) ~= nil and mods.JudgmentGraphic or available_judgments[1]) or "None"
+
+if file_to_load == "None" then
+	return Def.Actor{ InitCommand=function(self) self:visible(false) end }
 end
 
-if wanted_graphics == "None" then return end
-
--- - - - - - - - - - - - - - - - - - - - - -
+------------------------------------------------------------
 
 local TNSFrames = {
 	TapNoteScore_W1 = 0,
@@ -73,7 +73,7 @@ local t = Def.ActorFrame {
 				self:Load( THEME:GetPathG("", "_judgments/Competitive/Love") )
 
 			else
-				self:Load( THEME:GetPathG("", "_judgments/" .. mode .. "/" .. wanted_graphics) )
+				self:Load( THEME:GetPathG("", "_judgments/" .. mode .. "/" .. file_to_load) )
 			end
 
 		end,

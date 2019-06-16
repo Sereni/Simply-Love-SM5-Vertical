@@ -9,8 +9,8 @@ local sortmenu = { w=210, h=160 }
 local t = Def.ActorFrame {
 	Name="SortMenu",
 	InitCommand=function(self)
-		-- ALWAYS ensure that the SortMenu is hidden and that players have
-		-- input directed back to them on screen initialization.  Always.
+		-- Always ensure that the SortMenu is hidden and that player input
+		-- is directed back to the engine on screen initialization.
 		self:queuecommand("HideSortMenu")
 			:draworder(1)
 	end,
@@ -30,6 +30,8 @@ local t = Def.ActorFrame {
 		end
 		self:visible(false)
 	end,
+	-- Always ensure that player input is directed back to the engine when leaving SelectMusic.
+	OffCommand=function(self) self:playcommand("HideSortMenu") end,
 
 	OnCommand=function(self)
 		self:visible(false)
@@ -50,12 +52,14 @@ local t = Def.ActorFrame {
 			{"SortBy", "Recent"}
 		}
 
+		local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
+
 		-- Allow players to switch from single to double and from double to single
 		-- but only present these options if Joint Double or Joint Premium is enabled
-		if PREFSMAN:GetPreference("Premium") ~= "Premium_Off" then
-			if SL.Global.Gamestate.Style == "single" then
+		if not (PREFSMAN:GetPreference("Premium") == "Premium_Off" and GAMESTATE:GetCoinMode() == "CoinMode_Pay") then
+			if style == "single" then
 				table.insert(wheel_options, {"ChangeStyle", "Double"})
-			elseif SL.Global.Gamestate.Style == "double" then
+			elseif style == "double" then
 				table.insert(wheel_options, {"ChangeStyle", "Single"})
 			end
 		end

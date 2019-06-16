@@ -1,5 +1,5 @@
 local Players = GAMESTATE:GetHumanPlayers()
-local NumPanes = SL.Global.GameMode=="Casual" and 1 or 4
+local NumPanes = SL.Global.GameMode=="Casual" and 1 or 5
 
 -- Start by loading actors that would be the same whether 1 or 2 players are joined.
 local t = Def.ActorFrame{
@@ -20,8 +20,8 @@ local t = Def.ActorFrame{
 	-- the title of the song and its graphical banner, if there is one
 	LoadActor("./TitleAndBanner.lua"),
 
-	-- the ratemod text that appears at the bottom of the banner if music rate ~= 1.0
-	LoadActor("./RateMod.lua"),
+	-- text to display BPM range (and ratemod if ~= 1.0) immediately under the banner
+	LoadActor("./BPM_RateMod.lua"),
 
 	-- code for handling score vocalization
 	LoadActor("./ScoreVocalization.lua"),
@@ -100,6 +100,8 @@ for player in ivalues(Players) do
 	}
 
 	-- add available Panes to the lower ActorFrame via a loop
+	-- Note(teejusb): Some of these actors may be nil. This is not a bug, but
+	-- a feature for any panes we want to be conditional (e.g. the QR code).
 	for i=1, NumPanes do
 		lower[#lower+1] = LoadActor("./PerPlayer/Pane"..i, player)
 	end

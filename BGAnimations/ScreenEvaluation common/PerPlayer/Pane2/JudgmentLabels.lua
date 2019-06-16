@@ -1,23 +1,19 @@
 local player = ...
 local pn = ToEnumShortString(player)
+local track_missbcheld = SL[pn].ActiveModifiers.MissBecauseHeld
 
-local judgments = { "W1", "W2", "W3", "W4", "W5", "Miss" }
-local TNSNames = {}
-
-local mode = ""
-if SL.Global.GameMode == "StomperZ" then mode = "StomperZ"
-elseif SL.Global.GameMode == "ECFA" then mode = "ECFA" end
-
-
--- tap note types
--- Iterating through the enum isn't worthwhile because the sequencing is so bizarre...
-for i, judgment in ipairs(judgments) do
-	TNSNames[#TNSNames+1] = THEME:GetString("TapNoteScore" .. mode, judgment)
+local TapNoteScores = { Types={'W1', 'W2', 'W3', 'W4', 'W5', 'Miss'}, Names={} }
+local tns_string = "TapNoteScore" .. (SL.Global.GameMode=="Competitive" and "" or SL.Global.GameMode)
+-- get TNS names appropriate for the current GameMode, localized to the current language
+for i, judgment in ipairs(TapNoteScores.Types) do
+	TapNoteScores.Names[#TapNoteScores.Names+1] = THEME:GetString(tns_string, judgment)
 end
 
+local box_height = 146
+local row_height = box_height/#TapNoteScores.Types
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(xy, 50, _screen.cy-24),
+	InitCommand=cmd(xy, 50, _screen.cy-36),
 	OnCommand=function(self)
 		if player == PLAYER_2 then
 			self:x( self:GetX() * -1)
@@ -25,42 +21,43 @@ local t = Def.ActorFrame{
 	end
 }
 
+local miss_bmt
+
+local worst = SL.Global.ActiveModifiers.WorstTimingWindow
 
 --  labels: W1 ---> Miss
-for index, label in ipairs(TNSNames) do
+for i=1, #TapNoteScores.Types do
+	-- no need to add BitmapText actors for TimingWindows that were turned off
+	if i <= worst or i==#TapNoteScores.Types then
+
+		local window = TapNoteScores.Types[i]
+		local label = TapNoteScores.Names[i]
+
+		t[#t+1] = LoadFont("_miso")..{
+			Text=label:upper(),
+			InitCommand=function(self)
+				self:zoom(0.8):horizalign(right)
+					:x( (player == PLAYER_1 and -130) or -28 )
+					:y( i * row_height )
+					:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
+
+				if i == #TapNoteScores.Types then miss_bmt = self end
+			end
+		}
+	end
+end
+
+if track_missbcheld then
 	t[#t+1] = LoadFont("_miso")..{
-		Text=label:upper(),
-		InitCommand=cmd(zoom,0.775; horizalign,right ),
-		BeginCommand=function(self)
-			self:x( (player == PLAYER_1 and -130) or -28 )
-			self:y((index-1)*24 + 8)
-
-			-- if StomperZ, color the JudgmentLabel
-			if mode == "StomperZ" then
-				self:diffuse( SL.JudgmentColors.StomperZ[index] )
-
-			-- if ECFA, color the JudgmentLabel
-			elseif mode == "ECFA" then
-				self:diffuse( SL.JudgmentColors.ECFA[index] )
-			end
-
-
-			-- Check for Decents/Way Offs
-			local gmods = SL.Global.ActiveModifiers
-
-			-- if Way Offs were turned off
-			if gmods.DecentsWayOffs == "Decents Only" and label == THEME:GetString("TapNoteScore", "W5") then
-				self:visible(false)
-
-			-- if both Decents and WayOffs were turned off
-			elseif gmods.DecentsWayOffs == "Off" and (label == THEME:GetString("TapNoteScore", "W4") or label == THEME:GetString("TapNoteScore", "W5")) then
-				self:visible(false)
-			end
-
-
+		Text=ScreenString("Held"),
+		InitCommand=function(self)
+			self:y(140):zoom(0.6):halign(1)
+				:diffuse( SL.JudgmentColors[SL.Global.GameMode][6] )
+		end,
+		OnCommand=function(self)
+			self:x( miss_bmt:GetX() - miss_bmt:GetWidth()/1.15 )
 		end
 	}
 end
-
 
 return t

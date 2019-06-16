@@ -14,9 +14,9 @@ local title_zoom		= (IsVerticalScreen() and 0.4 or 0.7)
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:y( image == "Hearts" and _screen.cy or _screen.cy+10 )		
+		self:y( image == "Hearts" and _screen.cy or _screen.cy+10 )
 	end,
-		
+
 	LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
 		InitCommand=function(self)
 			self:xy(_screen.cx+logos_x, logos_y):zoom( game=="pump" and logos_zoom_itg or logos_zoom_pump ):cropright(1)
@@ -26,7 +26,7 @@ local t = Def.ActorFrame{
 		end
 	},
 
-	LoadActor(THEME:GetPathB("ScreenTitleMenu","underlay/Simply".. image .." (doubleres).png"))..{
+	LoadActor(THEME:GetPathG("", "_VisualStyles/".. image .."/TitleMenu (doubleres).png"))..{
 		InitCommand=function(self)
 			self:x(_screen.cx+2):diffusealpha(0):zoom(title_zoom)
 				:shadowlength(1)

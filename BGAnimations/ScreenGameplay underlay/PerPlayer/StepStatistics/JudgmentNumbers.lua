@@ -24,10 +24,13 @@ for index, window in ipairs(TapNoteScores) do
 		Text="0000",
 		InitCommand=function(self)
 			self:zoom(0.5):horizalign(right)
-				:diffuse( SL.JudgmentColors[SL.Global.GameMode][index] )
-
-			leadingZeroAttr = { Length=3, Diffuse=Brightness(SL.JudgmentColors[SL.Global.GameMode][index], 0.5) }
-			self:AddAttribute(0, leadingZeroAttr )
+			if index <= SL.Global.ActiveModifiers.WorstTimingWindow or index==#TapNoteScores then
+				self:diffuse( SL.JudgmentColors[SL.Global.GameMode][index] )
+				leadingZeroAttr = { Length=3, Diffuse=Brightness(self:GetDiffuse(), 0.35) }
+				self:AddAttribute(0, leadingZeroAttr )
+			else
+				self:diffuse(Brightness({1,1,1,1},0.25))
+			end
 		end,
 		BeginCommand=function(self)
 			self:x( 180 )
@@ -53,8 +56,7 @@ end
 for index, RCType in ipairs(RadarCategories) do
 
 	-- player performance value
-	t[#t+1] = Def.BitmapText{
-		Font="_ScreenEvaluation numbers",
+	t[#t+1] = LoadFont("_ScreenEvaluation numbers")..{
 		Text="000",
 		InitCommand=cmd(zoom,0.5; horizalign, right),
 		BeginCommand=function(self)
@@ -99,8 +101,7 @@ for index, RCType in ipairs(RadarCategories) do
 	}
 
 	-- possible value
-	t[#t+1] = Def.BitmapText{
-		Font="_ScreenEvaluation numbers",
+	t[#t+1] = LoadFont("_ScreenEvaluation numbers")..{
 		InitCommand=cmd(zoom,0.5; horizalign, right),
 		BeginCommand=function(self)
 

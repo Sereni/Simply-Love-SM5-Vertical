@@ -17,8 +17,8 @@ local SL_CustomPrefs =
 	HideStockNoteSkins =
 	{
 		Default = false,
-		Choices = { THEME:GetString("ThemePrefs", "Hide"), THEME:GetString("ThemePrefs", "Show") },
-		Values 	= { true, false }
+		Choices = { THEME:GetString("ThemePrefs", "Show"), THEME:GetString("ThemePrefs", "Hide") },
+		Values 	= { false, true }
 	},
 	MusicWheelStyle =
 	{
@@ -77,8 +77,10 @@ local SL_CustomPrefs =
 			THEME:GetString("ThemePrefs", "Ducks"),
 			THEME:GetString("ThemePrefs", "Spooky"),
 			THEME:GetString("ThemePrefs", "Gay"),
+			THEME:GetString("ThemePrefs", "Stars"),
+			"🤔" -- emojis are our lingua franca for the 21st century
 		},
-		Values  = { "Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay" },
+		Values  = { "Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay", "Stars", "Thonk" },
 	},
 	RainbowMode = {
 		Default = false,
@@ -193,6 +195,12 @@ local SL_CustomPrefs =
 		Default = 0,
 		Choices = { THEME:GetString("ThemePrefs","Off"), THEME:GetString("ThemePrefs","On"), THEME:GetString("ThemePrefs","OnWithSound"),  },
 		Values  = { 0, 1, 2 }
+	},
+	-- - - - - - - - - - - - - - - - - - - -
+	--- ???
+	RabbitHole = {
+		Default = 0,
+		Choices = range(0, 20, 1),
 	},
 }
 

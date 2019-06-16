@@ -23,8 +23,9 @@ local Offset, CurrentSecond, TimingWindow, x, y, c, r, g, b
 -- ---------------------------------------------
 -- if players have disabled W4 or W4+W5, there will be a smaller pool
 -- of judgments that could have possibly been earned
-local num_judgments_available = (SL.Global.ActiveModifiers.DecentsWayOffs=="Decents Only" and 4) or (SL.Global.ActiveModifiers.DecentsWayOffs=="Off" and 3) or 5
-local worst_window = SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..num_judgments_available]
+local num_judgments_available = SL.Global.ActiveModifiers.WorstTimingWindow
+local worst_window = SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..(num_judgments_available > 0 and num_judgments_available or 5)]
+
 -- ---------------------------------------------
 
 for t in ivalues(sequential_offsets) do
@@ -53,10 +54,11 @@ for t in ivalues(sequential_offsets) do
 		b = c[3]
 
 		-- insert four datapoints into the verts tables, effectively generating a single quadrilateral
-		table.insert( verts, {{x, y, 0}, {r,g,b,0.666} } )
-		table.insert( verts, {{x+1.5, y, 0}, {r,g,b,0.666} } )
-		table.insert( verts, {{x+1.5, y+1.5, 0}, {r,g,b,0.666} } )
-		table.insert( verts, {{x, y+1.5, 0}, {r,g,b,0.666} } )
+		-- top left,  top right,  bottom right,  bottom left
+		table.insert( verts, {{x,y,0}, {r,g,b,0.666}} )
+		table.insert( verts, {{x+1.5,y,0}, {r,g,b,0.666}} )
+		table.insert( verts, {{x+1.5,y+1.5,0}, {r,g,b,0.666}} )
+		table.insert( verts, {{x,y+1.5,0}, {r,g,b,0.666}} )
 	else
 		-- else, a miss should be a quadrilateral that is the height of the entire graph and red
 		table.insert( verts, {{x, 0, 0}, color("#ff000077")} )
@@ -72,7 +74,7 @@ end
 local amv = Def.ActorMultiVertex{
 	OnCommand=function(self)
 		self:x(-GraphWidth/2)
-			:y(_screen.cy + 151 - GraphHeight/2 - 1)
+			:y(_screen.cy + 151 - GraphHeight/2)
 			:SetDrawState{Mode="DrawMode_Quads"}
 			:SetVertices(verts)
 	end,

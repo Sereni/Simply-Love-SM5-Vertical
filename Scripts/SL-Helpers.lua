@@ -16,9 +16,62 @@ function Border(width, height, bw)
 	}
 end
 
+------------------------------------------------------------------------------
+-- Is this even how this works?  I need to research this more.
+local OnlyASCII = function(text)
+	return text:len() == text:utf8len()
+end
+
+BitmapText.Truncate = function(bmt, m)
+	local text = bmt:GetText()
+	local l = text:len()
+
+	-- With SL's Miso and JP fonts, ASCII characters (Miso) tend to render 2-3x less wide
+	-- than JP characters. If the text includes JP characters, it is (probably) desired to
+	-- truncate the string earlier to achieve the same effect.
+	-- Here, we are arbitrarily "weighting" JP characters to count 4x as much as one ASCII
+	-- character and then scaling the point at which we truncate accordingly.
+	-- This is, of course, a VERY broad over-generalization, but It Works For Now™.
+	if not OnlyASCII(text) then
+		l = 0
+
+		-- a range of bytes I'm considering to indicate JP characters,
+		-- mostly derived from empirical observation and guesswork
+		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso in SL, so don't include those
+		-- If you know more about how this actually works, please submit a pull request.
+		local lower = 200
+		local upper = 240
+
+		for i=1, text:utf8len() do
+			local b = text:utf8sub(i,i):byte()
+			l = l + ((b < upper and b > lower) and 4 or 1)
+		end
+		m = math.floor(m * (m/l))
+	end
+
+	-- if the length of the string is less than the specified truncate point, don't do anything
+	if l <= m then return end
+	-- otherwise, replace everything after the truncate point with an ellipsis
+	bmt:settext( text:utf8sub(1, m) .. "…" )
+end
+
 
 ------------------------------------------------------------------------------
 -- Misc Lua functions that didn't fit anywhere else...
+
+-- return true or nil
+CurrentGameIsSupported = function()
+	-- a hardcoded list of games that Simply Love supports
+	local support = {
+		dance	= true,
+		pump = true,
+		techno = true,
+		para = true,
+		kb7 = true
+	}
+	return support[GAMESTATE:GetCurrentGame():GetName()]
+end
+
 
 -- helper function used to detmerine which timing_window a given offset belongs to
 function DetermineTimingWindow(offset)
@@ -57,11 +110,12 @@ end
 
 function GetNotefieldX( player )
 	local p = ToEnumShortString(player)
+	local game = GAMESTATE:GetCurrentGame():GetName()
 
 	local IsPlayingDanceSolo = (GAMESTATE:GetCurrentStyle():GetStepsType() == "StepsType_Dance_Solo")
-	local IsUsingSoloSingles = PREFSMAN:GetPreference('Center1Player') or IsPlayingDanceSolo
 	local NumPlayersEnabled = GAMESTATE:GetNumPlayersEnabled()
 	local NumSidesJoined = GAMESTATE:GetNumSidesJoined()
+	local IsUsingSoloSingles = PREFSMAN:GetPreference('Center1Player') or IsPlayingDanceSolo or (NumSidesJoined==1 and (game=="techno" or game=="kb7"))
 
 	if IsUsingSoloSingles and NumPlayersEnabled == 1 and NumSidesJoined == 1 then return _screen.cx end
 	if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then return _screen.cx end
@@ -70,30 +124,60 @@ function GetNotefieldX( player )
 	return THEME:GetMetric("ScreenGameplay","Player".. p .. NumPlayersAndSides .."X")
 end
 
-function GetNotefieldWidth()
+-- -----------------------------------------------------------------------
 
-	-- double
-	if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_OnePlayerTwoSides" then
-		return _screen.w*1.058/GetScreenAspectRatio()
+-- this is verbose, but it lets us manage what seem to be
+-- quirks/oversights in the engine on a per-game + per-style basis
 
-	-- dance solo
-	elseif GAMESTATE:GetCurrentStyle():GetStepsType() == "StepsType_Dance_Solo" then
-		return _screen.w*0.8/GetScreenAspectRatio()
+local NoteFieldWidth = {
+	-- dance Just Works™.  Wow!  It's almost like this game gets the most attention and fixes.
+	dance = {
+		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		double = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		solo = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+	},
+	-- the values returned by the engine for Pump are slightly too small(?), so... uh... pad it
+	pump = {
+		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		double = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+	},
+	-- techno works for single8, needs to be smaller for versus8 and double8
+	techno = {
+		single8 = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		versus8 = function(p) return (GAMESTATE:GetCurrentStyle():GetWidth(p)/1.65) end,
+		double8 = function(p) return (GAMESTATE:GetCurrentStyle():GetWidth(p)/1.65) end,
+	},
+	-- the values returned for para are also slightly too small, so... pad those, too
+	para = {
+		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+	},
+	-- kb7 works for single, needs to be smaller for versus
+	-- there is no kb7 double (would that be kb14?)
+	kb7 = {
+		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p)/1.65 end,
+	},
+}
 
-	-- single
-	else
-		return _screen.w*0.529/GetScreenAspectRatio()
-	end
+function GetNotefieldWidth(player)
+	if not player then return false end
+
+	local game = GAMESTATE:GetCurrentGame():GetName()
+	local style = GAMESTATE:GetCurrentStyle():GetName()
+	return NoteFieldWidth[game][style](player)
 end
 
-------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------
 -- Define what is necessary to maintain and/or increment your combo, per Gametype.
 -- For example, in dance Gametype, TapNoteScore_W3 (window #3) is commonly "Great"
 -- so in dance, a "Great" will not only maintain a player's combo, it will also increment it.
 --
 -- We reference this function in Metrics.ini under the [Gameplay] section.
 function GetComboThreshold( MaintainOrContinue )
-	local CurrentGame = string.lower( GAMESTATE:GetCurrentGame():GetName() )
+	local CurrentGame = GAMESTATE:GetCurrentGame():GetName()
 
 	local ComboThresholdTable = {
 		dance	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
@@ -105,11 +189,16 @@ function GetComboThreshold( MaintainOrContinue )
 
 		-- I don't know what these values are supposed to actually be...
 		popn	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-		beat	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+		beat	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
+		kickbox	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
+
+		-- lights is not a playable game mode, but it is, oddly, a selectable one within the operator menu
+		-- include dummy values here to prevent Lua errors in case players accidentally switch to lights
+		lights =	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
 	}
 
 
-	if CurrentGame == "dance" then
+	if CurrentGame ~= "para" then
 		if SL.Global.GameMode == "StomperZ" or SL.Global.GameMode=="ECFA" then
 			ComboThresholdTable.dance.Maintain = "TapNoteScore_W4"
 			ComboThresholdTable.dance.Continue = "TapNoteScore_W4"
@@ -119,8 +208,10 @@ function GetComboThreshold( MaintainOrContinue )
 	return ComboThresholdTable[CurrentGame][MaintainOrContinue]
 end
 
+-- -----------------------------------------------------------------------
 
 function SetGameModePreferences()
+	-- apply the preferences associated with this GameMode
 	for key,val in pairs(SL.Preferences[SL.Global.GameMode]) do
 		PREFSMAN:SetPreference(key, val)
 	end
@@ -129,18 +220,25 @@ function SetGameModePreferences()
 	-- we want to reduce the number of judgments,
 	-- so turn Decents and WayOffs off now.
 	if SL.Global.GameMode == "Casual" then
-		SL.Global.ActiveModifiers.DecentsWayOffs = "Off"
+		SL.Global.ActiveModifiers.WorstTimingWindow = 3
 
-	-- Otherwise, we want Decents and WayOffs enabled by default.
+	-- Otherwise, we want all TimingWindows enabled by default.
 	else
- 		SL.Global.ActiveModifiers.DecentsWayOffs = "On"
+ 		SL.Global.ActiveModifiers.WorstTimingWindow = 5
 	end
 
-	-- Now that we've set the SL table for DecentsWayOffs appropriately,
-	-- use it to apply DecentsWayOffs as a mod.
+	-- loop through human players and apply whatever mods need to be set now
 	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-		local OptRow = CustomOptionRow( "DecentsWayOffs" )
+		-- Now that we've set the SL table for WorstTimingWindow appropriately,
+		-- use it to apply WorstTimingWindow as a mod.
+		local OptRow = CustomOptionRow( "WorstTimingWindow" )
 		OptRow:LoadSelections( OptRow.Choices, player )
+
+		-- using PREFSMAN to set the preference for MinTNSToHideNotes apparently isn't
+		-- enough when switching gamemodes because MinTNSToHideNotes is also a PlayerOption.
+		-- so, set the PlayerOption version of it now, too, to ensure that arrows disappear
+		-- at the appropriate judgments during gameplay for this gamemode.
+		GAMESTATE:GetPlayerState(player):GetPlayerOptions("ModsLevel_Preferred"):MinTNSToHideNotes(SL.Preferences[SL.Global.GameMode].MinTNSToHideNotes)
 	end
 
 	local prefix = {
@@ -155,8 +253,25 @@ function SetGameModePreferences()
 	end
 end
 
+-- -----------------------------------------------------------------------
+-- the available OptionRows for an options screen can change depending on certain conditions
+-- these functions start with all possible OptionRows and remove rows as needed
+-- whatever string is finally returned is passed off to the pertinent LineNames= in Metrics.ini
+
 function GetOperatorMenuLineNames()
-	local lines = "System,KeyConfig,TestInput,Visual,GraphicsSound,Arcade,Input,Theme,MenuTimer,CustomSongs,Advanced,Profiles,Acknowledgments,Reload"
+	local lines = "System,KeyConfig,TestInput,Visual,GraphicsSound,Arcade,Input,Theme,MenuTimer,CustomSongs,Advanced,Profiles,Acknowledgments,ClearCredits,Reload"
+
+	-- the TestInput screen only supports dance, pump, and techno; remove it when in other games
+	local CurrentGame = GAMESTATE:GetCurrentGame():GetName()
+	if not (CurrentGame=="dance" or CurrentGame=="pump" or CurrentGame=="techno") then
+		lines = lines:gsub("TestInput,", "")
+	end
+
+	-- hide the OptionRow for ClearCredits if we're not in CoinMode_Pay; it doesn't make sense to show for at-home players
+	-- note that (EventMode + CoinMode_Pay) will actually place you in CoinMode_Home
+	if GAMESTATE:GetCoinMode() ~= "CoinMode_Pay" then
+		lines = lines:gsub("ClearCredits,", "")
+	end
 
 	-- CustomSongs preferences don't exist in 5.0.x, which many players may still be using
 	-- thus, if the preference for CustomSongsEnable isn't found in this version of SM, don't let players
@@ -177,41 +292,46 @@ function GetSimplyLoveOptionsLineNames()
 end
 
 
-function GetPlayerOptionsLineNames()
-	if SL.Global.GameMode == "Casual" then
-		return "SpeedMod,BackgroundFilter,MusicRate,Difficulty,ScreenAfterPlayerOptions"
-	else
-		return "SpeedModType,SpeedMod,Mini,Perspective,NoteSkin2,Judgment,BackgroundFilter,MusicRate,Difficulty,ScreenAfterPlayerOptions"
-	end
-end
-
 function GetPlayerOptions2LineNames()
-	local mods = "Turn,Scroll,7,8,9,10,11,12,13,Attacks,Hide,ReceptorArrowsPosition,LifeMeterType,TargetStatus,TargetBar,ActionOnMissedTarget,GameplayExtras,MeasureCounterPosition,MeasureCounter,DecentsWayOffs,Vocalization,ScreenAfterPlayerOptions2"
+	local mods = "Turn,Scroll,7,8,9,10,11,12,13,Attacks,Hide,ReceptorArrowsPosition,LifeMeterType,DataVisualizations,TargetScore,ActionOnMissedTarget,GameplayExtras,MeasureCounter,MeasureCounterOptions,WorstTimingWindow,Vocalization,Characters,ScreenAfterPlayerOptions2"
 
 	-- remove ReceptorArrowsPosition if GameMode isn't StomperZ
 	if SL.Global.GameMode ~= "StomperZ" then
 		mods = mods:gsub("ReceptorArrowsPosition", "")
 	end
 
-	-- remove DecentsWayOffs and LifeMeterType if GameMode is StomperZ
+	-- remove WorstTimingWindow and LifeMeterType if GameMode is StomperZ
 	if SL.Global.GameMode == "StomperZ" then
-		mods = mods:gsub("DecentsWayOffs,", ""):gsub("LifeMeterType", "")
+		mods = mods:gsub("WorstTimingWindow,", ""):gsub("LifeMeterType", "")
 	end
 
-	-- remove TargetStatus and TargetBar (IIDX pacemaker) if style is double
-	if SL.Global.Gamestate.Style == "double" then
-		mods = mods:gsub("TargetStatus,TargetBar,ActionOnMissedTarget,", "")
+	local game = GAMESTATE:GetCurrentGame():GetName()
+
+	-- remove Vocalization if no voice packs were found in the filesystem
+	if #FILEMAN:GetDirListing(GetVocalizeDir() , true, false) < 1 then
+		mods = mods:gsub("Vocalization," ,"")
 	end
 
-	-- only show if the user is in event mode
-	-- no need to have this show up in arcades.
-	-- the pref is also checked against EventMode during runtime.
+	-- remove Characters if no dancing character directories were found
+	if #CHARMAN:GetAllCharacters() < 1 then
+		mods = mods:gsub("Characters,", "")
+	end
+
+	-- ActionOnMissedTarget can automatically fail or restart Gameplay when a target score
+	-- becomes impossible to achieve; it really only makes sense in EventMode (i.e., not public arcades)
+	-- a second check is performed in ./ScreenGameplay underlay/PerPlayer/TargetScore/default.lua
+	-- to ensure it isn't accidentally brought into non-EventMode via player profile
 	if not PREFSMAN:GetPreference("EventMode") then
 		mods = mods:gsub("ActionOnMissedTarget,", "")
 	end
 
 	return mods
 end
+
+-- -----------------------------------------------------------------------
+-- given a player, return a table of stepartist text for the current song or course
+-- so that various screens (SSM, Eval) can cycle through these values and players
+-- can see each for brief duration
 
 GetStepsCredit = function(player)
 	local t = {}
@@ -235,11 +355,29 @@ GetStepsCredit = function(player)
 	return t
 end
 
+-- -----------------------------------------------------------------------
 BrighterOptionRows = function()
 	if ThemePrefs.Get("RainbowMode") then return true end
 	if PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11 then return true end -- holiday cheer
 	return false
 end
+
+-- -----------------------------------------------------------------------
+-- account for the possibility that emojis shouldn't be diffused to Color.Black
+
+DiffuseEmojis = function(bmt, text)
+	-- loop through each char in the string, checking for emojis; if any are found
+	-- don't diffuse that char to be any specific color by selectively diffusing it to be {1,1,1,1}
+	for i=1, text:utf8len() do
+		if text:utf8sub(i,i):byte() >= 240 then
+			bmt:AddAttribute(i-1, { Length=1, Diffuse={1,1,1,1} } )
+		end
+	end
+end
+
+-- -----------------------------------------------------------------------
+-- read the theme version from ThemeInfo.ini to display on ScreenTitleMenu underlay
+-- this allows players to more easily identify what version of the theme they are currently using
 
 GetThemeVersion = function()
 	local file = IniFile.ReadFile( THEME:GetCurrentThemeDirectory() .. "ThemeInfo.ini" )
@@ -251,6 +389,9 @@ GetThemeVersion = function()
 	return false
 end
 
+-- -----------------------------------------------------------------------
+-- functions that attempt to handle the mess that is custom judgment graphic detection/loading
+
 local function FilenameIsMultiFrameSprite(filename)
 	-- look for the "[frames wide] x [frames tall]"
 	-- and some sort of all-letters file extension
@@ -258,20 +399,9 @@ local function FilenameIsMultiFrameSprite(filename)
 	return string.match(filename, " %d+x%d+") and string.match(filename, "%.[A-Za-z]+")
 end
 
-local function StripSpriteHints(filename)
+function StripSpriteHints(filename)
 	-- handle common cases here, gory details in /src/RageBitmapTexture.cpp
 	return filename:gsub(" %d+x%d+", ""):gsub(" %(doubleres%)", ""):gsub(".png", "")
-end
-
-function CleanString(filename)
-	-- do a couple text conversions to allow spaces and periods in display strings
-	-- without causing so much grief with SM loading
-	-- Suppose two images named "A" and "A B" are in the same folder
-	-- Attempting to load "A" will throw a nonsensical but harmless error
-	local name = filename:gsub("_", " ")
-	name = name:gsub("`", ".")
-
-	return name
 end
 
 function GetJudgmentGraphics(mode)
@@ -291,14 +421,14 @@ function GetJudgmentGraphics(mode)
 
 			-- Fill the table, special-casing Love so that it comes first.
 			if name == "Love" then
-				table.insert(judgment_graphics, 1, name)
+				table.insert(judgment_graphics, 1, filename)
 			else
-				judgment_graphics[#judgment_graphics+1] = name
+				judgment_graphics[#judgment_graphics+1] = filename
 			end
 		end
 	end
 
-	-- "None" -> no graphic in Player judgment lua
+	-- "None" -> no graphic in Player judgment.lua
 	judgment_graphics[#judgment_graphics+1] = "None"
 
 	return judgment_graphics

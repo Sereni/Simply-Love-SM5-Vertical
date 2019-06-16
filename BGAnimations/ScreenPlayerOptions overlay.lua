@@ -110,7 +110,6 @@ local t = Def.ActorFrame{
 }
 
 local game_name = GAMESTATE:GetCurrentGame():GetName()
--- This doesn't handle every game type that SM5 supports, but could, if I knew more about NoteSkins...
 local column = {
 	dance = "Up",
 	pump = "UpRight",
@@ -142,6 +141,19 @@ end
 for noteskin in ivalues( CustomOptionRow("NoteSkin").Choices ) do
 	t[#t+1] = GetNoteSkinActor(noteskin)
 end
+
+
+for judgment_filename in ivalues( GetJudgmentGraphics(SL.Global.GameMode) ) do
+	if judgment_filename ~= "None" then
+		t[#t+1] = LoadActor( THEME:GetPathG("", "_judgments/" .. SL.Global.GameMode .. "/" .. judgment_filename) )..{
+			Name="JudgmentGraphic_"..StripSpriteHints(judgment_filename),
+			InitCommand=function(self) self:visible(false):animate(false) end
+		}
+	else
+		t[#t+1] = Def.Actor{ Name="JudgmentGraphic_None", InitCommand=function(self) self:visible(false) end }
+	end
+end
+
 
 
 t[#t+1] = LoadActor(THEME:GetPathB("ScreenPlayerOptions", "common"))
@@ -238,15 +250,10 @@ for player in ivalues(Players) do
 		Name=pn.."SpeedModHelper",
 		Text="",
 		InitCommand=function(self)
-			self:diffuse(PlayerColor(player))
-			self:zoom(0.5)
-			if player == PLAYER_1 then
-				self:x(-100)
-			elseif player == PLAYER_2 then
-				self:x(150)
-			end
-			self:y(48)
-			self:diffusealpha(0)
+			self:diffuse(PlayerColor(player)):diffusealpha(0)
+			self:zoom(0.5):y(48)
+			self:x(player==PLAYER_1 and -100 or 150)
+			self:shadowlength(0.55)
 		end,
 		OnCommand=cmd(linear,0.4;diffusealpha,1)
 	}

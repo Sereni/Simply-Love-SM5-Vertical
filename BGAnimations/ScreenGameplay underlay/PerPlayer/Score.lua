@@ -1,15 +1,30 @@
 local player = ...
+local pn = ToEnumShortString(player)
+local mods = SL[pn].ActiveModifiers
+local center1p = PREFSMAN:GetPreference("Center1Player")
 
-if SL[ ToEnumShortString(player) ].ActiveModifiers.HideScore then return end
+if mods.HideScore then return end
+
+if #GAMESTATE:GetHumanPlayers() > 1
+and mods.NPSGraphAtTop
+and SL.Global.GameMode ~= "StomperZ"
+then return end
+
+if #GAMESTATE:GetHumanPlayers() == 1
+and SL.Global.GameMode ~= "StomperZ"
+and mods.NPSGraphAtTop
+and mods.DataVisualizations ~= "Step Statistics"
+and not center1p
+then return end
 
 local dance_points, percent
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
-return Def.BitmapText{
-	Font="_wendy monospace numbers",
+return LoadFont("_wendy monospace numbers")..{
 	Text="0.00",
 
-	Name=ToEnumShortString(player).."Score",
+	Name=pn.."Score",
+	-- TODO: support density graph on top.
 	InitCommand=function(self)
 		self:valign(1):halign(1)
                 self:zoom(Positions.ScreenGameplay.ScoreZoom())

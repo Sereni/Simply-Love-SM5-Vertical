@@ -1,4 +1,4 @@
-local function GetSimfileString(path)
+function GetSimfileString(path)
 
 	local filename, filetype
 	local files = FILEMAN:GetDirListing(path)
@@ -123,23 +123,7 @@ local function getStreamMeasures(measuresString, notesPerMeasure)
 		if(line:match("^[,;]%s*")) then
 			-- Does this measure contain a stream of notes based on our notesPerMeasure global?
 			if(#measureNotes >= notesPerMeasure) then
-				local isStream = true
-
-				-- What can the gap be between notes?
-				local noteGapThreshold = measureTiming / notesPerMeasure
-
-				-- Loop through our notes and see if they're placed correctly to be considered a stream (every 8th, every 16th, etc.)
-				for i=1,(#measureNotes - 1),1 do
-					-- Is the gap between this note and the next note greater than what's allowed?
-					if((measureNotes[i+1] - measureNotes[i]) > noteGapThreshold) then
-						isStream = false
-					end
-				end
-
-				-- This measure is a stream
-				if(isStream == true) then
-					table.insert(streamMeasures, measureCount)
-				end
+				table.insert(streamMeasures, measureCount)
 			end
 
 			-- Reset iterative variables
@@ -157,28 +141,51 @@ local function getStreamMeasures(measuresString, notesPerMeasure)
 		end
 	end
 
-	return streamMeasures
+	return streamMeasures, measureCount
 end
 
--- Get the start/end of each stream sequence in our table of measures
-local function getStreamSequences(streamMeasures, measureSequenceThreshold)
+-- Get the start/end of each stream and break sequence in our table of measures
+local function getStreamSequences(streamMeasures, measureSequenceThreshold, totalMeasures)
 	local streamSequences = {}
 
 	local counter = 1
 	local streamEnd = nil
+
+	-- First add an initial break if it's larger than measureSequenceThreshold
+	if(#streamMeasures > 0) then
+		local breakStart = 0
+		local k, v = next(streamMeasures) -- first element of a table
+		local breakEnd = streamMeasures[k] - 1
+		if (breakEnd - breakStart >= measureSequenceThreshold) then
+			table.insert(streamSequences,
+				{streamStart=breakStart, streamEnd=breakEnd, isBreak=true})
+		end
+	end
+
 	-- Which sequences of measures are considered a stream?
 	for k,v in pairs(streamMeasures) do
-		-- Are we still in sequence?
-		if(streamMeasures[k-1] == (streamMeasures[k] - 1)) then
-			counter = counter + 1
-			streamEnd = streamMeasures[k]
-		end
+		local curVal = streamMeasures[k]
+		local nextVal = streamMeasures[k+1] and streamMeasures[k+1] or -1
 
-		-- Are we out of sequence OR at the end of the array?
-		if(streamMeasures[k+1] == nil or streamMeasures[k-1] ~= (streamMeasures[k] - 1)) then
+		-- Are we still in sequence?
+		if(curVal + 1 == nextVal) then
+			counter = counter + 1
+			streamEnd = curVal + 1
+		else
+			-- Found the first section that counts as a stream
 			if(counter >= measureSequenceThreshold) then
-				streamStart = (streamEnd - counter)
-				table.insert(streamSequences, {streamStart=streamStart,streamEnd=streamEnd})
+				local streamStart = (streamEnd - counter)
+				-- Add the current stream.
+				table.insert(streamSequences,
+					{streamStart=streamStart, streamEnd=streamEnd, isBreak=false})
+			end
+
+			-- Add any trailing breaks if they're larger than measureSequenceThreshold
+			local breakStart = curVal
+			local breakEnd = (nextVal ~= -1) and nextVal - 1 or totalMeasures
+			if (breakEnd - breakStart >= measureSequenceThreshold) then
+				table.insert(streamSequences,
+					{streamStart=breakStart, streamEnd=breakEnd, isBreak=true})
 			end
 			counter = 1
 		end
@@ -188,10 +195,10 @@ local function getStreamSequences(streamMeasures, measureSequenceThreshold)
 end
 
 
--- GetNPSperMeasure() accepts three arguments:
+-- GetNPSperMeasure() accepts two arguments:
 -- 		Song, a song object provided by something like GAMESTATE:GetCurrentSong()
--- 		StepsType, a string like "dance-single" or "pump-double"
--- 		Difficulty, a string like "Beginner" or "Challenge"
+-- 		Steps, a steps object provided by something like GAMESTATE:GetCurrentSteps(player)
+--
 -- GetNPSperMeasure() returns two values
 --		PeakNPS, a number representing the peak notes-per-second for the given stepchart
 --			This is an imperfect measurement, as we sample the note density per-second-per-measure, not per-second.
@@ -201,10 +208,17 @@ end
 --			So if you're looping through the Density table, subtract 1 from the current index to get the
 --			actual measure number.
 
-function GetNPSperMeasure(Song, StepsType, Difficulty)
+function GetNPSperMeasure(Song, Steps)
+	if Song==nil or Steps==nil then return end
+
 	local SongDir = Song:GetSongDir()
 	local SimfileString, Filetype = GetSimfileString( SongDir )
 	if not SimfileString then return end
+
+	-- StepsType, a string like "dance-single" or "pump-double"
+	local StepsType = ToEnumShortString( Steps:GetStepsType() ):gsub("_", "-"):lower()
+	-- Difficulty, a string like "Beginner" or "Challenge"
+	local Difficulty = ToEnumShortString( Steps:GetDifficulty() )
 
 	-- Discard header info; parse out only the notes
 	local ChartString = GetSimfileChartString(SimfileString, StepsType, Difficulty, Filetype)
@@ -224,7 +238,7 @@ function GetNPSperMeasure(Song, StepsType, Difficulty)
 	local NotesInThisMeasure = 0
 
 	local NPSforThisMeasure, PeakNPS, BPM = 0, 0, 0
-	local TimingData = Song:GetTimingData()
+	local TimingData = Steps:GetTimingData()
 
 	-- Loop through each line in our string of measures
 	for line in ChartString:gmatch("[^\r\n]+") do
@@ -233,6 +247,18 @@ function GetNPSperMeasure(Song, StepsType, Difficulty)
 		if(line:match("^[,;]%s*")) then
 
 			DurationOfMeasureInSeconds = TimingData:GetElapsedTimeFromBeat((measureCount+1)*4) - TimingData:GetElapsedTimeFromBeat(measureCount*4)
+
+			-- FIXME: We subtract the time at the current measure from the time at the next measure to determine
+			-- the duration of this measure in seconds, and use that to calculate notes per second.
+			--
+			-- Measures *normally* occur over some positive quantity of seconds.  Measures that use warps,
+			-- negative BPMs, and negative stops are normally reported by the SM5 engine as having a duration
+			-- of 0 seconds, and when that happens, we safely assume that there were 0 notes in that measure.
+			--
+			-- This doesn't always hold true.  Measures 48 and 49 of "Mudkyp Korea/Can't Nobody" use a properly
+			-- timed negative stop, but the engine reports them as having very small but positive durations
+			-- which erroneously inflates the notes per second calculation.
+
 			if (DurationOfMeasureInSeconds == 0) then
 				NPSforThisMeasure = 0
 			else
@@ -240,7 +266,7 @@ function GetNPSperMeasure(Song, StepsType, Difficulty)
 			end
 
 			-- measureCount in SM truly starts at 0, but indexed Lua tables start at 1
-			-- add 1 now to the table behaves and subtract 1 later when drawing the histogram
+			-- add 1 now so the table behaves and subtract 1 later when drawing the histogram
 			Density[measureCount+1] = NPSforThisMeasure
 
 			-- determine whether this measure contained the PeakNPS
@@ -272,8 +298,8 @@ function GetStreams(SongDir, StepsType, Difficulty, NotesPerMeasure, MeasureSequ
 	if not ChartString then return end
 
 	-- Which measures have enough notes to be considered as part of a stream?
-	local StreamMeasures = getStreamMeasures(ChartString, NotesPerMeasure)
+	local StreamMeasures, totalMeasures = getStreamMeasures(ChartString, NotesPerMeasure)
 
 	-- Which sequences of measures are considered a stream?
-	return (getStreamSequences(StreamMeasures, MeasureSequenceThreshold))
+	return (getStreamSequences(StreamMeasures, MeasureSequenceThreshold, totalMeasures))
 end

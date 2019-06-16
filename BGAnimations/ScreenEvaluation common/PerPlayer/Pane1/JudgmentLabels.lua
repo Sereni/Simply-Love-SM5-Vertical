@@ -6,34 +6,21 @@ local mode = ""
 if SL.Global.GameMode == "StomperZ" then mode = "StomperZ" end
 if SL.Global.GameMode == "ECFA" then mode = "ECFA" end
 
-function firstToUpper(str)
+local firstToUpper = function(str)
     return (str:gsub("^%l", string.upper))
 end
 
-function getStringFromTheme( arg )
+local getStringFromTheme = function( arg )
 	return THEME:GetString("TapNoteScore" .. mode, arg);
 end
 
 --Values above 0 means the user wants to be shown or told they are nice.
-local nice = ThemePrefs.Get("nice") > 0
-
--- i'm learning haskell okay? map is nice
-function map(func, array)
-  local new_array = {}
-  for i,v in ipairs(array) do
-    new_array[i] = func(v)
-  end
-  return new_array
-end
+local nice = ThemePrefs.Get("nice") > 0 and SL.Global.GameMode ~= "Casual"
 
 -- Iterating through the enum isn't worthwhile because the sequencing is so bizarre...
-local TapNoteScores = {
-	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
-	-- dunno if it's possible to access another subtable from a subtable
-	-- i want TapNoteScores.Types in place of the {'W1',...} table below
-	-- but i couldn't figure it out so i just lazily pasted it back in.
-	Names = map (getStringFromTheme, { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' } )
-}
+local TapNoteScores = {}
+TapNoteScores.Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' }
+TapNoteScores.Names = map(getStringFromTheme, TapNoteScores.Types)
 
 local RadarCategories = {
 	THEME:GetString("ScreenEvaluation", 'Holds'),
@@ -61,39 +48,29 @@ local t = Def.ActorFrame{
 	end
 }
 
+local worst = SL.Global.ActiveModifiers.WorstTimingWindow
 
---  labels: W1 ---> Miss
-for index, window in ipairs(TapNoteScores.Types) do
+-- labels: W1 ---> Miss
+for i=1, #TapNoteScores.Types do
+-- no need to add BitmapText actors for TimingWindows that were turned off
+	if i <= worst or i==#TapNoteScores.Types then
 
-	local label = getStringFromTheme ( window )
+		local window = TapNoteScores.Types[i]
+		local label = getStringFromTheme( window )
 
-	t[#t+1] = LoadFont("_miso")..{
-		Text=(nice and scores_table[window] == 69) and 'NICE' or label:upper();
-		InitCommand=cmd(zoom,0.833; horizalign,right; maxwidth, 76),
-		BeginCommand=function(self)
-			self:y((index-1)*28)
+		t[#t+1] = LoadFont("_miso")..{
+			Text=(nice and scores_table[window] == 69) and 'NICE' or label:upper(),
+			InitCommand=cmd(zoom,0.833; horizalign,right; maxwidth, 76),
+			BeginCommand=function(self)
+				self:y((i-1)*28)
 
-			-- if StomperZ, diffuse the JudgmentLabel the StomperZ colors
-			if SL.Global.GameMode == "StomperZ" then
-				self:diffuse( SL.JudgmentColors.StomperZ[index] )
-
-			elseif SL.Global.GameMode == "ECFA" then
-				self:diffuse( SL.JudgmentColors.ECFA[index] )
+				-- diffuse the JudgmentLabels the appropriate colors for the current GameMode
+				if SL.Global.GameMode ~= "Competitive" then
+					self:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
+				end
 			end
-
-
-			local gmods = SL.Global.ActiveModifiers
-
-			-- if Way Offs were turned off
-			if gmods.DecentsWayOffs == "Decents Only" and label == THEME:GetString("TapNoteScore" .. mode, "W5") then
-				self:visible(false)
-
-			-- if both Decents and WayOffs were turned off
-			elseif gmods.DecentsWayOffs == "Off" and (label == THEME:GetString("TapNoteScore" .. mode, "W4") or label == THEME:GetString("TapNoteScore" .. mode, "W5")) then
-				self:visible(false)
-			end
-		end
-	}
+		}
+	end
 end
 
 -- labels: holds, mines, hands, rolls

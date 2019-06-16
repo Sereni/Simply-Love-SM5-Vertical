@@ -13,6 +13,7 @@ for player in ivalues(Players) do
 	-- actual underlays
 	t[#t+1] = LoadActor("./PerPlayer/Danger.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/BackgroundFilter.lua", player)
+	t[#t+1] = LoadActor("./PerPlayer/nice.lua", player)
 end
 
 -- shared UI elements for both players
@@ -21,6 +22,7 @@ t[#t+1] = LoadActor("./Shared/SongInfoBar.lua") -- title and progress bar
 
 -- per-player UI elements
 for player in ivalues(Players) do
+	t[#t+1] = LoadActor("./PerPlayer/UpperNPSGraph.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/Score.lua", player)
 	t[#t+1] = LoadActor("./PerPlayer/DifficultyMeter.lua", player)
 
