@@ -16,8 +16,7 @@ local RadarCategories = {
 
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(zoom, 0.56; x, 50),
-
+	InitCommand=function(self)self:zoom(0.56):x(50) end,
 }
 
 -- do "regular" TapNotes first
@@ -58,15 +57,14 @@ for i=1,#TapNoteScores.Types do
 
 end
 
-
 -- then handle holds, mines, hands, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
 
 	local y_position = (index-1)*35 + 70
 	local x_position = RadarCategories.x[pn]
 
-	local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..RCType )
-	local possible = stats:GetRadarPossible():GetValue( "RadarCategory_"..RCType )
+	local performance = pss:GetRadarActual():GetValue( "RadarCategory_"..RCType )
+	local possible = pss:GetRadarPossible():GetValue( "RadarCategory_"..RCType )
 
 	-- player performace value
 	t[#t+1] = Def.RollingNumbers{
