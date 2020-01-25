@@ -561,8 +561,9 @@ function GetJudgmentGraphics(mode)
 	return judgment_graphics
 end
 
-function IsVerticalScreen()
+IsVerticalScreen = function()
 	return GetScreenAspectRatio() <=1
+end
 
 -- -----------------------------------------------------------------------
 -- GetComboFonts returns a table of strings that match valid ComboFonts for use in Gameplay
