@@ -14,7 +14,7 @@ local title_zoom		= (IsVerticalScreen() and 0.4 or 0.7)
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:y( image == "Hearts" and _screen.cy or _screen.cy+10 )
+		self:xy(_screen.cx, _screen.cy-16):zoom( game=="pump" and 0.2 or 0.205 ):cropright(1)
 	end,
 
 	LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
@@ -35,16 +35,10 @@ local t = Def.ActorFrame{
 	}
 }
 
-
-local af = Def.ActorFrame{
-	OnCommand=cmd(queuecommand,"Refresh"),
-	CoinModeChangedMessageCommand=cmd(queuecommand,"Refresh"),
-	RefreshCommand=function(self)
-		self:visible(true)
-		self:diffuseshift()
-		self:effectperiod(1)
-		self:effectcolor1(1,1,1,0)
-		self:effectcolor2(1,1,1,1)
+t[#t+1] = LoadActor(THEME:GetPathG("", "_VisualStyles/".. image .."/TitleMenu (doubleres).png"))..{
+	InitCommand=function(self)
+		self:xy(_screen.cx+2, _screen.cy):diffusealpha(0):zoom(0.7)
+			:shadowlength(1)
 	end,
 	OffCommand=cmd(visible,false),
 
@@ -75,7 +69,5 @@ local af = Def.ActorFrame{
 		end
 	}
 }
-
-t[#t+1] =  af
 
 return t

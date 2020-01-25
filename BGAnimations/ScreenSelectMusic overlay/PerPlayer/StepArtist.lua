@@ -6,12 +6,11 @@ local text_table, marquee_index
 
 return Def.ActorFrame{
 	Name="StepArtistAF_" .. pn,
-	InitCommand=cmd(draworder,1),
 
 	-- song and course changes
-	OnCommand=cmd(queuecommand, "StepsHaveChanged"),
-	CurrentSongChangedMessageCommand=cmd(queuecommand, "StepsHaveChanged"),
-	CurrentCourseChangedMessageCommand=cmd(queuecommand, "StepsHaveChanged"),
+	OnCommand=function(self) self:queuecommand("StepsHaveChanged") end,
+	CurrentSongChangedMessageCommand=function(self) self:queuecommand("StepsHaveChanged") end,
+	CurrentCourseChangedMessageCommand=function(self) self:queuecommand("StepsHaveChanged") end,
 
 	PlayerJoinedMessageCommand=function(self, params)
 		if params.Player == player then
@@ -50,7 +49,7 @@ return Def.ActorFrame{
 	-- colored background quad
 	Def.Quad{
 		Name="BackgroundQuad",
-		InitCommand=cmd(zoomto, 175, _screen.h/28; x, 113; diffuse, DifficultyIndexColor(1) ),
+		InitCommand=function(self) self:zoomto(175, _screen.h/28):x(113) end,
 		StepsHaveChangedCommand=function(self)
 			local StepsOrTrail = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player) or GAMESTATE:GetCurrentSteps(player)
 
@@ -64,15 +63,13 @@ return Def.ActorFrame{
 	},
 
 	--STEPS label
-	Def.BitmapText{
-		Font="_miso",
-		OnCommand=cmd(diffuse, color("0,0,0,1"); horizalign, left; x, 30; settext, Screen.String("STEPS"))
+	LoadFont("Common Normal")..{
+		OnCommand=function(self) self:diffuse(0,0,0,1):horizalign(left):x(30):settext(Screen.String("STEPS")) end
 	},
 
 	--stepartist text
-	Def.BitmapText{
-		Font="_miso",
-		InitCommand=cmd(diffuse,color("#1e282f"); horizalign, left; x, 75; maxwidth, 115),
+	LoadFont("Common Normal")..{
+		InitCommand=function(self) self:diffuse(color("#1e282f")):horizalign(left):x(75):maxwidth(115) end,
 		StepsHaveChangedCommand=function(self)
 
 			local SongOrCourse = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse() or GAMESTATE:GetCurrentSong()
@@ -81,15 +78,21 @@ return Def.ActorFrame{
 			-- always stop tweening when steps change in case a MarqueeCommand is queued
 			self:stoptweening()
 
-			-- clear the stepartist text, in case we're hovering over a group title
-			self:settext("")
-
 			if SongOrCourse and StepsOrCourse then
 				text_table = GetStepsCredit(player)
 				marquee_index = 0
 
 				-- only queue a marquee if there are things in the text_table to display
-				if #text_table > 0 then self:queuecommand("Marquee") end
+				if #text_table > 0 then
+					self:queuecommand("Marquee")
+				else
+					-- no credit information was specified in the simfile for this stepchart, so just set to an empty string
+					self:settext("")
+				end
+			else
+				-- there wasn't a song/course or a steps object, so the MusicWheel is probably hovering
+				-- on a group title, which means we want to set the stepartist text to an empty string for now
+				self:settext("")
 			end
 		end,
 		MarqueeCommand=function(self)

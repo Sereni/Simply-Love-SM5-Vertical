@@ -3,15 +3,15 @@ local banner_x =	(IsVerticalScreen() and 20 or WideScale(-280,-320))
 local text_wrap =	(IsVerticalScreen() and 150 or 264)
 local text_width =	(IsVerticalScreen() and 170 or 280)
 local score_x = 	(IsVerticalScreen() and 0 or WideScale(140,40))
-	
-	
+
+
 local HighScoreRow = Def.ActorFrame{
 	-- setting ztest to true allows masking
-	InitCommand=cmd(ztest, true),
+	InitCommand=function(self) self:ztest(true) end,
 
 	Def.Quad{
-		InitCommand=cmd(zoomto, _screen.w,60 ),
-		OnCommand=cmd(diffuse,Color.Black; diffusealpha,0.7)
+		InitCommand=function(self) self:zoomto(_screen.w, 60) end,
+		OnCommand=function(self) self:diffuse(Color.Black):diffusealpha(0.7) end
 	},
 
 	Def.Banner{
@@ -24,7 +24,7 @@ local HighScoreRow = Def.ActorFrame{
 	},
 
 	--the name of the song, on top of the graphical banner
-	LoadFont("_miso")..{
+	LoadFont("Common Normal")..{
 		InitCommand=cmd(x,WideScale(-220,-280); halign,0; shadowlength,1; wrapwidthpixels,text_wrap; maxheight,58; maxwidth,text_width),
 		SetCommand=function(self, params)
 			if params.Song then
@@ -83,7 +83,7 @@ for key, difficulty in ipairs(DifficultiesToShow) do
 
 	-- BitmapText actor for the name of the player and the high score itself
 	HighScore[#HighScore+1] = Def.BitmapText{
-		Font="_miso",
+		Font="Common Normal",
 		Name="HighScore_"..difficulty,
 		InitCommand=cmd(x,score_x + (key-1)*100; zoom,0.8; horizalign, center)
 	}

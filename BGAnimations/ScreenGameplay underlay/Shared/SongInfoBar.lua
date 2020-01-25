@@ -10,7 +10,7 @@ return Def.ActorFrame{
 
 		Def.SongMeterDisplay{
 			StreamWidth=barLength,
-			Stream=Def.Quad{ 
+			Stream=Def.Quad{
 				InitCommand=cmd(zoomy,18; diffuse,DifficultyIndexColor(2))
 			}
 		},
@@ -18,8 +18,10 @@ return Def.ActorFrame{
 		Border( barLength, 22, 2 ),
 	},
 
+	Border( _screen.w/2-10, 22, 2 ),
+
 	-- Song Title
-	LoadFont("_miso")..{
+	LoadFont("Common Normal")..{
 		Name="SongTitle",
 		InitCommand=cmd(zoom,0.8; shadowlength,0.6; maxwidth, barLength; xy, xOffset, yOffset ),
 		CurrentSongChangedMessageCommand=cmd(playcommand, "Update"),

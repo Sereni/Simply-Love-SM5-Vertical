@@ -1,50 +1,140 @@
-------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------
 -- call this to draw a Quad with a border
 -- width of quad, height of quad, and border width, in pixels
 
 function Border(width, height, bw)
 	return Def.ActorFrame {
-		Def.Quad {
-			InitCommand=cmd(zoomto, width-2*bw, height-2*bw;  MaskSource,true)
-		},
-		Def.Quad {
-			InitCommand=cmd(zoomto,width,height; MaskDest)
-		},
-		Def.Quad {
-			InitCommand=cmd(diffusealpha,0; clearzbuffer,true)
-		},
+		Def.Quad { InitCommand=function(self) self:zoomto(width-2*bw, height-2*bw):MaskSource(true) end },
+		Def.Quad { InitCommand=function(self) self:zoomto(width,height):MaskDest() end },
+		Def.Quad { InitCommand=function(self) self:diffusealpha(0):clearzbuffer(true) end },
 	}
 end
 
-------------------------------------------------------------------------------
--- Is this even how this works?  I need to research this more.
-local OnlyASCII = function(text)
+-- -----------------------------------------------------------------------
+-- SM5's d3d implementation does not support render to texture. The DISPLAY
+-- singleton has a method to check this but it doesn't seem to be implemented
+-- in RageDisplay_D3D which is, ironically, where it's most needed.  So, this.
+
+SupportsRenderToTexture = function()
+	return PREFSMAN:GetPreference("VideoRenderers"):sub(1,6):lower() == "opengl"
+end
+
+-- -----------------------------------------------------------------------
+-- There's surely a better way to do this.  I need to research this more.
+
+local is8bit = function(text)
 	return text:len() == text:utf8len()
+end
+
+
+-- Here's what inline comments in BitmapText.cpp currently have to say about wrapwidthpixels
+------
+-- // Break sText into lines that don't exceed iWrapWidthPixels. (if only
+-- // one word fits on the line, it may be larger than iWrapWidthPixels).
+--
+-- // This does not work in all languages:
+-- /* "...I can add Japanese wrapping, at least. We could handle hyphens
+-- * and soft hyphens and pretty easily, too." -glenn */
+------
+--
+-- So, wrapwidthpixels does not have great support for East Asian Languages.
+-- Without whitespace characters to break on, the text just... never wraps.  Neat.
+--
+-- Here are glenn's thoughts on the topic as of June 2019:
+------
+-- For Japanese specifically I'd convert the string to WString (so each character is one character),
+-- then make it split "words" (potential word wrap points) based on each character type.  If you
+-- were splitting "text あああ", it would split into "text " (including the space), "あ", "あ", "あ",
+-- using a mapping to know which language each character is.  Then just follow the same line fitting
+-- and recombine without reinserting spaces (since they're included in the array).
+--
+-- It wouldn't be great, you could end up with things like periods being wrapped onto a line by
+-- themselves, ugly single-character lines, etc.  There are more involved language-specific word
+-- wrapping algorithms that'll do a better job:
+-- ( https://en.wikipedia.org/wiki/Line_breaking_rules_in_East_Asian_languages ),
+-- or a line balancing algorithm that tries to generate lines of roughly even width instead of just
+-- filling line by line, but those are more involved.
+--
+-- A simpler thing to do is implement zero-width spaces (&zwsp), which is a character that just
+-- explicitly marks a place where word wrap is allowed, and then you can insert them strategically
+-- to manually word-wrap text.  Takes more work to insert them, but if there isn't a ton of text
+-- being wrapped, it might be simpler.
+------
+--
+-- I have neither the native intellignce nor the brute-force-self-taught-CS-experience to achieve
+-- any of the above, so here is some laughably bad code that is just barely good enough to meet the
+-- needs of JP text in Simply Love.  Feel free to copy+paste this method to /r/shittyprogramming,
+-- private Discord servers, etc., for didactic and comedic purposes alike.
+
+BitmapText._wrapwidthpixels = function(bmt, w)
+	local text = bmt:GetText()
+
+	if not is8bit(text) then
+		-- a range of bytes I'm considering to indicate JP characters,
+		-- mostly derived from empirical observation and guesswork
+		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso in SL, so don't include those
+		-- FIXME: If you know more about how this actually works, please submit a pull request.
+		local lower = 200
+		local upper = 240
+		bmt:settext("")
+
+		for i=1, text:utf8len() do
+			local c = text:utf8sub(i,i)
+			local b = c:byte()
+
+			-- if adding this character causes the displayed string to be wider than allowed
+			if bmt:settext( bmt:GetText()..c ):GetWidth() > w then
+				-- and if that character just added was in the jp range (...maybe)
+				if b < upper and b >= lower then
+					-- then insert a newline between the previous character and the current
+					-- character that caused us to go over
+					bmt:settext( bmt:GetText():utf8sub(1,-2).."\n"..c )
+				else
+					-- otherwise it's trickier, as romance languages only really allow newlines
+					-- to be inserted between words, not in the middle of single words
+					-- we'll have to "peel back" a character at a time until we hit whitespace
+					-- or something in the jp range
+					local _text = bmt:GetText()
+
+					for j=i,1,-1 do
+						local _c = _text:utf8sub(j,j)
+						local _b = _c:byte()
+
+						if _c:match("%s") or (_b < upper and _b >= lower) then
+							bmt:settext( _text:utf8sub(1,j) .. "\n" .. _text:utf8sub(j+1) )
+							break
+						end
+					end
+				end
+			end
+		end
+	else
+		bmt:wrapwidthpixels(w)
+	end
+
+	-- return the BitmapText actor in case the theme is chaining actor commands
+	return bmt
 end
 
 BitmapText.Truncate = function(bmt, m)
 	local text = bmt:GetText()
 	local l = text:len()
 
-	-- With SL's Miso and JP fonts, ASCII characters (Miso) tend to render 2-3x less wide
+	-- With SL's Miso and JP fonts, english characters (Miso) tend to render 2-3x less wide
 	-- than JP characters. If the text includes JP characters, it is (probably) desired to
 	-- truncate the string earlier to achieve the same effect.
-	-- Here, we are arbitrarily "weighting" JP characters to count 4x as much as one ASCII
+	-- Here, we are arbitrarily "weighting" JP characters to count 4x as much as one Miso
 	-- character and then scaling the point at which we truncate accordingly.
 	-- This is, of course, a VERY broad over-generalization, but It Works For Now™.
-	if not OnlyASCII(text) then
+	if not is8bit(text) then
 		l = 0
 
-		-- a range of bytes I'm considering to indicate JP characters,
-		-- mostly derived from empirical observation and guesswork
-		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso in SL, so don't include those
-		-- If you know more about how this actually works, please submit a pull request.
 		local lower = 200
 		local upper = 240
 
 		for i=1, text:utf8len() do
 			local b = text:utf8sub(i,i):byte()
-			l = l + ((b < upper and b > lower) and 4 or 1)
+			l = l + ((b < upper and b >= lower) and 4 or 1)
 		end
 		m = math.floor(m * (m/l))
 	end
@@ -53,28 +143,37 @@ BitmapText.Truncate = function(bmt, m)
 	if l <= m then return end
 	-- otherwise, replace everything after the truncate point with an ellipsis
 	bmt:settext( text:utf8sub(1, m) .. "…" )
+
+	-- return the BitmapText actor in case the theme is chaining actor commands
+	return bmt
 end
 
+-- -----------------------------------------------------------------------
+-- game types like "kickbox" and "lights" aren't supported in Simply Love, so we
+-- use this function to hardcode a list of game modes that are supported, and use it
+-- in ScreenInit overlay.lua to redirect players to ScreenSelectGame if necessary.
+--
+-- (Because so many people have accidentally gotten themselves into lights mode without
+-- having any idea they'd done so, and have then messaged me saying the theme was broken.)
 
-------------------------------------------------------------------------------
--- Misc Lua functions that didn't fit anywhere else...
-
--- return true or nil
 CurrentGameIsSupported = function()
 	-- a hardcoded list of games that Simply Love supports
 	local support = {
-		dance	= true,
-		pump = true,
+		dance  = true,
+		pump   = true,
 		techno = true,
-		para = true,
-		kb7 = true
+		para   = true,
+		kb7    = true
 	}
+	-- return true or nil
 	return support[GAMESTATE:GetCurrentGame():GetName()]
 end
 
+-- -----------------------------------------------------------------------
+-- determines which timing_window an offset value (number) belongs to
+-- used by the judgment scatter plot and offset histogram in ScreenEvaluation
 
--- helper function used to detmerine which timing_window a given offset belongs to
-function DetermineTimingWindow(offset)
+DetermineTimingWindow = function(offset)
 	for i=1,5 do
 		if math.abs(offset) < SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..i] + SL.Preferences[SL.Global.GameMode]["TimingWindowAdd"] then
 			return i
@@ -83,23 +182,23 @@ function DetermineTimingWindow(offset)
 	return 5
 end
 
+-- -----------------------------------------------------------------------
+-- some common information needed by ScreenSystemOverlay's credit display,
+-- as well as ScreenTitleJoin overlay and ./Scripts/SL-Branches.lua regarding coin credits
 
-function GetCredits()
+GetCredits = function()
 	local coins = GAMESTATE:GetCoins()
 	local coinsPerCredit = PREFSMAN:GetPreference('CoinsPerCredit')
 	local credits = math.floor(coins/coinsPerCredit)
 	local remainder = coins % coinsPerCredit
 
-	local r = {
-		Credits=credits,
-		Remainder=remainder,
-		CoinsPerCredit=coinsPerCredit
-	}
-	return r
+	return { Credits=credits,Remainder=remainder, CoinsPerCredit=coinsPerCredit }
 end
 
--- Used in Metrics.ini for ScreenRankingSingle and ScreenRankingDouble
-function GetStepsTypeForThisGame(type)
+-- -----------------------------------------------------------------------
+-- used in Metrics.ini for ScreenRankingSingle and ScreenRankingDouble
+
+GetStepsTypeForThisGame = function(type)
 	local game = GAMESTATE:GetCurrentGame():GetName()
 	-- capitalize the first letter
 	game = game:gsub("^%l", string.upper)
@@ -107,8 +206,11 @@ function GetStepsTypeForThisGame(type)
 	return "StepsType_" .. game .. "_" .. type
 end
 
+-- -----------------------------------------------------------------------
+-- return the x value for the center of a player's notefield
+-- used to position various elements in ScreenGameplay
 
-function GetNotefieldX( player )
+GetNotefieldX = function( player )
 	local p = ToEnumShortString(player)
 	local game = GAMESTATE:GetCurrentGame():GetName()
 
@@ -125,23 +227,24 @@ function GetNotefieldX( player )
 end
 
 -- -----------------------------------------------------------------------
-
 -- this is verbose, but it lets us manage what seem to be
 -- quirks/oversights in the engine on a per-game + per-style basis
 
 local NoteFieldWidth = {
 	-- dance Just Works™.  Wow!  It's almost like this game gets the most attention and fixes.
 	dance = {
-		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
-		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
-		double = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
-		solo = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		single  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		versus  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		double  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		solo    = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
+		routine = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) end,
 	},
 	-- the values returned by the engine for Pump are slightly too small(?), so... uh... pad it
 	pump = {
-		single = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
-		versus = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
-		double = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		single  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		versus  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		double  = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
+		routine = function(p) return GAMESTATE:GetCurrentStyle():GetWidth(p) + 10 end,
 	},
 	-- techno works for single8, needs to be smaller for versus8 and double8
 	techno = {
@@ -162,7 +265,7 @@ local NoteFieldWidth = {
 	},
 }
 
-function GetNotefieldWidth(player)
+GetNotefieldWidth = function(player)
 	if not player then return false end
 
 	local game = GAMESTATE:GetCurrentGame():GetName()
@@ -171,12 +274,79 @@ function GetNotefieldWidth(player)
 end
 
 -- -----------------------------------------------------------------------
+-- noteskin_name is a string that matches some available NoteSkin for the current game
+-- column is an (optional) string for the column you want returned, like "Left" or "DownRight"
+--
+-- if no errors are encountered, a full NoteSkin actor is returned
+-- otherwise, a generic Def.Actor is returned
+-- in both these cases, the Name of the returned actor will be ("NoteSkin_"..noteskin_name)
+
+GetNoteSkinActor = function(noteskin_name, column)
+
+	-- prepare a dummy Actor using the name of NoteSkin in case errors are
+	-- encountered so that a valid (inert, not-drawing) actor still gets returned
+	local dummy = Def.Actor{
+		Name="NoteSkin_"..(noteskin_name or ""),
+		InitCommand=function(self) self:visible(false) end
+	}
+
+	-- perform first check: does the NoteSkin exist for the current game?
+	if not NOTESKIN:DoesNoteSkinExist(noteskin_name) then return dummy end
+
+	local game_name = GAMESTATE:GetCurrentGame():GetName()
+	local fallback_column = { dance="Up", pump="UpRight", techno="Up", kb7="Key1" }
+
+	-- prefer the value for column if one was passed in, otherwise use a fallback value
+	column = column or fallback_column[game_name] or "Up"
+
+	-- most NoteSkins are free of errors, but we cannot assume they all are
+	-- one error in one NoteSkin is enough to halt ScreenPlayerOptions overlay
+	-- so, use pcall() to catch errors.  The first argument is the function we
+	-- want to check for runtime errors, and the remaining arguments are what
+	-- we would have passed to that function.
+	--
+	-- Using pcall() like this returns [multiple] values.  A boolean indicating that the
+	-- function is error-free (true) or that errors were caught (false), and then whatever
+	-- calling that function would have normally returned
+	local okay, noteskin_actor = pcall(NOTESKIN.LoadActorForNoteSkin, NOTESKIN, column, "Tap Note", noteskin_name)
+
+	-- if no errors were caught and we have a NoteSkin actor from NOTESKIN:LoadActorForNoteSkin()
+	if okay and noteskin_actor then
+
+		-- If we've made it this far, the screen will function without halting, but there
+		-- may still be Lua errors in the NoteSkin's InitCommand that might cause the actor
+		-- to display strangely (because Lua halted and sizing/positioning/etc. never happened).
+		--
+		-- There is some version of an "smx" NoteSkin that got passed around the community
+		-- that attempts to use a nil constant "FIXUP" in its InitCommand that exhibits this.
+		-- So, pcall() again, now specifically on the noteskin_actor's InitCommand if it has one.
+		if noteskin_actor.InitCommand then
+			okay = pcall(noteskin_actor.InitCommand)
+		end
+
+		if okay then
+			return noteskin_actor..{
+				Name="NoteSkin_"..noteskin_name,
+				InitCommand=function(self) self:visible(false) end
+			}
+		end
+	end
+
+	-- if the user has ShowThemeErrors enabled, let them know about the Lua errors via SystemMessage
+	if PREFSMAN:GetPreference("ShowThemeErrors") then
+		SM( THEME:GetString("ScreenPlayerOptions", "NoteSkinErrors"):format(noteskin_name) )
+	end
+
+	return dummy
+end
+
+-- -----------------------------------------------------------------------
 -- Define what is necessary to maintain and/or increment your combo, per Gametype.
 -- For example, in dance Gametype, TapNoteScore_W3 (window #3) is commonly "Great"
 -- so in dance, a "Great" will not only maintain a player's combo, it will also increment it.
 --
 -- We reference this function in Metrics.ini under the [Gameplay] section.
-function GetComboThreshold( MaintainOrContinue )
+GetComboThreshold = function( MaintainOrContinue )
 	local CurrentGame = GAMESTATE:GetCurrentGame():GetName()
 
 	local ComboThresholdTable = {
@@ -199,7 +369,7 @@ function GetComboThreshold( MaintainOrContinue )
 
 
 	if CurrentGame ~= "para" then
-		if SL.Global.GameMode == "StomperZ" or SL.Global.GameMode=="ECFA" then
+		if SL.Global.GameMode == "StomperZ" or SL.Global.GameMode=="FA+" then
 			ComboThresholdTable.dance.Maintain = "TapNoteScore_W4"
 			ComboThresholdTable.dance.Continue = "TapNoteScore_W4"
 		end
@@ -210,7 +380,7 @@ end
 
 -- -----------------------------------------------------------------------
 
-function SetGameModePreferences()
+SetGameModePreferences = function()
 	-- apply the preferences associated with this GameMode
 	for key,val in pairs(SL.Preferences[SL.Global.GameMode]) do
 		PREFSMAN:SetPreference(key, val)
@@ -241,9 +411,14 @@ function SetGameModePreferences()
 		GAMESTATE:GetPlayerState(player):GetPlayerOptions("ModsLevel_Preferred"):MinTNSToHideNotes(SL.Preferences[SL.Global.GameMode].MinTNSToHideNotes)
 	end
 
+	-- these are the prefixes that are prepended to each custom Stats.xml, resulting in
+	-- Stats.xml, ECFA-Stats.xml, StomperZ-Stats.xml, Casual-Stats.xml
+	-- "FA+" mode is prefixed with "ECFA-" because the mode was previously known as "ECFA Mode"
+	-- and I don't want to deal with renaming relatively critical files from the theme.
+	-- Thus, scores from FA+ mode will continue to go into ECFA-Stats.xml.
 	local prefix = {
-		Competitive = "",
-		ECFA = "ECFA-",
+		ITG = "",
+		["FA+"] = "ECFA-",
 		StomperZ = "StomperZ-",
 		Casual = "Casual-"
 	}
@@ -254,78 +429,24 @@ function SetGameModePreferences()
 end
 
 -- -----------------------------------------------------------------------
--- the available OptionRows for an options screen can change depending on certain conditions
--- these functions start with all possible OptionRows and remove rows as needed
--- whatever string is finally returned is passed off to the pertinent LineNames= in Metrics.ini
+-- Call ResetPreferencesToStockSM5() to reset all the Preferences that SL silently
+-- manages for you back to their stock SM5 values.  These "managed" Preferences are
+-- listed in ./Scripts/SL_Init.lua per-gamemode (Casual, ITG, FA+, StomperZ), and
+-- actively applied (and reapplied) for each new game using SetGameModePreferences()
+--
+-- SL normally calls ResetPreferencesToStockSM5() from
+-- ./BGAnimations/ScreenPromptToResetPreferencesToStock overlay.lua
+-- but people have requested that the functionality for resetting Preferences be
+-- generally accessible (for example, switching themes via a pad code).
+-- Thus, this global function.
 
-function GetOperatorMenuLineNames()
-	local lines = "System,KeyConfig,TestInput,Visual,GraphicsSound,Arcade,Input,Theme,MenuTimer,CustomSongs,Advanced,Profiles,Acknowledgments,ClearCredits,Reload"
-
-	-- the TestInput screen only supports dance, pump, and techno; remove it when in other games
-	local CurrentGame = GAMESTATE:GetCurrentGame():GetName()
-	if not (CurrentGame=="dance" or CurrentGame=="pump" or CurrentGame=="techno") then
-		lines = lines:gsub("TestInput,", "")
+ResetPreferencesToStockSM5 = function()
+	-- loop through all the Preferences that SL forcibly manages and reset them
+	for key, value in pairs(SL.Preferences[SL.Global.GameMode]) do
+		PREFSMAN:SetPreferenceToDefault(key)
 	end
-
-	-- hide the OptionRow for ClearCredits if we're not in CoinMode_Pay; it doesn't make sense to show for at-home players
-	-- note that (EventMode + CoinMode_Pay) will actually place you in CoinMode_Home
-	if GAMESTATE:GetCoinMode() ~= "CoinMode_Pay" then
-		lines = lines:gsub("ClearCredits,", "")
-	end
-
-	-- CustomSongs preferences don't exist in 5.0.x, which many players may still be using
-	-- thus, if the preference for CustomSongsEnable isn't found in this version of SM, don't let players
-	-- get into the CustomSongs submenu in the OperatorMenu by removing that OptionRow
-	if not PREFSMAN:PreferenceExists("CustomSongsEnable") then
-		lines = lines:gsub("CustomSongs,", "")
-	end
-	return lines
-end
-
-
-function GetSimplyLoveOptionsLineNames()
-	local lines = "CasualMaxMeter,AutoStyle,DefaultGameMode,TimingWindowAdd,CustomFailSet,CreditStacking,MusicWheelStyle,MusicWheelSpeed,SelectProfile,SelectColor,EvalSummary,NameEntry,GameOver,HideStockNoteSksins,DanceSolo,GradesInMusicWheel,Nice,VisualTheme,RainbowMode"
-	if Sprite.LoadFromCached ~= nil then
-		lines = lines .. ",UseImageCache"
-	end
-	return lines
-end
-
-
-function GetPlayerOptions2LineNames()
-	local mods = "Turn,Scroll,7,8,9,10,11,12,13,Attacks,Hide,ReceptorArrowsPosition,LifeMeterType,DataVisualizations,TargetScore,ActionOnMissedTarget,GameplayExtras,MeasureCounter,MeasureCounterOptions,WorstTimingWindow,Vocalization,Characters,ScreenAfterPlayerOptions2"
-
-	-- remove ReceptorArrowsPosition if GameMode isn't StomperZ
-	if SL.Global.GameMode ~= "StomperZ" then
-		mods = mods:gsub("ReceptorArrowsPosition", "")
-	end
-
-	-- remove WorstTimingWindow and LifeMeterType if GameMode is StomperZ
-	if SL.Global.GameMode == "StomperZ" then
-		mods = mods:gsub("WorstTimingWindow,", ""):gsub("LifeMeterType", "")
-	end
-
-	local game = GAMESTATE:GetCurrentGame():GetName()
-
-	-- remove Vocalization if no voice packs were found in the filesystem
-	if #FILEMAN:GetDirListing(GetVocalizeDir() , true, false) < 1 then
-		mods = mods:gsub("Vocalization," ,"")
-	end
-
-	-- remove Characters if no dancing character directories were found
-	if #CHARMAN:GetAllCharacters() < 1 then
-		mods = mods:gsub("Characters,", "")
-	end
-
-	-- ActionOnMissedTarget can automatically fail or restart Gameplay when a target score
-	-- becomes impossible to achieve; it really only makes sense in EventMode (i.e., not public arcades)
-	-- a second check is performed in ./ScreenGameplay underlay/PerPlayer/TargetScore/default.lua
-	-- to ensure it isn't accidentally brought into non-EventMode via player profile
-	if not PREFSMAN:GetPreference("EventMode") then
-		mods = mods:gsub("ActionOnMissedTarget,", "")
-	end
-
-	return mods
+	-- now that those Preferences are reset to default values, write Preferences.ini to disk now
+	PREFSMAN:SavePreferences()
 end
 
 -- -----------------------------------------------------------------------
@@ -356,9 +477,15 @@ GetStepsCredit = function(player)
 end
 
 -- -----------------------------------------------------------------------
+
+-- the best way to spread holiday cheer is singing loud for all to hear
+HolidayCheer = function()
+	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11)
+end
+
 BrighterOptionRows = function()
 	if ThemePrefs.Get("RainbowMode") then return true end
-	if PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11 then return true end -- holiday cheer
+	if HolidayCheer() then return true end
 	return false
 end
 
@@ -405,12 +532,12 @@ function StripSpriteHints(filename)
 end
 
 function GetJudgmentGraphics(mode)
-	if mode == 'Casual' then mode = 'Competitive' end
+	if mode == 'Casual' then mode = 'ITG' end
 	local path = THEME:GetPathG('', '_judgments/' .. mode)
 	local files = FILEMAN:GetDirListing(path .. '/')
 	local judgment_graphics = {}
 
-	for k,filename in ipairs(files) do
+	for i,filename in ipairs(files) do
 
 		-- Filter out files that aren't judgment graphics
 		-- e.g. hidden system files like .DS_Store
@@ -436,4 +563,71 @@ end
 
 function IsVerticalScreen()
 	return GetScreenAspectRatio() <=1
+
+-- -----------------------------------------------------------------------
+-- GetComboFonts returns a table of strings that match valid ComboFonts for use in Gameplay
+--
+-- a valid ComboFont must:
+--   • have its assets in a unique directory at ./Fonts/_Combo Fonts/
+--   • include the usual files needed for a StepMania BitmapText actor (a png and an ini)
+--   • have its png and ini file both be named to match the directory they are in
+--
+-- a valid ComboFont should:
+--   • include glyphs for 1234567890()/
+--   • be open source or "100% free" on dafont.com
+
+
+GetComboFonts = function()
+	local path = THEME:GetCurrentThemeDirectory().."Fonts/_Combo Fonts/"
+	local dirs = FILEMAN:GetDirListing(path, true, false)
+	local fonts = {}
+	local has_wendy_cursed = false
+
+	for directory_name in ivalues(dirs) do
+		local files = FILEMAN:GetDirListing(path..directory_name.."/")
+		local has_png, has_ini = false, false
+
+		for filename in ivalues(files) do
+			if FilenameIsMultiFrameSprite(filename) and StripSpriteHints(filename)==directory_name then has_png = true end
+			if filename:match(".ini") and filename:gsub(".ini","")==directory_name then has_ini = true end
+		end
+
+		if has_png and has_ini then
+			-- special-case Wendy to always appear first in the list
+			if directory_name == "Wendy" then
+				table.insert(fonts, 1, directory_name)
+
+			-- special-cased Wendy (Cursed) to always appear last in the last
+			elseif directory_name == "Wendy (Cursed)" then
+				has_wendy_cursed = true
+			else
+				table.insert(fonts, directory_name)
+			end
+		end
+	end
+
+	if has_wendy_cursed then table.insert(fonts, "Wendy (Cursed)") end
+
+	return fonts
+end
+
+-- -----------------------------------------------------------------------
+-- Pass in a string from the engine's Difficulty enum like "Difficulty_Beginner"
+-- or "Difficulty_Challenge" and this will return the index of that string within
+-- the enum (or nil if not found).  This is used by SL's color system to dynamically
+-- color theme elements based on difficulty as the primary color scheme changes.
+
+GetDifficultyIndex = function(difficulty)
+	-- if we weren't passed a string, return nil now
+	if type(difficulty) ~= "string" then return nil end
+
+	-- FIXME: Why is this hardcoded to 5?  I need to look into this and either change
+	-- it or leave a note explaining why it's this way.
+	if difficulty == "Difficulty_Edit" then return 5 end
+
+	-- Use Enum's reverse lookup functionality to find difficulty by index
+	-- note: this is 0 indexed, so Beginner is 0, Challenge is 4, and Edit is 5
+	-- for our purposes, increment by 1 here
+	local difficulty_index = Difficulty:Reverse()[difficulty]
+	if type(difficulty_index) == "number" then return (difficulty_index + 1) end
 end

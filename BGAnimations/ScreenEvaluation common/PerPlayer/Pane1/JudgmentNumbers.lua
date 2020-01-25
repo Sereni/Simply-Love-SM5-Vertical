@@ -1,8 +1,6 @@
 local player = ...
--- Use enum's reverse lookup to set pn to 1 if PLAYER_1, or 2 if PLAYER_2
-local pn = PlayerNumber:Reverse()[player] + 1
-
-local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
+local pn = ToEnumShortString(player)
+local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
 local TapNoteScores = {
 	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
@@ -25,7 +23,7 @@ local t = Def.ActorFrame{
 -- do "regular" TapNotes first
 for i=1,#TapNoteScores.Types do
 	local window = TapNoteScores.Types[i]
-	local number = stats:GetTapNoteScores( "TapNoteScore_"..window )
+	local number = pss:GetTapNoteScores( "TapNoteScore_"..window )
 
 	-- actual numbers
 	t[#t+1] = Def.RollingNumbers{
@@ -33,7 +31,7 @@ for i=1,#TapNoteScores.Types do
 		InitCommand=function(self)
 			self:zoom(0.5):horizalign(right)
 
-			if SL.Global.GameMode ~= "Competitive" then
+			if SL.Global.GameMode ~= "ITG" then
 				self:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
 			end
 
@@ -60,6 +58,7 @@ for i=1,#TapNoteScores.Types do
 
 end
 
+
 -- then handle holds, mines, hands, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
 
@@ -72,7 +71,7 @@ for index, RCType in ipairs(RadarCategories.Types) do
 	-- player performace value
 	t[#t+1] = Def.RollingNumbers{
 		Font="_ScreenEvaluation numbers",
-		InitCommand=cmd(zoom,0.5; horizalign, right; Load, "RollingNumbersEvaluationB"),
+		InitCommand=function(self) self:zoom(0.5):horizalign(right):Load("RollingNumbersEvaluationB") end,
 		BeginCommand=function(self)
 			self:y(y_position)
 			self:x( x_position )
@@ -81,9 +80,9 @@ for index, RCType in ipairs(RadarCategories.Types) do
 	}
 
 	--  slash
-	t[#t+1] = LoadFont("_miso")..{
+	t[#t+1] = LoadFont("Common Normal")..{
 		Text="/",
-		InitCommand=cmd(diffuse,color("#5A6166"); zoom, 1.25; horizalign, right),
+		InitCommand=function(self) self:diffuse(color("#5A6166")):zoom(1.25):horizalign(right) end,
 		BeginCommand=function(self)
 			self:y(y_position)
 			self:x(x_position + 12)
@@ -92,12 +91,12 @@ for index, RCType in ipairs(RadarCategories.Types) do
 
 	-- possible value
 	t[#t+1] = LoadFont("_ScreenEvaluation numbers")..{
-		InitCommand=cmd(zoom,0.5; horizalign, right),
+		InitCommand=function(self) self:zoom(0.5):horizalign(right) end,
 		BeginCommand=function(self)
 			self:y(y_position)
 			self:x(x_position + 65)
 			self:settext(("%03.0f"):format(possible))
-			local leadingZeroAttr = { Length=3-tonumber(tostring(possible):len()); Diffuse=color("#5A6166") }
+			local leadingZeroAttr = { Length=3-tonumber(tostring(possible):len()), Diffuse=color("#5A6166") }
 			self:AddAttribute(0, leadingZeroAttr )
 		end
 	}

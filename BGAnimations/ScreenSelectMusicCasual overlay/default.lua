@@ -101,7 +101,7 @@ local t = Def.ActorFrame {
 				SCREENMAN:GetTopScreen():SetNextScreenName( Branch.SSMCancel() ):StartTransitioningScreen("SM_GoToNextScreen")
 			else
 				if SL.Global.Stages.PlayedThisGame == 0 then
-					SL.Global.GameMode = "Competitive"
+					SL.Global.GameMode = "ITG"
 					SetGameModePreferences()
 					THEME:ReloadMetrics()
 					SCREENMAN:GetTopScreen():SetNextScreenName("ScreenReloadSSM"):StartTransitioningScreen("SM_GoToNextScreen")
@@ -136,8 +136,8 @@ local t = Def.ActorFrame {
 	LoadActor("./PlayerOptionsShared.lua", {row, col, Input}),
 	LoadActor("./SongWheelShared.lua", {row, col, songwheel_y_offset}),
 
-	-- commented out for now
-	-- LoadActor("./GroupWheelShared.lua", {row, col, group_info}),
+	-- included, but unused for now
+	LoadActor("./GroupWheelShared.lua", {row, col, group_info}),
 
 	SongWheel:create_actors( "SongWheel", 12, song_mt, 0, songwheel_y_offset),
 

@@ -27,9 +27,7 @@ local meter = Def.ActorFrame{
 
 	-- frame
 	Border(meterFillLength+4, meterFillHeight+4, 2)..{
-		OnCommand=function(self)
-			self:x(meterXOffset)
-		end
+		InitCommand=function(self) self:x(meterXOffset) end
 	},
 
 	-- // start meter proper //
@@ -54,8 +52,7 @@ local meter = Def.ActorFrame{
 			if(params.Player == player) then
 				local life = params.LifeMeter:GetLife() * (meterFillLength)
 				self:finishtweening()
-				self:bouncebegin(0.1)
-				self:zoomx( life )
+				self:bouncebegin(0.1):zoomx( life )
 			end
 		end,
 	},

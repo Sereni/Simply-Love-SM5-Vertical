@@ -100,10 +100,17 @@ Branch.AfterHeartEntry = function()
 	if( pm == "Nonstop" ) then return "ScreenEvaluationNonstop" end
 end
 
-Branch.PlayerOptions = function()
+Branch.AfterSelectMusic = function()
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenPlayerOptions"
 	else
+		-- routine mode specifically uses ScreenGameplayShared
+		local style = GAMESTATE:GetCurrentStyle():GetName()
+		if style == "routine" then
+			return "ScreenGameplayShared"
+		end
+
+		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
 		return "ScreenGameplay"
 	end
 end
@@ -177,7 +184,7 @@ Branch.AfterProfileSave = function()
 
 	else
 
-		-- deduct the number of stages that stock Stepmania says the song is
+		-- deduct the number of stages that stock StepMania says the song is
 		local song = GAMESTATE:GetCurrentSong()
 		local SMSongCost = (song:IsMarathon() and 3) or (song:IsLong() and 2) or 1
 		SL.Global.Stages.Remaining = SL.Global.Stages.Remaining - SMSongCost
@@ -202,9 +209,8 @@ Branch.AfterProfileSave = function()
 			SL.Global.Stages.Remaining = SL.Global.Stages.Remaining + StagesToAddBack
 		end
 
-		-- Now, check if StepMania and SL disagree on the stage count
-		-- If necessary, add stages back
-		-- This might be necessary because
+		-- Now, check if StepMania and SL disagree on the stage count. If necessary, add stages back.
+		-- This might be necessary because:
 		-- a) a Lua chart reloaded ScreenGameplay, or
 		-- b) everyone failed, and StepmMania zeroed out the stage numbers
 		if GAMESTATE:GetNumStagesLeft(GAMESTATE:GetMasterPlayerNumber()) < SL.Global.Stages.Remaining then

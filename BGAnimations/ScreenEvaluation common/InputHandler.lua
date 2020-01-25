@@ -25,9 +25,8 @@ end
 
 return function(event)
 
-	if not event.PlayerNumber or not event.button then
-		return false
-	end
+	if SL.Global.GameMode == "Casual" then return false end
+	if not (event and event.PlayerNumber and event.button) then return false end
 
 	local pn = ToEnumShortString(event.PlayerNumber)
 
@@ -41,8 +40,7 @@ return function(event)
 			end
 
 			for i=1,#panes[pn] do
-
-				if style == "OnePlayerTwoSides" and active_pane[pn] + 1 == 2 then
+				if style == "OnePlayerTwoSides" and panes[pn][active_pane[pn]+1]:GetCommand("ExpandForDouble") then
 					af:queuecommand("Expand")
 				else
 					af:queuecommand("Shrink")
@@ -52,6 +50,10 @@ return function(event)
 			end
 			panes[pn][active_pane[pn]+1]:visible(true)
 		end
+	end
+
+	if GAMESTATE:IsEventMode() and PREFSMAN:GetPreference("OnlyDedicatedMenuButtons") and event.type ~= "InputEventType_Repeat" then
+		MESSAGEMAN:Broadcast("TestInputEvent", event)
 	end
 
 	return false

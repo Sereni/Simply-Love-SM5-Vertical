@@ -44,12 +44,12 @@ return {
 		{
 			Name="David / mute",
 			Img="mute.png",
-			About="David composed the menu music for Simply Love.  In addition to being a prolific simfile author, he is known in the community for figuring out how to properly sync simfiles and authoring the de facto standard guide to simfile syncing.\n\nDavid was an early adopter of SM5 on arcade hardware and has been a vocal proponent of getting people to switch from SM3.95."
+			About="David composed much of the menu music for Simply Love.  In addition to being a prolific simfile author, he is known in the community for figuring out how to properly sync simfiles and authoring the de facto standard guide to simfile syncing.\n\nDavid was an early adopter of SM5 on arcade hardware and has been a vocal proponent of getting people to switch from SM3.95."
 		},
 		{
 			Name="GitHub Community",
 			Img="GitHub.png",
-			About="Many thanks go to the GitHub users who contributed pull requests and helped improve my code over the years.\n\nKauhsa, HeySora, OmnipotentEntity, ianklatzco, FishamanP, itg-abby, camsta4, fent, djjack, Flameshadowxeroshin, Horsey-, TheKamilia, tfrederick74656, DinsFire64, sahunt, StefanoFiumara, dougshell, shockdude, Sereni, karamel59, TheNick, and CrashCringle12."
+			About="Many thanks go to the GitHub users who have contributed over the years.  This includes:\n\nKauhsa, HeySora, OmnipotentEntity, ianklatzco, FishamanP, itg-abby, camsta4, fent, djjack, Flameshadowxeroshin, Horsey-, bowwychan, tfrederick74656, DinsFire64, sahunt, StefanoFiumara, concubidated, sangyeolbaek, nayotodot, dougshell, shockdude, Sereni, karamel59, electromuis, Fieoner, ListenerJubatus, TheNick, CrashCringle12, and natano."
 		}
 	},
 
@@ -77,12 +77,12 @@ return {
 	{
 		{
 			Name="Dance Dance Maniacs",
-			Img={ "ddm/2019.jpg", "ddm/2017.jpg", "ddm/2015.jpg", "ddm/2018.jpg", "ddm/2012.jpg" },
+			Img={ "ddm/2019.jpg", "ddm/2017.jpg", "ddm/2015.jpg", "ddm/2018.jpg", "ddm/2012.jpg", "ddm/2010.jpg" },
 			About="The PSU Dance Dance Maniacs dance gamed with me at my best and worst.\n\nLightningXCE, Zyroplex, Captain Swagonforce, rawinput, milk, teejusb, NBCrescendo, Vidur, freemansbackup, chronohat\n\nDJ OMiY, minomotu, Kristina, blakjakal, Vale, Silverheart97, AndyBeard, Alex, tfrederick, Catherine, Elena, Jonathan, Eileen, Ali, Anna\n\nRime, PirateKing, Fox, Lev, Cathy, Grant, Koopa, CCTV, MathMatt, TheNick, Nate(s), Crash Cringle, Daisy1218, Miaou Miaou Miaou, Silverwolfstar, and more."
 		},
 		{
 			Name="DDRIllini",
-			Img={ "uiuc/uiuc.jpg", "uiuc/uiuc2.jpg", "uiuc/uiuc3.jpg", "uiuc/uiuc4.jpg", "uiuc/uiuc5.jpg" },
+			Img={ "uiuc/uiuc.jpg", "uiuc/uiuc2.jpg", "uiuc/uiuc3.jpg", "uiuc/uiuc4.jpg", "uiuc/uiuc5.jpg", "uiuc/wendy.jpg" },
 			About="Thanks to the DDRIllini crew for being DDM's loving counterpart a time zone away.  I have fond memories of driving with DDM friends to DDRIllini's annual Rumble in the Prairie events each spring.\n\nThank you, Kyt-Xune, Z0rk, feedbacker, Sudzi, ian5v, Benpai, pez, mtgmackid, Krysel, Kasemei, Juni, rikame, Mary, andrewipark, et al!"
 		}
 	},
@@ -142,10 +142,24 @@ return {
 			Name="Moru Zerinho6",
 			Img="Moru_Zerinho6.jpg",
 			About="Moru Zerinho6 volunteered to translate Simply Love's UI into Brazilian Portuguese and the theme is richer for it.\n\nHe spoke with me extensively about his experience going down The Rabbit Hole in Simply Love and how he translated its words for other non-English-speaking people along the way.  His earnest sincerity helped me in ways I am unable to describe using any words of my own."
-		}
+		},
 	},
 
 	-- page 9
+	{
+		{
+			Name="FMS_Cat",
+			Img="fms_cat 1x32.png",
+			About="FMS_Cat translated Simply Love's UI into Japanese, helping to realize a longtime dream of mine.\n\nHe is an incredibly talented WebGL programmer whose creative work with shaders leaves me smiling and curious about how such expansive beauty appears in the tiniest of footprints."
+		},
+		{
+			Name="TheNick",
+			Img="TheNick.jpg",
+			About="Nick enthusiastically translated Simply Love's UI into German.  He's also something of a memer and has been responsible for such magical experiences as What a Wonderful World (UPS4). 👌\n\nWhen I left Penn State, I initially wondered what would become of the arcade machine there.  Would it fall into disrepair?\n\nDuring my first visit back, I saw a then-freshman Nick already quoting Shady Business like he and Mr. Nagasaki went way back.  I understood immediately that the future of dance games would be just fine."
+		},
+	},
+
+	-- page 10
 	{
 		{
 			Name="Riakodoadm",

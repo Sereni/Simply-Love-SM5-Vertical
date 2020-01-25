@@ -20,8 +20,10 @@ end
 -- Other times, we need to be able to localize the choices presented to the player but also
 -- maintain an internal value that code within the theme can rely on regardless of language.
 --
--- For each of the subtables in Overrides, you must specify a 'Choices' function and/or a 'Values' function
--- that returns a table of strings of valid choices.
+-- For each of the subtables in Overrides, you must specify 'Choices' and/or 'Values' depending on your
+-- needs. Each can be either a table of strings or a function that returns a table of strings.
+-- Using a function can be helpful when the OptionRow needs to present different options depending
+-- on certain conditions.
 --
 -- If you specify only 'Choices', the engine presents the strings exactly as-is and also uses those
 -- same strings internally.
@@ -38,30 +40,30 @@ end
 -- As an OptionRow, each subtable is expected to have specific key/value pairs:
 --
 -- ExportOnChange (boolean)
--- 		false if unspecified; if true, calls SaveSelections() whenever the current choice changes
+-- 	false if unspecified; if true, calls SaveSelections() whenever the current choice changes
 -- LayoutType (string)
---		"ShowAllInRow" if unspecified; you can set it to "ShowOneInRow" if needed
+-- 	"ShowAllInRow" if unspecified; you can set it to "ShowOneInRow" if needed
 -- OneChoiceForAllPlayers (boolean)
--- 		false if unspecified
+-- 	false if unspecified
 -- SelectType (string)
--- 		"SelectOne" if unspecified; you can set it to "SelectMultiple" if needed
+-- 	"SelectOne" if unspecified; you can set it to "SelectMultiple" if needed
 -- LoadSelections (function)
--- 		normally (in other themes) called when the PlayerOption screen initializes
---		read the notes surrounding ApplyMods() for further discussion of additional work SL does
+-- 	normally (in other themes) called when the PlayerOption screen initializes
+-- 	read the notes surrounding ApplyMods() for further discussion of additional work SL does
 -- SaveSelections (function)
--- 		this is where you should do whatever work is needed to ensure that the player's choice
---		persists beyond the PlayerOptions screen; normally called around the time of ScreenPlayerOption's
---		OffCommand; can also be called because ExportOnChange=true
+-- 	this is where you should do whatever work is needed to ensure that the player's choice
+-- 	persists beyond the PlayerOptions screen; normally called around the time of ScreenPlayerOption's
+-- 	OffCommand; can also be called because ExportOnChange=true
 
 
--- It's not necessary to define each possible key for each OptionRow.  Anything you don't specifiy
+-- It's not necessary to define each possible key for each OptionRow.  Anything you don't specify
 -- will use fallback values in OptionRowDefault (defined later, below).
 
 local Overrides = {
 
 	-------------------------------------------------------------------------
 	SpeedModType = {
-		Choices = function() return { "x", "C", "M" } end,
+		Choices = { "x", "C", "M" },
 		ExportOnChange = true,
 		LayoutType = "ShowOneInRow",
 		SaveSelections = function(self, list, pn)
@@ -76,7 +78,7 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	SpeedMod = {
-		Choices = function() return { "       " } end,
+		Choices = { "       " },
 		ExportOnChange = true,
 		LayoutType = "ShowOneInRow",
 		LoadSelections = function(self, list, pn)
@@ -109,26 +111,39 @@ local Overrides = {
 			local all = NOTESKIN:GetNoteSkinNames()
 
 			if ThemePrefs.Get("HideStockNoteSkins") then
+				local game = GAMESTATE:GetCurrentGame():GetName()
 
 				-- Apologies, midiman. :(
 				local stock = {
-					"default", "delta", "easyv2", "exactv2", "lambda", "midi-note",
-					"midi-note-3d", "midi-rainbow", "midi-routine-p1", "midi-routine-p2",
-					"midi-solo", "midi-vivid", "midi-vivid-3d", "retro",
-					"retrobar", "retrobar-splithand_whiteblue"
+					dance = {
+						"default", "delta", "easyv2", "exactv2", "lambda", "midi-note",
+						"midi-note-3d", "midi-rainbow", "midi-routine-p1", "midi-routine-p2",
+						"midi-solo", "midi-vivid", "midi-vivid-3d", "retro", "retrobar",
+						"retrobar-splithand_whiteblue"
+					},
+					pump = {
+						"cmd", "cmd-routine-p1", "cmd-routine-p2", "complex", "default",
+						"delta", "delta-note", "delta-routine-p1", "delta-routine-p2",
+						"frame5p", "newextra", "pad", "rhythm", "simple"
+					},
+					kb7 = {
+						"default", "orbital", "retrobar", "retrobar-iidx",
+						"retrobar-o2jam", "retrobar-razor", "retrobar-razor_o2"
+					}
 				}
-
-				for stock_noteskin in ivalues(stock) do
-					for i=1,#all do
-						if stock_noteskin == all[i] then
-							table.remove(all, i)
-							break
+				if stock[game] then
+					for stock_noteskin in ivalues(stock[game]) do
+						for i=1,#all do
+							if stock_noteskin == all[i] then
+								table.remove(all, i)
+								break
+							end
 						end
 					end
 				end
 			end
 
-			-- It's possible a user might want to hide stock notesksins
+			-- It's possible a user might want to hide stock noteskins
 			-- but only have stock noteskins.  If so, just return all noteskins.
 			if #all == 0 then all = NOTESKIN:GetNoteSkinNames() end
 
@@ -160,8 +175,22 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+	ComboFont = {
+		LayoutType = "ShowOneInRow",
+		ExportOnChange = true,
+		Choices = function() return GetComboFonts() end,
+		SaveSelections = function(self, list, pn)
+			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
+			for i, val in ipairs(self.Choices) do
+				if list[i] then mods.ComboFont = val; break end
+			end
+			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the ComboFont preview
+			MESSAGEMAN:Broadcast("ComboFontChanged", {Player=pn, ComboFont=mods.ComboFont})
+		end
+	},
+	-------------------------------------------------------------------------
 	BackgroundFilter = {
-		Values = function() return { 'Off','Dark','Darker','Darkest' } end,
+		Values = { 'Off','Dark','Darker','Darkest' },
 	},
 	-------------------------------------------------------------------------
 	Mini = {
@@ -233,26 +262,26 @@ local Overrides = {
 	-------------------------------------------------------------------------
 	Hide = {
 		SelectType = "SelectMultiple",
-		Values = function() return { "Targets", "SongBG", "Combo", "Lifebar", "Score", "Danger", "ComboExplosions" } end,
+		Values = { "Targets", "SongBG", "Combo", "Lifebar", "Score", "Danger", "ComboExplosions" },
 		LoadSelections = function(self, list, pn)
 			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
-			list[1] = mods.HideTargets 	or false
-			list[2] = mods.HideSongBG 	or false
-			list[3] = mods.HideCombo 	or false
-			list[4] = mods.HideLifebar 	or false
-			list[5] = mods.HideScore 	or false
-			list[6] = mods.HideDanger	or false
+			list[1] = mods.HideTargets or false
+			list[2] = mods.HideSongBG  or false
+			list[3] = mods.HideCombo   or false
+			list[4] = mods.HideLifebar or false
+			list[5] = mods.HideScore   or false
+			list[6] = mods.HideDanger  or false
 			list[7] = mods.HideComboExplosions or false
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
 			local mods, playeroptions = GetModsAndPlayerOptions(pn)
-			mods.HideTargets= list[1]
-			mods.HideSongBG = list[2]
-			mods.HideCombo	= list[3]
-			mods.HideLifebar= list[4]
-			mods.HideScore	= list[5]
-			mods.HideDanger = list[6]
+			mods.HideTargets = list[1]
+			mods.HideSongBG  = list[2]
+			mods.HideCombo   = list[3]
+			mods.HideLifebar = list[4]
+			mods.HideScore   = list[5]
+			mods.HideDanger  = list[6]
 			mods.HideComboExplosions = list[7]
 
 			playeroptions:Dark(mods.HideTargets and 1 or 0)
@@ -279,9 +308,7 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	TargetScore = {
-		Values = function()
-			return { 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'S-', 'S', 'S+', '☆', '☆☆', '☆☆☆', '☆☆☆☆', 'Machine best', 'Personal best' }
-		end,
+		Values = { 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'S-', 'S', 'S+', '☆', '☆☆', '☆☆☆', '☆☆☆☆', 'Machine best', 'Personal best' },
 		LoadSelections = function(self, list, pn)
 			local i = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.TargetScore) or 11
 			list[i] = true
@@ -295,7 +322,7 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	ActionOnMissedTarget = {
-		Values = function() return { "Nothing", "Fail", "Restart" } end,
+		Values = { "Nothing", "Fail", "Restart" },
 	},
 	-------------------------------------------------------------------------
 	GameplayExtras = {
@@ -308,17 +335,17 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	MeasureCounter = {
-		Values = function() return { "None", "8th", "12th", "16th", "24th", "32nd" } end,
+		Values = { "None", "8th", "12th", "16th", "24th", "32nd" },
 	},
 	-------------------------------------------------------------------------
 	MeasureCounterOptions = {
 		SelectType = "SelectMultiple",
-		Values = function() return { "MeasureCounterLeft", "MeasureCounterUp", "HideRestCounts" } end,
+		Values = { "MeasureCounterLeft", "MeasureCounterUp", "HideRestCounts" },
 	},
 	-------------------------------------------------------------------------
 	WorstTimingWindow = {
 		Choices = function()
-			local tns = "TapNoteScore" .. (SL.Global.GameMode=="Competitive" and "" or SL.Global.GameMode)
+			local tns = "TapNoteScore" .. (SL.Global.GameMode=="ITG" and "" or SL.Global.GameMode)
 			local t = {THEME:GetString("SLPlayerOptions","None")}
 			-- assume pluralization via terminal s
 			t[2] = THEME:GetString(tns,"W5").."s"
@@ -353,7 +380,7 @@ local Overrides = {
 					if PREFSMAN:PreferenceExists("TimingWindowSecondsW"..gmods.WorstTimingWindow) then
 						PREFSMAN:SetPreference("TimingWindowSecondsW"..i, SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..gmods.WorstTimingWindow])
 					else
-						PREFSMAN:SetPreference("TimingWindowSecondsW"..i, 0)
+						PREFSMAN:SetPreference("TimingWindowSecondsW"..i, -math.abs(math.random(math.floor(math.pi))))
 					end
 				end
 			end
@@ -362,9 +389,9 @@ local Overrides = {
 	-------------------------------------------------------------------------
 	Vocalization = {
 		Choices = function()
-			-- Allow users to artbitrarily add new vocalizations to ./Simply Love/Other/Vocalize/
+			-- Allow users to arbitrarily add new vocalizations to ./Simply Love/Other/Vocalize/
 			-- and have those vocalizations be automatically detected
-			local vocalizations = FILEMAN:GetDirListing(GetVocalizeDir() , true, false)
+			local vocalizations = FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory().."/Other/Vocalize/" , true, false)
 			table.insert(vocalizations, 1, "None")
 
 			if #vocalizations > 1 then
@@ -376,20 +403,18 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	ReceptorArrowsPosition = {
-		Choices = function() return { "StomperZ", "ITG" } end,
+		Choices = { "StomperZ", "ITG" },
 	},
 	-------------------------------------------------------------------------
 	LifeMeterType = {
-		Values = function() return { "Standard", "Surround", "Vertical" } end,
+		Values = { "Standard", "Surround", "Vertical" },
 	},
 	-------------------------------------------------------------------------
 	ScreenAfterPlayerOptions = {
 		Values = function()
-			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
-				return { 'Gameplay', 'Select Music', 'Extra Modifiers' }
-			else
-				return { 'Gameplay', 'Extra Modifiers' }
-			end
+			local choices = { "Gameplay", "Select Music", "Options2", "Options3"  }
+			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
+			return choices
 		end,
 		OneChoiceForAllPlayers = true,
 		LoadSelections = function(self, list, pn)
@@ -397,24 +422,24 @@ local Overrides = {
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
+			if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.GameplayScreen() end
+
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
-				if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.GameplayScreen() end
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions = SelectMusicOrCourse() end
 				if list[3] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions2" end
+				if list[4] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions3" end
 			else
-				if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.GameplayScreen() end
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions2" end
+				if list[3] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions3" end
 			end
 		end
 	},
 	-------------------------------------------------------------------------
 	ScreenAfterPlayerOptions2 = {
 		Values = function()
-			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
-				return { 'Gameplay', 'Select Music', 'Normal Modifiers' }
-			else
-				return { 'Gameplay', 'Normal Modifiers' }
-			end
+			local choices = { "Gameplay", "Select Music", "Options1", "Options3"  }
+			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
+			return choices
 		end,
 		OneChoiceForAllPlayers = true,
 		LoadSelections = function(self, list, pn)
@@ -422,13 +447,41 @@ local Overrides = {
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
+			if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.GameplayScreen() end
+
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
-				if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.GameplayScreen() end
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions2 = SelectMusicOrCourse() end
 				if list[3] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions" end
+				if list[4] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions3" end
 			else
-				if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.GameplayScreen() end
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions" end
+				if list[3] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions3" end
+			end
+		end
+	},
+	-------------------------------------------------------------------------
+	-- this is so dumb; I need to find time to completely rewrite ScreenPlayerOptions :(
+	ScreenAfterPlayerOptions3 = {
+		Values = function()
+			local choices = { "Gameplay", "Select Music", "Options1", "Options2"  }
+			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
+			return choices
+		end,
+		OneChoiceForAllPlayers = true,
+		LoadSelections = function(self, list, pn)
+			list[1] = true
+			return list
+		end,
+		SaveSelections = function(self, list, pn)
+			if list[1] then SL.Global.ScreenAfter.PlayerOptions3 = Branch.GameplayScreen() end
+
+			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
+				if list[2] then SL.Global.ScreenAfter.PlayerOptions3 = SelectMusicOrCourse() end
+				if list[3] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions" end
+				if list[4] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions2" end
+			else
+				if list[2] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions" end
+				if list[3] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions2" end
 			end
 		end
 	}
@@ -448,16 +501,16 @@ local OptionRowDefault = {
 
 			if Overrides[name].Values then
 				if Overrides[name].Choices then
-					self.Choices = Overrides[name].Choices()
+					self.Choices = type(Overrides[name].Choices)=="function" and Overrides[name].Choices() or Overrides[name].Choices
 				else
 					self.Choices = {}
-					for i, v in ipairs( Overrides[name].Values() ) do
+					for i, v in ipairs( (type(Overrides[name].Values)=="function" and Overrides[name].Values() or Overrides[name].Values) ) do
 						self.Choices[i] = THEME:GetString("SLPlayerOptions", v)
 					end
 				end
-				self.Values = Overrides[name].Values()
+				self.Values = type(Overrides[name].Values)=="function" and Overrides[name].Values() or Overrides[name].Values
 			else
-				self.Choices = Overrides[name].Choices()
+				self.Choices = type(Overrides[name].Choices)=="function" and Overrides[name].Choices() or Overrides[name].Choices
 			end
 
 			-- define fallback values to use here if an override isn't specified
@@ -509,6 +562,17 @@ local OptionRowDefault = {
 	}
 }
 
+------------------------------------------------------------
+-- Passed a string like "Mini", CustomOptionRow() will return table that represents
+-- the themeside attributes of the OptionRow for Mini.
+--
+-- CustomOptionRow() is mostly used in Metrics.ini under [ScreenPlayerOptions] and siblings
+-- to pass OptionRow data (Lua) to the engine (C++) via Metrics (ini).
+--
+-- Thre are a few other places in the theme where CustomOptionRow() is used to retrieve a list
+-- of possible choices for a given OptionRow and then do something based on that list.
+-- For example, ./ScreenPlayerOptions overlay/NoteSkinPreviews.lua uses it to get a list of NoteSkins
+-- so it can load preview NoteSkin actors into the overlay's ActorFrame ahead of time.
 
 function CustomOptionRow( name )
 	-- assign the properties of the generic OptionRowDefault to OptRow
@@ -519,13 +583,13 @@ function CustomOptionRow( name )
 end
 
 
+------------------------------------------------------------
 -- Mods are applied in their respective SaveSelections() functions when
 -- ScreenPlayerOptions receives its OffCommand(), but what happens
 -- if a player expects mods to have been set via a profile,
 -- and thus never visits ScreenPlayerOptions?
 --
--- Thus, we have this global function, ApplyMods()
--- which we can call from
+-- Thus, we have this global function, ApplyMods(), which we can call from
 -- ./BGAnimations/ScreenProfileLoad overlay.lua
 -- as well as the the PlayerJoinedMessageCommand of
 -- /BGAnimations/ScreenSelectMusic overlay/PlayerModifiers.lua
@@ -535,7 +599,7 @@ function ApplyMods(player)
 	for name,value in pairs(Overrides) do
 		OptRow = CustomOptionRow( name )
 
-		-- LoadSelections() and SaveSelections() expect two arguments in addtion to self (the OptionRow)
+		-- LoadSelections() and SaveSelections() expect two arguments in addition to self (the OptionRow)
 		-- first, a table of true/false values corresponding to the OptionRow's Choices table
 		-- second, the player that this applies to
 		--

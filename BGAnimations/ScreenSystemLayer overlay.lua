@@ -2,7 +2,7 @@
 -- very minor modifications.
 
 local function CreditsText( pn )
-	return LoadFont("_miso") .. {
+	return LoadFont("Common Normal") .. {
 		InitCommand=function(self)
 			self:visible(false)
 			self:name("Credits" .. PlayerNumberToString(pn))
@@ -48,7 +48,7 @@ t[#t+1] = Def.ActorFrame {
 		end
 		self:playcommand( "Off" )
 	end,
-	HideSystemMessageMessageCommand=cmd(finishtweening),
+	HideSystemMessageMessageCommand=function(self) self:finishtweening() end,
 
 	Def.Quad {
 		InitCommand=function(self)
@@ -59,13 +59,13 @@ t[#t+1] = Def.ActorFrame {
 			self:finishtweening():diffusealpha(0.85)
 				:zoomto(_screen.w, (SystemMessageText:GetHeight() + 16) * 0.8 )
 		end,
-		OffCommand=function(self) self:sleep(3):linear(0.5):diffusealpha(0) end,
+		OffCommand=function(self) self:sleep(3.33):linear(0.5):diffusealpha(0) end,
 	},
 
-	LoadFont("_miso")..{
+	LoadFont("Common Normal")..{
 		Name="Text",
 		InitCommand=function(self)
-			self:maxwidth(750):horizalign(left):vertalign(top)
+			self:maxwidth(_screen.w-20):horizalign(left):vertalign(top)
 				:xy(SCREEN_LEFT+10, 10):diffusealpha(0):zoom(0.8)
 			SystemMessageText = self
 		end,
@@ -76,7 +76,7 @@ t[#t+1] = Def.ActorFrame {
 
 -- Wendy CreditText at lower-center of screen
 t[#t+1] = LoadFont("_wendy small")..{
-	InitCommand=cmd(xy, _screen.cx, _screen.h-16; zoom,0.5; horizalign,center ),
+	InitCommand=function(self) self:xy(_screen.cx, _screen.h-16):zoom(0.5):horizalign(center) end,
 
 	OnCommand=function(self) self:playcommand("Refresh") end,
 	ScreenChangedMessageCommand=function(self) self:playcommand("Refresh") end,

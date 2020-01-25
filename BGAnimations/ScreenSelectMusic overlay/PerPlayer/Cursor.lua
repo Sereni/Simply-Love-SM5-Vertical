@@ -2,6 +2,7 @@ local player = ...
 local pn = ToEnumShortString(player)
 local p = PlayerNumber:Reverse()[player]
 
+local GetStepsToDisplay = LoadActor("../StepsDisplayList/StepsToDisplay.lua")
 -- I feel like this surely must be the wrong way to do this...
 local GlobalOffsetSeconds = PREFSMAN:GetPreference("GlobalOffsetSeconds")
 
@@ -11,7 +12,8 @@ return Def.Sprite{
 	Texture=THEME:GetPathB("ScreenSelectMusic", "overlay/PerPlayer/arrow.png"),
 	Name="Cursor"..pn,
 	InitCommand=function(self)
-		self:visible( false ):halign( p )
+		self:visible( GAMESTATE:IsHumanPlayer(player) )
+		self:halign( p )
 
 		self:zoom(0.575)
 		self:bounce():effectclock("beatnooffset")
@@ -27,84 +29,49 @@ return Def.Sprite{
 		end
 
 		self:effectperiod(1):effectoffset( -10 * GlobalOffsetSeconds)
-
-		if GAMESTATE:IsHumanPlayer(player) then
-			self:playcommand( "Appear" .. pn)
-		end
 	end,
-
-	OnCommand=cmd(queuecommand,"Set"),
-	CurrentSongChangedMessageCommand=cmd(queuecommand,"Set"),
-	CurrentCourseChangedMessageCommand=cmd(queuecommand,"Set"),
-
-	CurrentStepsP1ChangedMessageCommand=cmd(queuecommand,"Set"),
-	CurrentTrailP1ChangedMessageCommand=cmd(queuecommand,"Set"),
-	CurrentStepsP2ChangedMessageCommand=cmd(queuecommand,"Set"),
-	CurrentTrailP2ChangedMessageCommand=cmd(queuecommand,"Set"),
-
-	SetCommand=function(self)
-		local song = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
-
-		if song then
-			steps = (GAMESTATE:IsCourseMode() and song:GetAllTrails()) or SongUtil.GetPlayableSteps( song )
-
-			if steps then
-				StepsToDisplay = GetStepsToDisplay(steps)
-				self:playcommand("StepsHaveChanged", {Steps=StepsToDisplay, Player=player})
-			end
-		end
-	end,
-
 
 	PlayerJoinedMessageCommand=function(self, params)
-		if params.Player == player then
-			self:playcommand( "Appear" .. pn)
-		end
+		if params.Player == player then self:visible(true) end
 	end,
 	PlayerUnjoinedMessageCommand=function(self, params)
-		if params.Player == player then
-			self:visible(false)
-		end
+		if params.Player == player then self:visible(false) end
 	end,
 
-	["Appear" .. pn .. "Command"]=function(self) self:visible(true) end,
+	OnCommand=function(self) self:queuecommand("Set") end,
+	CurrentSongChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	CurrentCourseChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	CurrentTrailP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	CurrentTrailP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
 
-	StepsHaveChangedCommand=function(self, params)
+	SetCommand=function(self)
+		local SongOrCourse = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
 
-		if params and params.Player == player then
-			-- if we have params, but no steps
-			-- it means we're on hovering on a group
-			if not params.Steps then
-				-- so, since we're on a group, no charts should be specifically available
-				-- making any row on the grid temporarily able-to-be-moved-to
-				RowIndex = RowIndex + params.Direction
+		if SongOrCourse then
+			local AllStepsOrTrails = (GAMESTATE:IsCourseMode() and SongOrCourse:GetAllTrails()) or SongUtil.GetPlayableSteps( SongOrCourse )
+			local StepsToDisplay = GetStepsToDisplay(AllStepsOrTrails)
+			local CurrentStepsOrTrail = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player) or GAMESTATE:GetCurrentSteps(player)
 
-			else
-				-- otherwise, we have been passed steps
-				for index,chart in pairs(params.Steps) do
-					if GAMESTATE:IsCourseMode() then
-						if chart == GAMESTATE:GetCurrentTrail(player) then
-							RowIndex = index
-							break
-						end
-					else
-						if chart == GAMESTATE:GetCurrentSteps(player) then
-							RowIndex = index
-							break
-						end
-					end
+
+
+			for i,chart in pairs(StepsToDisplay) do
+				if chart == CurrentStepsOrTrail then
+					RowIndex = i
+					break
 				end
 			end
+		end
 
-			-- keep within reasonable limits because Edit charts are a thing
-			RowIndex = clamp(RowIndex, 1, 5)
+		-- keep within reasonable limits because Edit charts are a thing
+		RowIndex = clamp(RowIndex, 1, 5)
 
-			-- update cursor y position
-			local sdl = self:GetParent():GetParent():GetChild("StepsDisplayList")
-			if sdl then
-				local grid = sdl:GetChild("Grid")
-				self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Blocks_"..RowIndex):GetY() + 1 )
-			end
+		-- update cursor y position
+		local sdl = self:GetParent():GetParent():GetChild("StepsDisplayList")
+		if sdl then
+			local grid = sdl:GetChild("Grid")
+			self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Blocks_"..RowIndex):GetY() + 1 )
 		end
 	end
 }

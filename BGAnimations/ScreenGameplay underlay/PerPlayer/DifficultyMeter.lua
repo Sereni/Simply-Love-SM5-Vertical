@@ -25,7 +25,7 @@ return Def.ActorFrame{
 			self:diffuse( Color.Black )
 			self:zoom( 0.3 )
 		end,
-		CurrentSongChangedMessageCommand=cmd(queuecommand,"Begin"),
+		CurrentSongChangedMessageCommand=function(self) self:queuecommand("Begin") end,
 		BeginCommand=function(self)
 			local steps = GAMESTATE:GetCurrentSteps(player)
 			local meter = steps:GetMeter()

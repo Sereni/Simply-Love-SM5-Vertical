@@ -30,37 +30,38 @@ af[#af+1] = Def.Quad{
 }
 
 af[#af+1] = Def.BitmapText{
-	Font="_miso",
+	Font="Common Normal",
 	InitCommand=function(self)
 		self:xy(- bg_width/2 + padding, -bg_height/2 + padding)
 			:valign(0)
 			:halign(0)
-			:wrapwidthpixels(bg_width-padding*2)
+			:_wrapwidthpixels(bg_width-padding*2)
 	end,
 	UpdateCommand=function(self, params)
-		self:settext( THEME:GetString("OptionExplanations", params.Name) )
+		self:settext( THEME:GetString("OptionExplanations", params.Name) ):_wrapwidthpixels(bg_width-padding*2)
 	end
 }
 
 af[#af+1] = Def.ActorFrame{
 	Name="Recommended",
 	UpdateCommand=function(self, params)
-		self:visible( THEME:HasString("RecommendedOptionExplanations", params.Name) )
+		self:visible( THEME:HasString("RecommendedOptionExplanations", params.Name) and THEME:GetString("RecommendedOptionExplanations", params.Name) ~= "" )
 	end,
 
 	Def.BitmapText{
-		Font="_miso",
+		Font="Common Normal",
 		InitCommand=function(self)
 			recommended_bmt = self
 
 			self:xy(- bg_width/2 + padding, bg_height/2 - padding)
 				:valign(1) -- bottom aligned
 				:halign(0) -- left aligned
-				:wrapwidthpixels(bg_width-padding*2)
+				:_wrapwidthpixels(bg_width-padding*2)
 		end,
 		UpdateCommand=function(self, params)
 			if THEME:HasString("RecommendedOptionExplanations", params.Name) then
 				self:settext( recommended_string .. ": " .. THEME:GetString("RecommendedOptionExplanations", params.Name) )
+				self:_wrapwidthpixels(bg_width-padding*2)
 			else
 				self:settext("")
 			end

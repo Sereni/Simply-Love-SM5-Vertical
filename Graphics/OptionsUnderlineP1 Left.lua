@@ -1,4 +1,4 @@
 return Def.Quad {
-	Name="OptionsUnderlineMiddle",
-	InitCommand=cmd(zoomto,1,3)
+	Name="OptionsUnderlineLeft",
+	InitCommand=function(self) self:zoomto(1,3) end
 }

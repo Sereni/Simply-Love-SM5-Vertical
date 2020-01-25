@@ -21,6 +21,15 @@ local PictureActor = function( path, _y )
 		InitCommand=function(self)
 			src_width  = self:GetTexture():GetSourceWidth()
 			src_height = self:GetTexture():GetSourceHeight()
+
+			-- check for animated sprite textures
+			local w, h = path:match("(%d+)x(%d+)")
+			if w and h then
+				src_width = src_width/w
+				src_height = src_height/h
+				self:SetAllStateDelays(0.035)
+			end
+
 			img_height = img_width * (src_height/src_width)
 
 			self:zoomto(img_width, img_height)
@@ -81,7 +90,7 @@ for i=1, #people do
 
 	-- name / handle
 	af[#af+1] = Def.BitmapText{
-		Font="_miso",
+		Font="Common Normal",
 		Text=people[i].Name,
 		InitCommand=function(self)
 			local zoom_factor = scale(#people,2,5,1,0.75)
@@ -95,14 +104,17 @@ for i=1, #people do
 
 	-- about
 	af[#af+1] = Def.BitmapText{
-		Font="_miso",
+		Font="Common Normal",
 		Text=people[i].About,
 		InitCommand=function(self)
 			self:valign(0):halign(0):zoom(0.8)
-				:wrapwidthpixels((space.w - padding*4 - img_width) * (1/0.85) )
+				:_wrapwidthpixels((space.w - padding*4 - img_width) * (1/0.85) )
 				:x(-space.w/2 + padding*4 + img_width)
 				:y(padding + quad_y )
-			if #people >= 3 and people[i].Name ~= "Paul J Kim" then
+
+			if #people >= 3
+			and people[i].Name ~= "Paul J Kim" -- forever my favorite special case
+			then
 				self:vertspacing(-2)
 			end
 		end

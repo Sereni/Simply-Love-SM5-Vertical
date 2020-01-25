@@ -1,18 +1,29 @@
 local songs = {
-	Arrows = "cloud break",
-	Bears = "crystalis",
 	Hearts = "feel",
-	Ducks = "Xuxa fami VRC6",
-	Gay = "Mystical Wheelbarrow Journey",
+	Arrows = "cloud break",
+	Bears  = "crystalis",
+	Ducks  = "Xuxa fami VRC6",
+	Cats   = "Beanmania IIDX",
 	Spooky = "Spooky Scary Chiptunes",
-	Stars = "Shooting Star - faux VRC6 remix",
-	Thonk = "Da Box of Kardboard Too (feat Naoki vs ZigZag) - TaroNuke Remix",
+	Gay    = "Mystical Wheelbarrow Journey",
+	Stars  = "Shooting Star - faux VRC6 remix",
+	Thonk  = "Da Box of Kardboard Too (feat Naoki vs ZigZag) - TaroNuke Remix",
 }
 
+-- retrieve the current VisualTheme from the ThemePrefs system
 local style = ThemePrefs.Get("VisualTheme")
+
+-- use the style to index the songs table (above)
+-- and get the song associated with this VisualTheme
 local file = songs[ style ]
+
+-- if a song file wasn't defined in the songs table above
+-- fall back on the song for Hearts as default music
+-- (this sometimes happens when people are experimenting
+-- with making their own custom VisualThemes)
 if not file then file = songs.Hearts end
 
+-- annnnnd some EasterEggs
 if PREFSMAN:GetPreference("EasterEggs") and style ~= "Thonk" then
 	--  41 days remain until the end of the year.
 	if MonthOfYear()==10 and DayOfMonth()==20 then file = "20" end

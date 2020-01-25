@@ -1,13 +1,13 @@
-local pn = ...
+local player = ...
 
-local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(pn)
+local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local PercentDP = stats:GetPercentDancePoints()
 local percent = FormatPercentScore(PercentDP)
 -- Format the Percentage string, removing the % symbol
 percent = percent:gsub("%%", "")
 
 return Def.ActorFrame{
-	Name="PercentageContainer"..ToEnumShortString(pn),
+	Name="PercentageContainer"..ToEnumShortString(player),
 	OnCommand=function(self)
 		self:y( 5 )
 		self:x( -101 ) -- TODO move all frames 1 left
@@ -19,7 +19,6 @@ return Def.ActorFrame{
 	},
 
 	LoadFont("_wendy white")..{
-		Text=percent,
 		Name="Percent",
 		InitCommand=cmd(vertalign, middle; horizalign, right; zoom,0.38 ),
 		OnCommand=cmd(x, 45)

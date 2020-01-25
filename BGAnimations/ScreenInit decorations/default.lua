@@ -8,9 +8,9 @@ local arrow_zoom =	(IsVerticalScreen() and 0.07 or 0.1)
 local arrow_x =		(IsVerticalScreen() and 35 or 50)
 
 af[#af+1] = Def.Quad{
-	InitCommand=cmd(zoomto,_screen.w,0; diffuse, Color.Black; Center),
-	OnCommand=cmd( accelerate,0.3; zoomtoheight,128; diffusealpha,0.9; sleep,2.5),
-	OffCommand=cmd(accelerate,0.3; zoomtoheight,0)
+	InitCommand=function(self) self:zoomto(_screen.w,0):diffuse(Color.Black):Center() end,
+	OnCommand=function(self) self:accelerate(0.3):zoomtoheight(128):diffusealpha(0.9):sleep(2.5) end,
+	OffCommand=function(self) self:accelerate(0.3):zoomtoheight(0) end
 }
 
 -- loop to add 7 SM5 arrows to the primary ActorFrame
@@ -31,11 +31,11 @@ for i=1,7 do
 	}
 end
 
-af[#af+1] = LoadFont("_miso")..{
+af[#af+1] = LoadFont("Common Normal")..{
 	Text=ScreenString("ThemeDesign"),
-	InitCommand=cmd(diffuse,GetHexColor(slc); diffusealpha,0; Center),
-	OnCommand=cmd(sleep,3; linear,0.25; diffusealpha,1),
-	OffCommand=cmd(linear,0.25; diffusealpha,0),
+	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0):Center() end,
+	OnCommand=function(self) self:sleep(3):linear(0.25):diffusealpha(1) end,
+	OffCommand=function(self) self:linear(0.25):diffusealpha(0) end,
 }
 
 return af

@@ -4,13 +4,14 @@ local PlayerDefaults = {
 	__index = {
 		initialize = function(self)
 			self.ActiveModifiers = {
-				JudgmentGraphic = "Love 2x6.png",
-				Mini = "0%",
-				BackgroundFilter = "Off",
 				SpeedModType = "x",
 				SpeedMod = 1.00,
-				Vocalization = "None",
+				JudgmentGraphic = "Love 2x6.png",
+				ComboFont = "Wendy",
 				NoteSkin = nil,
+				Mini = "0%",
+				BackgroundFilter = "Off",
+
 				HideTargets = false,
 				HideSongBG = false,
 				HideCombo = false,
@@ -18,11 +19,12 @@ local PlayerDefaults = {
 				HideScore = false,
 				HideDanger = false,
 				HideComboExplosions = false,
+
 				ColumnFlashOnMiss = false,
 				SubtractiveScoring = false,
+				MeasureCounter = "None",
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
-				MeasureCounter = "None",
 				DataVisualizations = "Disabled",
 				TargetScore = 11,
 				ActionOnMissedTarget = "Nothing",
@@ -73,11 +75,12 @@ local GlobalDefaults = {
 			}
 			self.ScreenAfter = {
 				PlayAgain = "ScreenEvaluationSummary",
-				PlayerOptions = "ScreenGameplay",
-				PlayerOptions2 = "ScreenGameplay"
+				PlayerOptions  = "ScreenGameplay",
+				PlayerOptions2 = "ScreenGameplay",
+				PlayerOptions3 = "ScreenGameplay",
 			}
 			self.ContinuesRemaining = ThemePrefs.Get("NumberOfContinuesAllowed") or 0
-			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "Competitive"
+			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"
 			self.ScreenshotTexture = nil
 			self.MenuTimer = {
 				ScreenSelectMusic = ThemePrefs.Get("ScreenSelectMusicMenuTimer"),
@@ -88,6 +91,8 @@ local GlobalDefaults = {
 				ScreenNameEntry = ThemePrefs.Get("ScreenNameEntryMenuTimer"),
 			}
 			self.TimeAtSessionStart = nil
+
+			self.GameplayReloadCheck = false
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,
@@ -126,7 +131,7 @@ SL = {
 			color("#c9855e"),	-- peach?
 			color("#ff0000")	-- red
 		},
-		Competitive = {
+		ITG = {
 			color("#21CCE8"),	-- blue
 			color("#e29c18"),	-- gold
 			color("#66c955"),	-- green
@@ -134,7 +139,7 @@ SL = {
 			color("#c9855e"),	-- peach?
 			color("#ff0000")	-- red
 		},
-		ECFA = {
+		["FA+"] = {
 			color("#21CCE8"),	-- blue
 			color("#ffffff"),	-- white
 			color("#e29c18"),	-- gold
@@ -153,7 +158,7 @@ SL = {
 	},
 	Preferences = {
 		Casual = {
-			TimingWindowAdd=ThemePrefs.Get("TimingWindowAdd"),
+			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=0,
 			MaxRegenComboAfterMiss=0,
 			MinTNSToHideNotes="TapNoteScore_W3",
@@ -172,8 +177,8 @@ SL = {
 			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
-		Competitive = {
-			TimingWindowAdd=ThemePrefs.Get("TimingWindowAdd"),
+		ITG = {
+			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=10,
 			MinTNSToHideNotes="TapNoteScore_W3",
@@ -192,7 +197,7 @@ SL = {
 			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
-		ECFA = {
+		["FA+"] = {
 			TimingWindowAdd=0.0015,
 			RegenComboAfterMiss=5,
 			MaxRegenComboAfterMiss=10,
@@ -265,7 +270,7 @@ SL = {
 			LifePercentChangeHeld=0,
 			LifePercentChangeHitMine=0,
 		},
-		Competitive = {
+		ITG = {
 			PercentScoreWeightW1=5,
 			PercentScoreWeightW2=4,
 			PercentScoreWeightW3=2,
@@ -296,7 +301,7 @@ SL = {
 			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
 			LifePercentChangeHitMine=-0.050,
 		},
-		ECFA = {
+		["FA+"] = {
 			PercentScoreWeightW1=5,
 			PercentScoreWeightW2=5,
 			PercentScoreWeightW3=4,

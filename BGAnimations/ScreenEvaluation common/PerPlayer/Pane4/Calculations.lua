@@ -161,10 +161,10 @@ for offset=-worst_window, worst_window, 0.001 do
 end
 
 
--- --------------------------------------------------------
+-- ---------------------------------------------
 local af = Def.ActorFrame{}
 
--- --------------------------------------------------------
+-- ---------------------------------------------
 -- LOOK AT THIS GRAPH
 
 -- the histogram AMV
@@ -176,10 +176,10 @@ af[#af+1] = Def.ActorMultiVertex{
 	end
 }
 
--- --------------------------------------------------------
+-- ---------------------------------------------
 -- avg_timing_error value
 af[#af+1] = Def.BitmapText{
-	Font="_miso",
+	Font="Common Normal",
 	Text=(avg_timing_error*1000).."ms",
 	InitCommand=function(self)
 		self:x(40):y(-pane_height+32)
@@ -189,7 +189,7 @@ af[#af+1] = Def.BitmapText{
 
 -- median_offset value
 af[#af+1] = Def.BitmapText{
-	Font="_miso",
+	Font="Common Normal",
 	Text=(median_offset*1000).."ms",
 	InitCommand=function(self)
 		self:x(pane_width/2):y(-pane_height+32)
@@ -199,7 +199,7 @@ af[#af+1] = Def.BitmapText{
 
 -- mode_offset value
 af[#af+1] = Def.BitmapText{
-	Font="_miso",
+	Font="Common Normal",
 	Text=(mode_offset*1000).."ms",
 	InitCommand=function(self)
 		self:x(pane_width-40):y(-pane_height+32)

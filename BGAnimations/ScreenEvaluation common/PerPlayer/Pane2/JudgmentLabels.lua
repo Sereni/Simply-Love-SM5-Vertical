@@ -3,7 +3,7 @@ local pn = ToEnumShortString(player)
 local track_missbcheld = SL[pn].ActiveModifiers.MissBecauseHeld
 
 local TapNoteScores = { Types={'W1', 'W2', 'W3', 'W4', 'W5', 'Miss'}, Names={} }
-local tns_string = "TapNoteScore" .. (SL.Global.GameMode=="Competitive" and "" or SL.Global.GameMode)
+local tns_string = "TapNoteScore" .. (SL.Global.GameMode=="ITG" and "" or SL.Global.GameMode)
 -- get TNS names appropriate for the current GameMode, localized to the current language
 for i, judgment in ipairs(TapNoteScores.Types) do
 	TapNoteScores.Names[#TapNoteScores.Names+1] = THEME:GetString(tns_string, judgment)
@@ -13,12 +13,7 @@ local box_height = 146
 local row_height = box_height/#TapNoteScores.Types
 
 local t = Def.ActorFrame{
-	InitCommand=cmd(xy, 50, _screen.cy-36),
-	OnCommand=function(self)
-		if player == PLAYER_2 then
-			self:x( self:GetX() * -1)
-		end
-	end
+	InitCommand=function(self) self:xy(50 * (player==PLAYER_2 and -1 or 1), _screen.cy-36) end
 }
 
 local miss_bmt
@@ -33,10 +28,10 @@ for i=1, #TapNoteScores.Types do
 		local window = TapNoteScores.Types[i]
 		local label = TapNoteScores.Names[i]
 
-		t[#t+1] = LoadFont("_miso")..{
+		t[#t+1] = LoadFont("Common Normal")..{
 			Text=label:upper(),
 			InitCommand=function(self)
-				self:zoom(0.8):horizalign(right)
+				self:zoom(0.8):horizalign(right):maxwidth(65/self:GetZoom())
 					:x( (player == PLAYER_1 and -130) or -28 )
 					:y( i * row_height )
 					:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
@@ -48,7 +43,7 @@ for i=1, #TapNoteScores.Types do
 end
 
 if track_missbcheld then
-	t[#t+1] = LoadFont("_miso")..{
+	t[#t+1] = LoadFont("Common Normal")..{
 		Text=ScreenString("Held"),
 		InitCommand=function(self)
 			self:y(140):zoom(0.6):halign(1)
