@@ -4,7 +4,7 @@ local pn = ToEnumShortString(player)
 -- table of offet values obtained during this song's playthrough
 -- obtained via ./BGAnimations/ScreenGameplay overlay/JudgmentOffsetTracking.lua
 local sequential_offsets = SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].sequential_offsets
-local pane_width, pane_height = 300, 180
+local pane_width, pane_height = 210, 130
 
 -- ---------------------------------------------
 
@@ -51,7 +51,7 @@ local pane = Def.ActorFrame{
 	Name="Pane4",
 	InitCommand=function(self)
 		self:visible(false)
-			:xy(-pane_width*0.5, pane_height*1.95)
+			:xy(-pane_width*0.5, _screen.cy+pane_height*0.5 -3)
 	end
 }
 
@@ -60,8 +60,8 @@ pane[#pane+1] = Def.BitmapText{
 	Font="_wendy small",
 	Text=ScreenString("Early"),
 	InitCommand=function(self)
-		self:addx(10):addy(-125)
-			:zoom(0.3)
+		self:addx(10):addy(-80)
+			:zoom(0.2)
 			:horizalign(left)
 	end,
 }
@@ -71,8 +71,8 @@ pane[#pane+1] = Def.BitmapText{
 	Font="_wendy small",
 	Text=ScreenString("Late"),
 	InitCommand=function(self)
-		self:addx(pane_width-10):addy(-125)
-			:zoom(0.3)
+		self:addx(pane_width-10):addy(-80)
+			:zoom(0.2)
 			:horizalign(right)
 	end,
 }
@@ -153,7 +153,7 @@ pane[#pane+1] = Def.Quad{
 
 		self:vertalign(top)
 			:zoomto(1, pane_height - 40 )
-			:xy(x, -140)
+			:xy(x, -95)
 			:diffuse(1,1,1,0.666)
 
 		if SL.Global.GameMode == "StomperZ" then
@@ -186,13 +186,14 @@ label.y = -pane_height+20
 label.zoom = 0.575
 label.padding = 3
 label.max_width = ((pane_width/3)/label.zoom) - ((label.padding/label.zoom)*3)
+label.margin = 20
 
 -- avg_timing_error label
 pane[#pane+1] = Def.BitmapText{
 	Font="Common Normal",
 	Text=ScreenString("MeanTimingError"),
 	InitCommand=function(self)
-		self:x(40):y(label.y)
+		self:x(label.margin):y(label.y)
 			:zoom(label.zoom):maxwidth(label.max_width)
 
 		if self:GetWidth() > label.max_width then
@@ -216,7 +217,7 @@ pane[#pane+1] = Def.BitmapText{
 	Font="Common Normal",
 	Text=ScreenString("Mode"),
 	InitCommand=function(self)
-		self:x(pane_width-40):y(label.y)
+		self:x(pane_width-label.margin):y(label.y)
 			:zoom(label.zoom):maxwidth(label.max_width)
 
 		if self:GetWidth() > label.max_width then

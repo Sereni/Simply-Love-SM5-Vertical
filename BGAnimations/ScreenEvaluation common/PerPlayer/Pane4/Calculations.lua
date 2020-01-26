@@ -177,13 +177,15 @@ af[#af+1] = Def.ActorMultiVertex{
 }
 
 -- ---------------------------------------------
+local stat_font_size = 0.6
+local x_margin = 20
 -- avg_timing_error value
 af[#af+1] = Def.BitmapText{
 	Font="Common Normal",
 	Text=(avg_timing_error*1000).."ms",
 	InitCommand=function(self)
-		self:x(40):y(-pane_height+32)
-			:zoom(0.8)
+		self:x(x_margin):y(-pane_height+32)
+			:zoom(stat_font_size)
 	end,
 }
 
@@ -193,7 +195,7 @@ af[#af+1] = Def.BitmapText{
 	Text=(median_offset*1000).."ms",
 	InitCommand=function(self)
 		self:x(pane_width/2):y(-pane_height+32)
-			:zoom(0.8)
+			:zoom(stat_font_size)
 	end,
 }
 
@@ -202,8 +204,8 @@ af[#af+1] = Def.BitmapText{
 	Font="Common Normal",
 	Text=(mode_offset*1000).."ms",
 	InitCommand=function(self)
-		self:x(pane_width-40):y(-pane_height+32)
-			:zoom(0.8)
+		self:x(pane_width-x_margin):y(-pane_height+32)
+			:zoom(stat_font_size)
 	end,
 }
 
