@@ -5,13 +5,13 @@ local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local TapNoteScores = {
 	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
 	-- x values for P1 and P2
-	x = { 0, 0 }
+	x = { P1=0, P2=0 }
 }
 
 local RadarCategories = {
 	Types = { 'Holds', 'Mines', 'Hands', 'Rolls' },
 	-- x values for P1 and P2, offset relatively to TapNoteScores to fit judgment labels.
-	x = { -242, -242 }
+	x = { P1=-242, P2=-242 }
 }
 
 
