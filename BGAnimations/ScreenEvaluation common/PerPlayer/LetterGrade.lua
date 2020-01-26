@@ -1,3 +1,7 @@
+-- Letter grade doesn't fit into vertical screen right now.
+-- TODO(Sereni): Find a space for letter grade or delete this file.
+if true then return end
+
 if SL.Global.GameMode == "StomperZ" then return end
 
 local player = ...
