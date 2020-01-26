@@ -84,7 +84,7 @@ else
 end
 local hash = GenerateHash(style, difficulty):sub(1, 12)
 
-local qrcode_size = 168
+local qrcode_size = 122
 
 -- ************* CURRENT QR VERSION *************
 -- * Update whenever we change relevant QR code *
@@ -104,9 +104,14 @@ local pane = Def.ActorFrame{
 	end
 }
 
+local text_x_offset = -100
+local text_y_offset = 225
+local text_width = 72
+local text_body_size = 0.55
+
 pane[#pane+1] = qrcode_amv( url, qrcode_size )..{
 	OnCommand=function(self)
-		self:xy(-23,190)
+		self:xy(-21,189)
 	end
 }
 
@@ -114,17 +119,17 @@ pane[#pane+1] = LoadActor("../Pane2/Percentage.lua", player)
 
 pane[#pane+1] = LoadFont("Common Normal")..{
 	Text="GrooveStats QR",
-	InitCommand=function(self) self:xy(-140, 222):align(0,0) end
+	InitCommand=function(self) self:zoom(0.7):xy(text_x_offset, text_y_offset):align(0,0) end
 }
 
 pane[#pane+1] = Def.Quad{
-	InitCommand=function(self) self:xy(-140, 245):zoomto(96,1):align(0,0):diffuse(1,1,1,0.33) end
+	InitCommand=function(self) self:xy(text_x_offset, text_y_offset+20):zoomto(text_width,1):align(0,0):diffuse(1,1,1,0.33) end
 }
 
 pane[#pane+1] = LoadFont("Common Normal")..{
 	Text=ScreenString("QRInstructions"),
 	InitCommand=function(self)
-		self:zoom(0.8):xy(-140,255):align(0,0):vertspacing(-4):wrapwidthpixels(96/0.8)
+		self:zoom(text_body_size):xy(text_x_offset,text_y_offset+27):align(0,0):vertspacing(-4):wrapwidthpixels(text_width/text_body_size)
 		-- FIXME: Oof.
 		if THEME:GetCurLanguage() == "ja" then self:_wrapwidthpixels(96/0.8) end
 	end,
