@@ -55,9 +55,6 @@ for player in ivalues(Players) do
 		-- nice
 		LoadActor("./PerPlayer/nice.lua", player),
 
-		-- stepartist
-		LoadActor("./PerPlayer/StepArtist.lua", player),
-
 		-- difficulty text and meter
 		LoadActor("./PerPlayer/Difficulty.lua", player),
 
