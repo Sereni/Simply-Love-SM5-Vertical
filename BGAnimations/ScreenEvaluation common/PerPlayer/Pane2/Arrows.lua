@@ -22,8 +22,8 @@ local columns = {
 
 local rows = { "W1", "W2", "W3", "W4", "W5", "Miss" }
 
-local box_width = 230
-local box_height = 146
+local box_width = 140
+local box_height = 96
 local column_width = box_width/#columns[game]
 local row_height = box_height/#rows
 
@@ -38,7 +38,7 @@ if style == "OnePlayerTwoSides" then
 end
 
 local af = Def.ActorFrame{
-	InitCommand=function(self) self:xy(-104, _screen.cy-40) end
+	InitCommand=function(self) self:xy(-box_width/2 + 15, _screen.cy-38) end
 }
 
 local gmods = SL.Global.ActiveModifiers
@@ -49,7 +49,7 @@ for i,column in ipairs( columns[game] ) do
 	-- rudimentary error handling because NoteSkins From The Internet™ may contain Lua errors
 	af[#af+1] = GetNoteSkinActor(noteskin, column)..{
 		OnCommand=function(self)
-			self:x( i*column_width ):zoom(0.4):visible(true)
+			self:x( i*column_width ):zoom(0.35):visible(true)
 		end
 	}
 
@@ -64,7 +64,7 @@ for i,column in ipairs( columns[game] ) do
 				Text=SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment],
 				InitCommand=function(self)
 					self:xy(i*column_width, j*row_height + 4)
-						:zoom(0.9)
+						:zoom(0.8)
 					if j == #rows then miss_bmt = self end
 				end
 			}
@@ -76,7 +76,7 @@ for i,column in ipairs( columns[game] ) do
 		af[#af+1] = LoadFont("Common Normal")..{
 			Text=SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i].MissBecauseHeld,
 			InitCommand=function(self)
-				self:xy(i*column_width - 1, 144):zoom(0.65):halign(1)
+				self:xy(i*column_width - 1, 95):zoom(0.65):halign(1)
 			end,
 			OnCommand=function(self)
 				self:x( self:GetX() - miss_bmt:GetWidth()/2 )

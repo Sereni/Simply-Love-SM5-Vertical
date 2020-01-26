@@ -9,8 +9,8 @@ percent = percent:gsub("%%", "")
 return Def.ActorFrame{
 	Name="PercentageContainer"..ToEnumShortString(pn),
 	OnCommand=function(self)
-		self:x( -115 )
-		self:y( _screen.cy-40 )
+		self:x( -70 )
+		self:y( _screen.cy-39 )
 	end,
 
 	-- dark background quad behind player percent score
