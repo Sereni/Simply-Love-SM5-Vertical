@@ -153,7 +153,7 @@ pane[#pane+1] = Def.Quad{
 
 		self:vertalign(top)
 			:zoomto(1, pane_height - 40 )
-			:xy(x, -95)
+			:xy(x, -91)
 			:diffuse(1,1,1,0.666)
 
 		if SL.Global.GameMode == "StomperZ" then
