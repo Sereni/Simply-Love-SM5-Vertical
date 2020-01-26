@@ -10,17 +10,18 @@ return Def.ActorFrame{
 	Name="PercentageContainer"..ToEnumShortString(player),
 	OnCommand=function(self)
 		self:y( 5 )
-		self:x( -101 ) -- TODO move all frames 1 left
+		self:x( -101 )
 	end,
 
 	-- dark background quad behind player percent score
 	Def.Quad{
-		InitCommand=cmd(diffuse, color("#101519"); zoomto, 102,40 )
+		InitCommand=cmd(diffuse, color("#101519"); zoomto, 102,40)
 	},
 
 	LoadFont("_wendy white")..{
 		Name="Percent",
-		InitCommand=cmd(vertalign, middle; horizalign, right; zoom,0.38 ),
+		Text = percent,
+		InitCommand=cmd(vertalign, middle; horizalign, right; zoom, 0.38),
 		OnCommand=cmd(x, 45)
 	}
 }
