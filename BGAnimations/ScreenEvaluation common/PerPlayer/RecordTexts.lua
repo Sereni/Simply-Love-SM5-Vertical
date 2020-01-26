@@ -44,22 +44,28 @@ if EarnedMachineRecord or EarnedPersonalRecord then
 	local t = Def.ActorFrame{
 		InitCommand=function(self) self:zoom(0.225) end,
 		OnCommand=function(self)
-			self:x( player == PLAYER_1 and -45 or 95 )
-			self:y( 54 )
+			self:x( _screen.cx -55 )
+			self:y( _screen.cy -70 )
 		end
 	}
 
 	if HighScoreIndex.Machine+1 > 0 then
+		local y_offset = -18
+		-- If Personal record isn't displayed, move machine record down
+		if HighScoreIndex.Personal+1 <= 0 then
+			y_offset = 24
+		end
 		t[#t+1] = LoadFont("_wendy small")..{
 			Text=string.format("Machine Record %i", HighScoreIndex.Machine+1),
-			InitCommand=function(self) self:xy(-110,-18):diffuse(PlayerColor(player)) end,
+			InitCommand=function(self) self:y(y_offset):horizalign(right):diffuse(PlayerColor(player)) end,
+
 		}
 	end
 
 	if HighScoreIndex.Personal+1 > 0 then
 		t[#t+1] = LoadFont("_wendy small")..{
 			Text=string.format("Personal Record %i", HighScoreIndex.Personal+1),
-			InitCommand=function(self) self:xy(-110,24):diffuse(PlayerColor(player)) end,
+			InitCommand=function(self) self:y(24):horizalign(right):diffuse(PlayerColor(player)) end,
 		}
 	end
 
