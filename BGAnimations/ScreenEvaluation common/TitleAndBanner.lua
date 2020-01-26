@@ -17,24 +17,7 @@ local title = {
 local y_offset = SL.Global.GameMode=="Casual" and 50 or 46
 local banner_y_offset = y_offset + 2.5
 
-local af = Def.ActorFrame{
-	InitCommand=function(self) self:xy(_screen.cx, y_offset) end,
-
-	-- quad behind the song/course title text
-	Def.Quad{
-		InitCommand=function(self) self:diffuse(color("#1E282F")):setsize(banner.width,title.height):zoom(banner.zoom) end,
-	},
-
-	-- song/course title text
-	LoadFont("_miso")..{
-		InitCommand=function(self)
-			local songtitle = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse():GetDisplayFullTitle()) or GAMESTATE:GetCurrentSong():GetDisplayFullTitle()
-			if songtitle then self:settext(songtitle):maxwidth(banner.width*banner.zoom):zoom(title.zoom) end
-		end
-	}
-}
-
-local af = Def.ActorFrame{ InitCommand=function(self) self:xy(_screen.cx, y_offset) end }
+local af = Def.ActorFrame{InitCommand=function(self) self:xy(_screen.cx, y_offset) end}
 
 if SongOrCourse and SongOrCourse:HasBanner() then
 	--song or course banner, if there is one
@@ -58,14 +41,14 @@ end
 
 -- quad behind the song/course title text
 af[#af+1] = Def.Quad{
-	InitCommand=function(self) self:diffuse(color("#1E282F")):setsize(banner.width,25):zoom(banner.zoom) end,
+	InitCommand=function(self) self:diffuse(color("#1E282F")):setsize(banner.width,title.height):zoom(banner.zoom) end,
 }
 
 -- song/course title text
 af[#af+1] = LoadFont("Common Normal")..{
 	InitCommand=function(self)
 		local songtitle = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse():GetDisplayFullTitle()) or GAMESTATE:GetCurrentSong():GetDisplayFullTitle()
-		if songtitle then self:settext(songtitle):maxwidth(banner.width*banner.zoom) end
+		if songtitle then self:settext(songtitle):maxwidth(banner.width*banner.zoom):zoom(title.zoom) end
 	end
 }
 
