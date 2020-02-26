@@ -39,6 +39,7 @@ local profile_whitelist = {
 	Pacemaker = "boolean",
 	MissBecauseHeld = "boolean",
 	NPSGraphAtTop = "boolean",
+	DoNotJudgeMe = "boolean",
 
 	Vocalization = "string",
 	ReceptorArrowsPosition = "string",
