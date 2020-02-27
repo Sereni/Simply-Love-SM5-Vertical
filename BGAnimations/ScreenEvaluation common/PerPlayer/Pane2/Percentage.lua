@@ -1,5 +1,9 @@
 local pn = ...
 
+local mods = SL[ToEnumShortString(pn)].ActiveModifiers
+-- No judgement in DoNotJudgeMe mode.
+if mods.DoNotJudgeMe then return end
+
 local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(pn)
 local PercentDP = stats:GetPercentDancePoints()
 local percent = FormatPercentScore(PercentDP)

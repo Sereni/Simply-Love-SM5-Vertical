@@ -1,5 +1,9 @@
 local player = ...
 
+local mods = SL[ToEnumShortString(player)].ActiveModifiers
+-- No records in DoNotJudgeMe mode.
+if mods.DoNotJudgeMe then return end
+
 local pane = Def.ActorFrame{
 	Name="Pane3",
 	InitCommand=function(self)

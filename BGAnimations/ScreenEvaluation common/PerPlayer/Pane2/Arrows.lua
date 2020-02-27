@@ -22,6 +22,14 @@ local columns = {
 
 local rows = { "W1", "W2", "W3", "W4", "W5", "Miss" }
 
+local function ShouldDisplayJudgmentNumber(judgment)
+	if not SL[pn].ActiveModifiers.DoNotJudgeMe then return true end
+	-- Show judgments worse than Great to help debug pad errors.
+	-- Hide others to reduce pressure.
+	if judgment > 3 then return true end
+	return false
+end
+
 local box_width = 140
 local box_height = 96
 local column_width = box_width/#columns[game]
@@ -59,9 +67,15 @@ for i,column in ipairs( columns[game] ) do
 	for j, judgment in ipairs(rows) do
 		-- don't add rows for TimingWindows that were turned off, but always add Miss
 		if j <= gmods.WorstTimingWindow or j==#rows then
+			local judgmentText
+			if ShouldDisplayJudgmentNumber(j) then
+				judgmentText=SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment]
+			else
+				judgmentText = "*"
+			end
 			-- add a BitmapText actor to be the number for this column
 			af[#af+1] = LoadFont("Common Normal")..{
-				Text=SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment],
+				Text=judgmentText,
 				InitCommand=function(self)
 					self:xy(i*column_width, j*row_height + 4)
 						:zoom(0.8)

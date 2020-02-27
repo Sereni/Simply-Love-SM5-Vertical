@@ -1,4 +1,7 @@
 local player = ...
+local mods = SL[ToEnumShortString(player)].ActiveModifiers
+-- No judgement in DoNotJudgeMe mode.
+if mods.DoNotJudgeMe then return end
 
 return Def.ActorFrame{
 	Name="Pane1",

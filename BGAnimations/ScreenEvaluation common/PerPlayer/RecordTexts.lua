@@ -3,6 +3,9 @@ if SL.Global.GameMode == "Casual" then return end
 local player = ...
 local pn = ToEnumShortString(player)
 
+-- No records in DoNotJudgeMe mode.
+if SL[pn].ActiveModifiers.DoNotJudgeMe then return end
+
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
 -- ---------------------------------------------
