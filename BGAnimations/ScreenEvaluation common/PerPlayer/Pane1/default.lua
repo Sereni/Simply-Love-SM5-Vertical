@@ -1,7 +1,13 @@
 local player = ...
 local mods = SL[ToEnumShortString(player)].ActiveModifiers
 -- No judgement in DoNotJudgeMe mode.
-if mods.DoNotJudgeMe then return end
+if mods.DoNotJudgeMe then
+  return Def.ActorFrame{
+		Name="Pane1",
+		InitCommand=cmd(xy, 0, 250),
+		LoadActor("otter.png")..{ OnCommand=function(self) self:zoomto(210,130) end }
+	}
+end
 
 return Def.ActorFrame{
 	Name="Pane1",
