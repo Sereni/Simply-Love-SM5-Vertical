@@ -103,6 +103,7 @@ local GetNameAndScore = function(profile)
 
 		if topscore then
 			score = string.format("%.2f%%", topscore:GetPercentDP()*100.0)
+			if SL[pn].ActiveModifiers.DoNotJudgeMe then score = "??.??%" end
 			name = topscore:GetName()
 		else
 			score = string.format("%.2f%%", 0)
