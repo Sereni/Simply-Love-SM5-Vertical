@@ -9,8 +9,8 @@ then
 end
 
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
-local width = GetNotefieldWidth(player) - 30
-local height = 30
+local width = 109
+local height = 18
 
 -- support double, double8, and routine by making as wide as single
 if styletype == "OnePlayerTwoSides" or styletype == "TwoPlayersSharedSides" then
@@ -21,12 +21,8 @@ local song_percent, first_second, last_second
 
 return Def.ActorFrame{
 	InitCommand=function(self)
-		self:y(71)
-		if PREFSMAN:GetPreference("Center1Player") and #GAMESTATE:GetHumanPlayers()==1 then
-			self:x(_screen.cx - width/2)
-		else
-			self:x((player==PLAYER_1 and WideScale(50, 105)) or _screen.cx+WideScale(45, 95))
-		end
+		self:y(49)
+		self:x(_screen.cx + 18)
 	end,
 	-- called at the start of each new song in CourseMode, and once at the start of regular gameplay
 	CurrentSongChangedMessageCommand=function(self)
