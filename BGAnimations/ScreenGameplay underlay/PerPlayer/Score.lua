@@ -25,7 +25,6 @@ return LoadFont("_wendy monospace numbers")..{
 	Text="0.00",
 
 	Name=pn.."Score",
-	-- TODO: support density graph on top.
 	InitCommand=function(self)
 		self:valign(1):halign(1)
                 self:zoom(Positions.ScreenGameplay.ScoreZoom())
