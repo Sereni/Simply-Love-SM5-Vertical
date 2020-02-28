@@ -68,7 +68,7 @@ af[#af+1] = LoadFont("_wendy small")..{
 		if not SL.Global.GameplayReloadCheck then
 			self:accelerate(0.5):diffusealpha(1):sleep(0.66):accelerate(0.33)
 		end
-		self:zoom(0.4):y(_screen.h-30)
+		self:zoom(0.2):xy(_screen.w-20, _screen.h-10)
 	end,
 	CurrentSongChangedMessageCommand=function(self)
 		if GAMESTATE:IsCourseMode() then
