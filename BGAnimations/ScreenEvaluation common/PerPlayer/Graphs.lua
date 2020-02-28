@@ -6,7 +6,7 @@ local GraphWidth = THEME:GetMetric("GraphDisplay", "BodyWidth")
 local GraphHeight = THEME:GetMetric("GraphDisplay", "BodyHeight")
 
 return Def.ActorFrame{
-	InitCommand=function(self) self:y(_screen.cy + 124) end,
+	InitCommand=function(self) self:y(_screen.cy + 94) end,
 
 	-- Draw a Quad behind the GraphDisplay (lifebar graph) and Judgment ScatterPlot
 	Def.Quad{
