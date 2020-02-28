@@ -16,7 +16,7 @@ return Def.ActorFrame {
 	},
 
 	LoadActor(img)..{
-		InitCommand=function(self) self:Center():zoom(0.8):diffusealpha(0) end,
+		InitCommand=function(self) self:Center():zoom(0.35):diffusealpha(0) end,
 		OnCommand=function(self) self:accelerate(0.4):diffusealpha(1):sleep(0.6):decelerate(0.4):diffusealpha(0) end
 	}
 }
