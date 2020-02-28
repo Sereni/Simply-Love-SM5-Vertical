@@ -48,21 +48,21 @@ af[#af+1] = Def.ActorFrame{
 
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn splode"))..{
 		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationz(10):zoom(0):diffusealpha(0.9) end,
-		OnCommand=function(self) self:sleep(0.4):linear(0.6):rotationz(0):zoom(1.1):diffusealpha(0) end
+		OnCommand=function(self) self:sleep(0.4):linear(0.6):rotationz(0):zoom(0.7):diffusealpha(0) end
 	},
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn splode"))..{
 		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationy(180):rotationz(-10):zoom(0):diffusealpha(0.8) end,
-		OnCommand=function(self) self:sleep(0.4):decelerate(0.6):rotationz(0):zoom(1.3):diffusealpha(0) end
+		OnCommand=function(self) self:sleep(0.4):decelerate(0.6):rotationz(0):zoom(0.8):diffusealpha(0) end
 	},
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn minisplode"))..{
 		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationz(10):zoom(0) end,
-		OnCommand=function(self) self:sleep(0.4):decelerate(0.8):rotationz(0):zoom(0.9):diffusealpha(0) end
+		OnCommand=function(self) self:sleep(0.4):decelerate(0.8):rotationz(0):zoom(0.5):diffusealpha(0) end
 	}
 }
 
 af[#af+1] = LoadFont("_wendy small")..{
 	Text=text,
-	InitCommand=function(self) self:Center():diffusealpha(0):shadowlength(1) end,
+	InitCommand=function(self) self:Center():zoom(0.5):diffusealpha(0):shadowlength(1) end,
 	OnCommand=function(self)
 		-- don't animate the text tweening to the bottom of the screen if ScreenGameplay was just reloaded by a mod chart
 		if not SL.Global.GameplayReloadCheck then
