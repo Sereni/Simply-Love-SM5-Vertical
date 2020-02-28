@@ -1,8 +1,8 @@
 local player = ...
 
 local meterFillLength = (IsVerticalScreen() and 102 or 136)
-local meterFillHeight = 18
-local meterXOffset = Positions.ScreenGameplay.LifeMeterStandardX(player)
+local meterFillHeight = 14
+local meterXOffset = Positions.ScreenGameplay.LifeMeterStandardX(player) + 2
 
 local newBPS, oldBPS
 local swoosh, move
@@ -22,7 +22,7 @@ local meter = Def.ActorFrame{
 
 	InitCommand=function(self)
 		self:SetUpdateFunction(Update)
-			:y(57)
+			:y(40)
 	end,
 
 	-- frame

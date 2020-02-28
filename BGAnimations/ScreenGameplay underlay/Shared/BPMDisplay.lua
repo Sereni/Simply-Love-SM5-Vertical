@@ -7,6 +7,7 @@ local so = GAMESTATE:GetSongOptionsObject("ModsLevel_Song")
 local bpmDisplay, SongPosition
 local StepsP1, StepsP2
 
+local font_size = 0.6
 
 -- the update function when a single BPM Display is in use
 local UpdateSingleBPM = function(af)
@@ -21,7 +22,7 @@ local UpdateSingleBPM = function(af)
 
 	-- MusicRate Display
 	MusicRate = string.format("%.2f", MusicRate )
-	MusicRateDisplay:settext( MusicRate ~= "1.00" and MusicRate.."x rate" or "" )
+	MusicRateDisplay:settext( MusicRate ~= "1.00" and MusicRate.."x" or "" )
 end
 
 -- the update function when two BPM Displays are needed for divergent TimingData (split BPMs)
@@ -36,7 +37,7 @@ local Update2PBPM = function(self)
 	end
 
 	MusicRate = string.format("%.2f", MusicRate )
-	MusicRateDisplay:settext( MusicRate ~= "1.00" and MusicRate.."x rate" or "" )
+	MusicRateDisplay:settext( MusicRate ~= "1.00" and MusicRate.."x" or "" )
 end
 
 
@@ -48,7 +49,7 @@ local SingleBPMDisplay = function()
 		LoadFont("Common Normal")..{
 			Name="BPMDisplay",
 			InitCommand=function(self)
-				self:zoom(1)
+				self:zoom(font_size)
 				bpmDisplay = self
 			end
 		}
@@ -63,14 +64,14 @@ local DualBPMDisplay = function()
 		LoadFont("Common Normal")..{
 			Name="DisplayP1",
 			InitCommand=function(self)
-				self:x(-18):zoom(1):shadowlength(1)
+				self:x(-18):zoom(font_size):shadowlength(1)
 				dispP1 = self
 			end
 		},
 		LoadFont("Common Normal")..{
 			Name="DisplayP2",
 			InitCommand=function(self)
-				self:x(18):zoom(1):shadowlength(1)
+				self:x(18):zoom(font_size):shadowlength(1)
 				dispP2 = self
 			end
 		}
@@ -81,7 +82,7 @@ end
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy(_screen.cx + 15, 57):valign(1)
+		self:xy(_screen.cx, 40):valign(1)
 
 		if PREFSMAN:GetPreference("Center1Player") and #GAMESTATE:GetHumanPlayers() == 1 then
 			local mpn = GAMESTATE:GetMasterPlayerNumber()
@@ -90,14 +91,14 @@ local t = Def.ActorFrame{
 			end
 		end
 
-		self:zoom(SL.Global.GameMode == "StomperZ" and 1 or 1.33)
+		self:zoom(SL.Global.GameMode == "StomperZ" and font_size or 1.33)
 	end,
 
 	LoadFont("Common Normal")..{
 		Name="RatemodDisplay",
-		Text=MusicRate ~= 1 and MusicRate.."x rate" or "",
+		Text=MusicRate ~= 1 and MusicRate.."x" or "",
 		InitCommand=function(self)
-			self:zoom(0.5):y(12)
+			self:zoom(font_size-0.1):y(12)
 			MusicRateDisplay = self
 		end
 	}

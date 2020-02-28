@@ -2,13 +2,13 @@ local player = ...
 
 return Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy( _screen.w-20, 20 )
+		self:xy( _screen.w-16, 16 )
 	end,
 
 	-- colored background for player's chart's difficulty meter
 	Def.Quad{
 		InitCommand=function(self)
-			self:zoomto(23, 23)
+			self:zoomto(18, 18)
 		end,
 		OnCommand=function(self)
 			local currentSteps = GAMESTATE:GetCurrentSteps(player)
@@ -23,7 +23,7 @@ return Def.ActorFrame{
 	LoadFont("_wendy small")..{
 		InitCommand=function(self)
 			self:diffuse( Color.Black )
-			self:zoom( 0.3 )
+			self:zoom( 0.25 )
 		end,
 		CurrentSongChangedMessageCommand=function(self) self:queuecommand("Begin") end,
 		BeginCommand=function(self)

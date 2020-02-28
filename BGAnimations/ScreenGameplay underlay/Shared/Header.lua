@@ -6,7 +6,7 @@ return Def.Quad{
 		if SL.Global.GameMode == "StomperZ" then
 			self:zoomtoheight(40)
 		else
-			self:zoomtoheight(80)
+			self:zoomtoheight(65)
 		end
 	end
 }
