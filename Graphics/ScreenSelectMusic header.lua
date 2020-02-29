@@ -44,9 +44,9 @@ local t = Def.ActorFrame{
 		InitCommand=function(self)
 			bmt_actor = self
 			if PREFSMAN:GetPreference("EventMode") then
-				self:diffusealpha(0):zoom( WideScale(0.305,0.365) ):horizalign(left):xy(10, WideScale(10,9))
+				self:diffusealpha(0):zoom( 0.2 ):horizalign(left):xy(10, 4.5)
 			else
-				self:diffusealpha(0):zoom( WideScale(0.5,0.6) ):xy(_screen.cx, 15)
+				self:diffusealpha(0):zoom( 0.2 ):xy(_screen.cx, 4.5)
 			end
 		end,
 		OnCommand=function(self)
@@ -61,7 +61,7 @@ local t = Def.ActorFrame{
 	LoadFont("_wendy small")..{
 		Name="GameModeText",
 		InitCommand=function(self)
-			self:diffusealpha(0):zoom( WideScale(0.5,0.6)):xy(_screen.w-70, 15):halign(1)
+			self:diffusealpha(0):zoom( 0.3 ):xy(_screen.w-70, 7.5):halign(1)
 			if not PREFSMAN:GetPreference("MenuTimer") then
 				self:x(_screen.w-10)
 			end

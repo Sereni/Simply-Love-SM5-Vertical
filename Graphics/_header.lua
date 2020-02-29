@@ -6,7 +6,7 @@ return Def.ActorFrame{
 
 	Def.Quad{
 		InitCommand=function(self)
-			self:zoomto(_screen.w, 32):vertalign(top):x(_screen.cx)
+			self:zoomto(_screen.w, 16):vertalign(top):x(_screen.cx)
 			if ThemePrefs.Get("RainbowMode") then
 				self:diffuse(dark)
 			else
