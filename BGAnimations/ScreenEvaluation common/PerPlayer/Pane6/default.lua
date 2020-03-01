@@ -123,7 +123,7 @@ pane[#pane+1] = LoadFont("Common Normal")..{
 }
 
 pane[#pane+1] = Def.Quad{
-	InitCommand=function(self) self:xy(text_x_offset, text_y_offset+20):zoomto(text_width,1):align(0,0):diffuse(1,1,1,0.33) end
+	InitCommand=function(self) self:xy(text_x_offset, text_y_offset+20):zoomto(text_width-3,1):align(0,0):diffuse(1,1,1,0.33) end
 }
 
 pane[#pane+1] = LoadFont("Common Normal")..{
