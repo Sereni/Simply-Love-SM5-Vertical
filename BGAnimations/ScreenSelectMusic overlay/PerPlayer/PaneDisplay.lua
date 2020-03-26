@@ -3,16 +3,20 @@ local pn = ToEnumShortString(player)
 local p = PlayerNumber:Reverse()[player]
 
 local rv
-local zoom_factor = WideScale(0.8,0.9)
+local zoom_factor = 0.55
 
-local labelX_col1 = WideScale(-70,-90)
-local dataX_col1  = WideScale(-75,-96)
+local Y_row1 = 158
+local Y_row2 = 172
+local Y_row3 = 186
 
-local labelX_col2 = WideScale(10,20)
-local dataX_col2  = WideScale(5,15)
+local labelX_col1 = -75
+local dataX_col1  = -80
 
-local highscoreX = WideScale(56, 80)
-local highscorenameX = WideScale(61, 97)
+local labelX_col2 = -30
+local dataX_col2  = -35
+
+local highscoreX = 15
+local highscorenameX = 20
 
 local PaneItems = {}
 
@@ -21,11 +25,11 @@ PaneItems[THEME:GetString("RadarCategory","Taps")] = {
 	rc = 'RadarCategory_TapsAndHolds',
 	label = {
 		x = labelX_col1,
-		y = 150,
+		y = Y_row1,
 	},
 	data = {
 		x = dataX_col1,
-		y = 150
+		y = Y_row1
 	}
 }
 
@@ -33,11 +37,11 @@ PaneItems[THEME:GetString("RadarCategory","Mines")] = {
 	rc = 'RadarCategory_Mines',
 	label = {
 		x = labelX_col2,
-		y = 150,
+		y = Y_row1,
 	},
 	data = {
 		x = dataX_col2,
-		y = 150
+		y = Y_row1
 	}
 }
 
@@ -45,11 +49,11 @@ PaneItems[THEME:GetString("RadarCategory","Jumps")] = {
 	rc = 'RadarCategory_Jumps',
 	label = {
 		x = labelX_col1,
-		y = 168,
+		y = Y_row2,
 	},
 	data = {
 		x = dataX_col1,
-		y = 168
+		y = Y_row2
 	}
 }
 
@@ -57,11 +61,11 @@ PaneItems[THEME:GetString("RadarCategory","Hands")] = {
 	rc = 'RadarCategory_Hands',
 	label = {
 		x = labelX_col2,
-		y = 168,
+		y = Y_row2,
 	},
 	data = {
 		x = dataX_col2,
-		y = 168
+		y = Y_row2
 	}
 }
 
@@ -69,11 +73,11 @@ PaneItems[THEME:GetString("RadarCategory","Holds")] = {
 	rc = 'RadarCategory_Holds',
 	label = {
 		x = labelX_col1,
-		y = 186,
+		y = Y_row3,
 	},
 	data = {
 		x = dataX_col1,
-		y = 186
+		y = Y_row3
 	}
 }
 
@@ -81,11 +85,11 @@ PaneItems[THEME:GetString("RadarCategory","Rolls")] = {
 	rc = 'RadarCategory_Rolls',
 	label = {
 		x = labelX_col2,
-		y = 186,
+		y = Y_row3,
 	},
 	data = {
 		x = dataX_col2,
-		y = 186
+		y = Y_row3
 	}
 }
 
@@ -122,12 +126,12 @@ local af = Def.ActorFrame{
 		self:visible(GAMESTATE:IsHumanPlayer(player))
 
 		if player == PLAYER_1 then
-			self:x(_screen.w * 0.25 - 5)
+			self:x(_screen.cx + 25)
 		elseif player == PLAYER_2 then
 			self:x( _screen.w * 0.75 + 5)
 		end
 
-		self:y(_screen.cy + 5)
+		self:y(_screen.cy + 22)
 	end,
 
 	PlayerJoinedMessageCommand=function(self, params)
@@ -172,7 +176,7 @@ local af = Def.ActorFrame{
 -- colored background for chart statistics
 af[#af+1] = Def.Quad{
 	Name="BackgroundQuad",
-	InitCommand=function(self) self:zoomto(_screen.w/2-10, _screen.h/8):y(_screen.h/2 - 67) end,
+	InitCommand=function(self) self:zoomto(_screen.w-20, _screen.h/10 +1):y(_screen.h/2 - 62) end,
 	SetCommand=function(self, params)
 		if GAMESTATE:IsHumanPlayer(player) then
 			local StepsOrTrail = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player) or GAMESTATE:GetCurrentSteps(player)
@@ -227,7 +231,7 @@ end
 -- chart difficulty meter
 af[#af+1] = LoadFont("_wendy small")..{
 	Name="DifficultyMeter",
-	InitCommand=function(self) self:horizalign(right):diffuse(Color.Black):xy(_screen.w/4 - 10, _screen.h/2 - 65):queuecommand("Set") end,
+	InitCommand=function(self) self:horizalign(right):diffuse(Color.Black):xy(_screen.w/3 + 13, _screen.h/2 - 63):queuecommand("Set") end,
 	SetCommand=function(self)
 		local SongOrCourse = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
 		if not SongOrCourse then self:settext(""); return end
@@ -241,26 +245,26 @@ af[#af+1] = LoadFont("_wendy small")..{
 --MACHINE high score
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="MachineHighScore",
-	InitCommand=function(self) self:x(highscoreX):y(156):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
+	InitCommand=function(self) self:x(highscoreX):y(Y_row1 + 6):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
 }
 
 --MACHINE highscore name
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="MachineHighScoreName",
-	InitCommand=function(self) self:x(highscorenameX):y(156):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
+	InitCommand=function(self) self:x(highscorenameX):y(Y_row1 + 6):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
 }
 
 
 --PLAYER PROFILE high score
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="PlayerHighScore",
-	InitCommand=function(self) self:x(highscoreX):y(176):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
+	InitCommand=function(self) self:x(highscoreX):y(Y_row2 + 6):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
 }
 
 --PLAYER PROFILE highscore name
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="PlayerHighScoreName",
-	InitCommand=function(self) self:x(highscorenameX):y(176):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
+	InitCommand=function(self) self:x(highscorenameX):y(Y_row2 + 6):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
 }
 
 return af

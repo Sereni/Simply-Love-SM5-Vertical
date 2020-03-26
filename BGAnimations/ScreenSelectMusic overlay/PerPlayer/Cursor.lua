@@ -15,12 +15,12 @@ return Def.Sprite{
 		self:visible( GAMESTATE:IsHumanPlayer(player) )
 		self:halign( p )
 
-		self:zoom(0.575)
+		self:zoom(0.275)
 		self:bounce():effectclock("beatnooffset")
 
 		if player == PLAYER_1 then
-			self:x( IsUsingWideScreen() and _screen.cx-330 or 0)
-			self:effectmagnitude(-3,0,0)
+			self:x(12)
+			self:effectmagnitude(-9,0,0)
 
 		elseif player == PLAYER_2 then
 			self:rotationz(180)
@@ -71,7 +71,7 @@ return Def.Sprite{
 		local sdl = self:GetParent():GetParent():GetChild("StepsDisplayList")
 		if sdl then
 			local grid = sdl:GetChild("Grid")
-			self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Blocks_"..RowIndex):GetY() + 1 )
+			self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Meter_"..RowIndex):GetY() + 1 )
 		end
 	end
 }
