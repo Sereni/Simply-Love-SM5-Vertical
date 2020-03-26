@@ -76,7 +76,7 @@ t[#t+1] = Def.ActorFrame {
 
 -- Wendy CreditText at lower-center of screen
 t[#t+1] = LoadFont("_wendy small")..{
-	InitCommand=function(self) self:xy(_screen.cx, _screen.h-16):zoom(0.5):horizalign(center) end,
+	InitCommand=function(self) self:xy(_screen.cx, _screen.h-8):zoom(0.2):horizalign(center) end,
 
 	OnCommand=function(self) self:playcommand("Refresh") end,
 	ScreenChangedMessageCommand=function(self) self:playcommand("Refresh") end,
