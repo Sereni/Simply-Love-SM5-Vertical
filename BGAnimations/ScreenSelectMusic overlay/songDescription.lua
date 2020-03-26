@@ -30,7 +30,7 @@ end
 local t = Def.ActorFrame{
 
 	OnCommand=function(self)
-		self:xy(_screen.cx - (IsUsingWideScreen() and 170 or 165), _screen.cy - 28)
+		self:xy(83.5, 92.5)
 	end,
 
 	-- ----------------------------------------
@@ -47,7 +47,7 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			InitCommand=function(self)
 				self:diffuse(color("#1e282f"))
-					:zoomto( IsUsingWideScreen() and 320 or 310, 48 )
+					:zoomto( 167, 24 )
 
 				if ThemePrefs.Get("RainbowMode") then
 					self:diffusealpha(0.75)
@@ -57,22 +57,23 @@ local t = Def.ActorFrame{
 
 		Def.ActorFrame{
 
-			InitCommand=function(self) self:x(-110) end,
+			InitCommand=function(self) self:x(-55) end,
 
 			-- Artist Label
 			LoadFont("Common Normal")..{
 				InitCommand=function(self)
 					local text = GAMESTATE:IsCourseMode() and "NumSongs" or "Artist"
 					self:settext( THEME:GetString("SongDescription", text) )
-						:horizalign(right):y(-12)
+						:horizalign(right):y(-6)
 						:maxwidth(44)
+						:zoom(0.5)
 				end,
 				OnCommand=function(self) self:diffuse(0.5,0.5,0.5,1) end
 			},
 
 			-- Song Artist
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(5,-12):maxwidth(WideScale(225,260)) end,
+				InitCommand=function(self) self:horizalign(left):xy(5,-6):maxwidth(225):zoom(0.5) end,
 				SetCommand=function(self)
 					if GAMESTATE:IsCourseMode() then
 						local course = GAMESTATE:GetCurrentCourse()
@@ -90,14 +91,14 @@ local t = Def.ActorFrame{
 			LoadFont("Common Normal")..{
 				Text=THEME:GetString("SongDescription", "BPM"),
 				InitCommand=function(self)
-					self:horizalign(right):y(8)
+					self:horizalign(right):y(6):zoom(0.5)
 						:diffuse(0.5,0.5,0.5,1)
 				end
 			},
 
 			-- BPM value
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(5,8):diffuse(1,1,1,1) end,
+				InitCommand=function(self) self:horizalign(left):xy(5,6):diffuse(1,1,1,1):zoom(0.5) end,
 				SetCommand=function(self)
 					--defined in ./Scipts/SL-BPMDisplayHelpers.lua
 					local text = GetDisplayBPMs()
@@ -110,14 +111,14 @@ local t = Def.ActorFrame{
 				Text=THEME:GetString("SongDescription", "Length"),
 				InitCommand=function(self)
 					self:horizalign(right)
-						:x(_screen.w/4.5):y(8)
+						:x(95):y(6):zoom(0.5)
 						:diffuse(0.5,0.5,0.5,1)
 				end
 			},
 
 			-- Song Duration Value
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(_screen.w/4.5 + 5, 8) end,
+				InitCommand=function(self) self:horizalign(left):xy(95 + 5, 6):zoom(0.5) end,
 				SetCommand=function(self)
 					local duration
 
@@ -174,7 +175,7 @@ local t = Def.ActorFrame{
 		-- long/marathon version bubble graphic and text
 		Def.ActorFrame{
 			OnCommand=function(self)
-				self:x( IsUsingWideScreen() and 102 or 97 )
+				self:x( 76 )
 			end,
 			SetCommand=function(self)
 				local song = GAMESTATE:GetCurrentSong()
@@ -182,11 +183,11 @@ local t = Def.ActorFrame{
 			end,
 
 			LoadActor("bubble")..{
-				InitCommand=function(self) self:diffuse(GetCurrentColor()):zoom(0.455):y(29) end
+				InitCommand=function(self) self:diffuse(GetCurrentColor()):zoom(0.25):y(21) end
 			},
 
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:diffuse(Color.Black):zoom(0.8):y(34) end,
+				InitCommand=function(self) self:diffuse(Color.Black):zoom(0.4):y(21+2.5) end,
 				SetCommand=function(self)
 					local song = GAMESTATE:GetCurrentSong()
 					if not song then self:settext(""); return end
