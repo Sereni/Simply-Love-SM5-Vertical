@@ -9,7 +9,7 @@ t[#t+1] = Def.Quad {
 	Name="RowBackgroundQuad",
 	InitCommand=function(self)
 		self:horizalign(left)
-		:x(-95)
+		:x(-92)
 		:setsize(359, 30)
 	end
 }
@@ -19,7 +19,7 @@ t[#t+1] = Def.Quad {
 	Name="TitleBackgroundQuad",
 	OnCommand=function(self)
 		self:horizalign(left)
-		:x(-95)
+		:x(-92)
 		:setsize(120, 30)
 		:diffuse(Color.Black)
 		:diffusealpha(BrighterOptionRows() and 0.8 or 0.25)

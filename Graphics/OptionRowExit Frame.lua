@@ -1,7 +1,7 @@
 return Def.Quad {
 	InitCommand=function(self)
 		self:horizalign(left)
-		:x(28)
-		:setsize(358, 30)
+		:x(30.3)
+		:setsize(359, 30)
 	end
 }
