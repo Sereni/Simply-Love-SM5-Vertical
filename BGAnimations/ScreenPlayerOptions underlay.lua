@@ -3,8 +3,8 @@ return Def.Quad{
 	InitCommand=function(self)
 		self:diffuse(0,0,0,0)
 		:horizalign(left):vertalign(top)
-		:setsize(WideScale(598,792), 40)
-		:xy(WideScale(20,30), _screen.h-76)
+		:setsize(233.2, 29)
+		:xy(18.4, _screen.h-80)
 	end,
 	OnCommand=function(self) self:linear(0.2):diffusealpha(0.8) end,
 }
