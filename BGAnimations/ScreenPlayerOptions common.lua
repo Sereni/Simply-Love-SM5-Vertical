@@ -1,4 +1,5 @@
-return Def.Actor{
+t = Def.ActorFrame{}
+t[#t+1] = Def.Actor{
 	-- this is broadcast from [OptionRow] TitleGainFocusCommand in metrics.ini
 	-- we use it to color the active OptionRow's title appropriately by PlayerColor()
 	OptionRowChangedMessageCommand=function(self, params)
@@ -39,3 +40,5 @@ return Def.Actor{
 
 	end
 }
+LoadActor("ScreenPlayerOptions overlay/ComboFontPreviews.lua", t)
+return t

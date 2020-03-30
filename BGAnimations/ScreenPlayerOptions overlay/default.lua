@@ -157,7 +157,6 @@ local t = Def.ActorFrame{
 -- and referred to as needed via ActorProxy in ./Graphics/OptionRow Frame.lua
 LoadActor("./NoteSkinPreviews.lua", t)
 LoadActor("./JudgmentGraphicPreviews.lua", t)
-LoadActor("./ComboFontPreviews.lua", t)
 
 -- some functionality needed in both PlayerOptions and PlayerOptions2
 t[#t+1] = LoadActor(THEME:GetPathB("ScreenPlayerOptions", "common"))
@@ -255,8 +254,8 @@ for player in ivalues(Players) do
 		Text="",
 		InitCommand=function(self)
 			self:diffuse(PlayerColor(player)):diffusealpha(0)
-			self:zoom(0.5):y(48)
-			self:x(player==PLAYER_1 and -100 or 150)
+			self:zoom(0.3):y(45)
+			self:x(37)
 			self:shadowlength(0.55)
 		end,
 		OnCommand=function(self) self:linear(0.4):diffusealpha(1) end

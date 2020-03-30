@@ -7,13 +7,20 @@ local t = ...
 -- but a lot of people like to edit their Metrics.ini and far fewer people
 -- are comfortable digging into the many, many Lua files throughout this theme.
 -- So, maybe they've moved the ComboFont row somewhere else.  Let's try to accommodate.
-local ComboFontOptRowIndex
+local ComboFontOptRowIndex = -1
 local i = 0
 -- get all the LinesNames as a single string from Metrics.ini, split on commas,
 -- and loop through until we find one that matches "ComboFont" (or, we don't).
 for name in THEME:GetMetric("ScreenPlayerOptions", "LineNames"):gmatch('([^,]+)') do
 	if name == "ComboFont" then ComboFontOptRowIndex = i; break end
 	i = i + 1
+end
+if ComboFontOptRowIndex == -1 then
+	i = 0
+	for name in THEME:GetMetric("ScreenPlayerOptions2", "LineNames"):gmatch('([^,]+)') do
+		if name == "ComboFont" then ComboFontOptRowIndex = i; break end
+		i = i + 1
+	end
 end
 
 local PlayerOnComboFontOptRow = function(p)
