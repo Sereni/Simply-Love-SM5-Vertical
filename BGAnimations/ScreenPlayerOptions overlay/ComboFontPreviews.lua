@@ -9,12 +9,14 @@ local t = ...
 -- So, maybe they've moved the ComboFont row somewhere else.  Let's try to accommodate.
 local ComboFontOptRowIndex = -1
 local i = 0
--- get all the LinesNames as a single string from Metrics.ini, split on commas,
+-- get all the LineNames as a single string from Metrics.ini, split on commas,
 -- and loop through until we find one that matches "ComboFont" (or, we don't).
 for name in THEME:GetMetric("ScreenPlayerOptions", "LineNames"):gmatch('([^,]+)') do
 	if name == "ComboFont" then ComboFontOptRowIndex = i; break end
 	i = i + 1
 end
+-- if "ComboFont" wasn't found in the LineNames from ScreenPlayerOptions
+-- we have to keep looking for it in ScreenPlayerOptions2
 if ComboFontOptRowIndex == -1 then
 	i = 0
 	for name in THEME:GetMetric("ScreenPlayerOptions2", "LineNames"):gmatch('([^,]+)') do
