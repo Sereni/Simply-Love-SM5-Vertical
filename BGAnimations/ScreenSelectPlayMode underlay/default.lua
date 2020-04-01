@@ -4,12 +4,28 @@ local TopScreen = nil
 -- we'll reassign it appropriately below, once the TopScreen is available
 local ScreenName = "ScreenSelectPlayMode"
 
+-- we use this to determine where the cursor should move when selecting an option
+-- it's a hackish way of making the localized strings for "regular" and "marathon" fill
+-- the horizontal space under the big square in every language
+-- we'll asign it a value below, once the TopScreen is available
+local separation
+
 local cursor = {
 	h = 40,
 	index = 0,
 	-- the width of the cursor will be clamped to exist between these two values
-	min_w = 90, max_w = 170,
+	min_w = 80, max_w = 270,
 }
+
+-- the options in ScreenSelectPlayMode can have different sizes and the cursor should adapt
+-- to them but in ScreenSelectPlayMode2 they just need to fill the horizontal space
+local getCursorWidth = function(sn)
+	if sn == "ScreenSelectPlayMode" then
+		return clamp( choice_actors[cursor.index+1]:GetWidth()/1.4, cursor.min_w, cursor.max_w) +2 
+	else
+		return 160
+	end
+end
 
 local Update = function(af, delta)
 	local index = TopScreen:GetSelectionIndex( GAMESTATE:GetMasterPlayerNumber() )
@@ -30,8 +46,8 @@ end
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:SetUpdateFunction( Update )
-			:xy(_screen.cx+90, _screen.cy)
-			:zoom(1.25)
+			:xy(_screen.cx, _screen.cy)
+			:zoom(0.75)
 	end,
 	OnCommand=function(self)
 		-- Get the Topscreen and its name, now that that TopScreen itself actually exists
@@ -44,6 +60,13 @@ local t = Def.ActorFrame{
 		for choice in THEME:GetMetric(ScreenName, "ChoiceNames"):gmatch('([^,]+)') do
 			choices[#choices+1] = choice
 			choice_actors[#choice_actors+1] = TopScreen:GetChild("IconChoice"..choice)
+		end
+
+		-- also get the separation between the different options
+		if ScreenName == "ScreenSelectPlayMode" then
+			separation = 78
+		else
+			separation = 140
 		end
 
 		self:queuecommand("Update")
@@ -71,24 +94,28 @@ local t = Def.ActorFrame{
 
 	-- gray backgrounds
 	Def.ActorFrame{
-		InitCommand=function(self) self:x(-188) end,
+		InitCommand=function(self) self:y(80) end,
+		-- ScreenSelectPlayMode
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(-60) end,
+			OnCommand=function(self) if ScreenName == "ScreenSelectPlayMode2" then self:visible(false) end end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(76,80):x(-111) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(-20) end,
+			OnCommand=function(self) if ScreenName == "ScreenSelectPlayMode2" then self:visible(false) end end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(77,80):x(-32) end,
+			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
+		},
+		-- ScreenSelectPlayMode2
+		Def.Quad{
+			OnCommand=function(self) if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(137,80):x(-80) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(20) end,
-			OnCommand=function(self) if choices[3]==nil then self:visible(false) end end,
-			OffCommand=function(self) self:sleep(0.2):linear(0.1):diffusealpha(0) end
-		},
-		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(60) end,
-			OnCommand=function(self) if choices[4]==nil then self:visible(false) end end,
-			OffCommand=function(self) self:sleep(0.1):linear(0.1):diffusealpha(0) end
+			OnCommand=function(self) if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(168,80):x(66) end,
+			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 	},
 
@@ -108,7 +135,7 @@ local t = Def.ActorFrame{
 	Def.BitmapText{
 		Font="Common Normal",
 		InitCommand=function(self)
-			self:zoom(0.825):halign(0):valign(0):xy(-130,-60)
+			self:zoom(0.625):halign(0):valign(0):xy(-130,-60)
 		end,
 		UpdateCommand=function(self)
 			self:settext( THEME:GetString("ScreenSelectPlayMode", choices[cursor.index+1] .. "Description") )
@@ -127,21 +154,21 @@ local t = Def.ActorFrame{
 			if ScreenName == "ScreenSelectPlayMode" then
 				cursor.index = (FindInTable(ThemePrefs.Get("DefaultGameMode"), choices) or 1) - 1
 			end
-			self:x(-150):y( -60 + (cursor.h * cursor.index) )
+			self:x( -150 + (cursor.max_w * cursor.index) ):y(100)
 		end,
 		UpdateCommand=function(self)
 			self:stoptweening():linear(0.1)
-				:y( -60 + (cursor.h * cursor.index) )
+				:x( -150 + ( separation * cursor.index ))
 		end,
 
 		Def.Quad{
-			InitCommand=function(self) self:zoomtoheight(cursor.h+2):diffuse(1,1,1,1):x(-1):halign(1) end,
-			UpdateCommand=function(self) self:zoomtowidth( clamp( choice_actors[cursor.index+1]:GetWidth()/1.4, cursor.min_w, cursor.max_w) ) end,
+			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(1,1,1,1):x(-1):y(1):halign(0) end,
+			UpdateCommand=function(self) self:zoomtowidth( getCursorWidth(ScreenName) +2 ) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1):halign(1) end,
-			UpdateCommand=function(self) self:zoomtowidth( clamp(choice_actors[cursor.index+1]:GetWidth()/1.4, cursor.min_w, cursor.max_w) ) end,
+			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1):halign(0) end,
+			UpdateCommand=function(self) self:zoomtowidth( getCursorWidth(ScreenName) ) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
 		}
 	},
