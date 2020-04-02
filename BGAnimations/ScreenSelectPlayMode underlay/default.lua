@@ -9,6 +9,11 @@ local cursor = {
 	index = 0,
 }
 
+-- the width of the choice_actors multiplied by 0.386 gives us aproximately the width of the text icons
+-- we add 30 to have a pretty margin around it 
+local iconWidthScale = 0.386
+local cursorMargin = 30
+
 local Update = function(af, delta)
 	local index = TopScreen:GetSelectionIndex( GAMESTATE:GetMasterPlayerNumber() )
 	if index ~= cursor.index then
@@ -29,7 +34,6 @@ local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:SetUpdateFunction( Update )
 			:xy(_screen.cx, _screen.cy)
-			:zoom(1)
 	end,
 	OnCommand=function(self)
 		-- Get the Topscreen and its name, now that that TopScreen itself actually exists
@@ -71,35 +75,32 @@ local t = Def.ActorFrame{
 		-- ScreenSelectPlayMode
 		Def.Quad{
 			OnCommand=function(self)
-				-- the width of the choice_actor multiplied by 0.386 gives us aproximately the width of the text icon
-				-- we add 30 to have a pretty margin around it 
-				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * 0.386 + 30)
-				if ScreenName == "ScreenSelectPlayMode2" then self:visible(false) end
+				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(76,30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
-			OnCommand=function(self) if ScreenName == "ScreenSelectPlayMode2" then self:visible(false) end end,
 			OnCommand=function(self)
-				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * 0.386 + 30)
-				if ScreenName == "ScreenSelectPlayMode2" then self:visible(false) end
+				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(77,30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		-- ScreenSelectPlayMode2
 		Def.Quad{
 			OnCommand=function(self)
-				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * 0.386 + 30)
+				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(137,30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
 			OnCommand=function(self)
-				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * 0.386 + 30)
+				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
 			end,
 			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(168,30) end,
@@ -145,9 +146,7 @@ local t = Def.ActorFrame{
 			self:x( choice_positions[cursor.index+1] ):y(75)
 		end,
 		UpdateCommand=function(self)
-			-- the width of the choice_actor multiplied by 0.386 gives us aproximately the width of the text icon
-			-- we add 30 to have a pretty margin around it 
-			cursor.w = choice_widths[cursor.index+1] * 0.386 + 30
+			cursor.w = choice_widths[cursor.index+1] * iconWidthScale + cursorMargin
 			self:stoptweening():linear(0.1)
 				:x( choice_positions[cursor.index+1] )
 		end,
