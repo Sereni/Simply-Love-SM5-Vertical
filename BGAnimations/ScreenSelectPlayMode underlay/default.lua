@@ -78,7 +78,7 @@ local t = Def.ActorFrame{
 				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
@@ -86,7 +86,7 @@ local t = Def.ActorFrame{
 				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		-- ScreenSelectPlayMode2
@@ -95,7 +95,7 @@ local t = Def.ActorFrame{
 				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
@@ -103,7 +103,7 @@ local t = Def.ActorFrame{
 				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
 			end,
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(168,30) end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 	},
