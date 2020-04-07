@@ -632,3 +632,47 @@ GetDifficultyIndex = function(difficulty)
 	local difficulty_index = Difficulty:Reverse()[difficulty]
 	if type(difficulty_index) == "number" then return (difficulty_index + 1) end
 end
+
+-- -----------------------------------------------------------------------
+-- Get the difference between default global offset stored in ThemePrefs, and the
+-- current global offset, formatted as "+/- X ms".
+-- Example:
+-- DefaultGlobalOffset = 0.069
+-- Current GlobalOffset = 0.066
+-- returns: "-3 ms"
+GetGlobalOffsetDiffString = function()
+  local defaultOffset = ThemePrefs.Get("DefaultGlobalOffsetSeconds")
+	local currentOffset = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+	local diffMs = (defaultOffset - currentOffset) * 1000
+	if (string.format("%.0f", diffMs) == "0") then return "" end
+	local formattedDiff = string.format("%.0f ms", diffMs)
+	if (diffMs > 0) then formattedDiff = "+" .. formattedDiff end
+	return formattedDiff
+end
+
+-- -----------------------------------------------------------------------
+-- Store the current global offset
+StoreCurrentGlobalOffset = function()
+	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+end
+
+-- -----------------------------------------------------------------------
+-- Update the default global offset in ThemePrefs.ini and the SL table with the current
+-- global offset if it was changed since the last time StoreCurrentGlobalOffset was called
+-- Since there's no straightforward way to run this consistently after ScreenGameplay and ScreenSaveSync
+-- it has to be placed before Evaluation screen in Scripts/SL-Branches.lua and in ScreenSelectMusic
+UpdateDefaultGlobalOffset = function()
+	if not GAMESTATE:Env()["GlobalOffsetAtSongStart"] then return end
+	offsetAtSongStart = GAMESTATE:Env()["GlobalOffsetAtSongStart"]
+	currentOffset = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+	if currentOffset ~= offsetAtSongStart then
+		ThemePrefs.Set("DefaultGlobalOffsetSeconds", currentOffset)
+		ThemePrefs.Save()
+		SL.Global.DefaultGlobalOffsetSeconds = currentOffset
+		notes = offsetAtSongStart < currentOffset and " (notes earlier)" or " (notes later)"
+		offsetChange = string.format("Default global offset changed from %.3f to %.3f %s",
+			offsetAtSongStart, currentOffset, notes)
+		SM(offsetChange)
+	end
+	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = nil
+end

@@ -387,6 +387,51 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+	GlobalOffsetDelta = {
+		Choices = function()
+			local first	= -30
+			local last 	= 30
+			local step 	= 1
+
+			local t = {}
+			for k, v in pairs(range(first, last, step)) do
+				form = v > 0 and "+%d ms (notes earlier)" or "%d ms (notes later)"
+				t[k] = string.format(form, v):gsub("^+?0 ms.*", "No Change")
+			end
+			return t
+		end,
+		Values = function()
+			local first	= -0.03
+			local last 	= 0.03
+			local step 	= 0.001
+
+			local t = {}
+			for k, v in pairs(range(first, last, step)) do
+				t[k] = string.format("%.3f", v)
+			end
+			return t
+		end,
+		ExportOnChange = true,
+		OneChoiceForAllPlayers = true,
+		LoadSelections = function(self,list)
+			local globaloffsetdelta = string.format("%.3f", SL.Global.ActiveModifiers.GlobalOffsetDelta)
+			local i = FindInTable(globaloffsetdelta, self.Values) or math.round(#self.Values/2)
+			list[i] = true
+			return list
+		end,
+		SaveSelections = function(self,list,player)
+			local globaloffset = ThemePrefs.Get( "DefaultGlobalOffsetSeconds" )
+			local gmods = SL.Global.ActiveModifiers
+			for i=1,#self.Values do
+				if list[i] then
+					gmods.GlobalOffsetDelta = tonumber( self.Values[i] )
+					PREFSMAN:SetPreference( "GlobalOffsetSeconds", globaloffset + gmods.GlobalOffsetDelta )
+					MESSAGEMAN:Broadcast("GlobalOffsetChanged")
+				end
+			end
+		end,
+	},
+	-------------------------------------------------------------------------
 	Vocalization = {
 		Choices = function()
 			-- Allow users to arbitrarily add new vocalizations to ./Simply Love/Other/Vocalize/
