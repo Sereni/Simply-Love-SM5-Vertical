@@ -76,4 +76,19 @@ local t = Def.ActorFrame{
 	}
 }
 
+t[#t+1] = LoadFont("_wendy small")..{
+	Name="CustomGlobalOffset",
+	InitCommand=function(self)
+		self:diffusealpha(0):zoom( WideScale(0.5,0.6)):xy(_screen.w-170, 15):halign(1)
+	end,
+	OnCommand=function(self)
+		self:settext(GetGlobalOffsetDiffString())
+			:sleep(0.1):decelerate(0.33):diffusealpha(1)
+	end,
+	-- FIXME: Changing global offset via F11/12 will not trigger an update.
+	GlobalOffsetChangedMessageCommand=function(self)
+		self:settext(GetGlobalOffsetDiffString())
+	end
+}
+
 return t

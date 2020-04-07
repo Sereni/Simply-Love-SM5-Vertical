@@ -9,8 +9,8 @@ t[#t+1] = Def.Quad {
 	Name="RowBackgroundQuad",
 	InitCommand=function(self)
 		self:horizalign(left)
-		:x(WideScale(-271.5, -360))
-		:setsize(WideScale(543,720), 30)
+		:x(-94)
+		:setsize(358.6, 30)
 	end
 }
 
@@ -19,8 +19,8 @@ t[#t+1] = Def.Quad {
 	Name="TitleBackgroundQuad",
 	OnCommand=function(self)
 		self:horizalign(left)
-		:x(WideScale(-271.5, -360))
-		:setsize(115, 30)
+		:x(-94)
+		:setsize(120, 30)
 		:diffuse(Color.Black)
 		:diffusealpha(BrighterOptionRows() and 0.8 or 0.25)
 	end
@@ -44,7 +44,7 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 
 			if optrow:GetName()=="NoteSkin" or optrow:GetName()=="JudgmentGraphic" or optrow:GetName()=="ComboFont" then
 				-- if this OptionRow needs an ActorProxy for preview purposes, set the necessary parameters
-				self:x(player==PLAYER_1 and WideScale(20, 0) or WideScale(220, 240)):zoom(0.4)
+				self:x(63):zoom(0.36)
 					-- What was my reasoning for diffusing in after 0.01? It seems unncessary.
 					-- I don't remember but am afraid to remove it.
 					:diffusealpha(0):sleep(0.01):diffusealpha(1)

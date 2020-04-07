@@ -387,6 +387,51 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+	GlobalOffsetDelta = {
+		Choices = function()
+			local first	= -30
+			local last 	= 30
+			local step 	= 1
+
+			local t = {}
+			for k, v in pairs(range(first, last, step)) do
+				form = v > 0 and "+%d ms (notes earlier)" or "%d ms (notes later)"
+				t[k] = string.format(form, v):gsub("^+?0 ms.*", "No Change")
+			end
+			return t
+		end,
+		Values = function()
+			local first	= -0.03
+			local last 	= 0.03
+			local step 	= 0.001
+
+			local t = {}
+			for k, v in pairs(range(first, last, step)) do
+				t[k] = string.format("%.3f", v)
+			end
+			return t
+		end,
+		ExportOnChange = true,
+		OneChoiceForAllPlayers = true,
+		LoadSelections = function(self,list)
+			local globaloffsetdelta = string.format("%.3f", SL.Global.ActiveModifiers.GlobalOffsetDelta)
+			local i = FindInTable(globaloffsetdelta, self.Values) or math.round(#self.Values/2)
+			list[i] = true
+			return list
+		end,
+		SaveSelections = function(self,list,player)
+			local globaloffset = ThemePrefs.Get( "DefaultGlobalOffsetSeconds" )
+			local gmods = SL.Global.ActiveModifiers
+			for i=1,#self.Values do
+				if list[i] then
+					gmods.GlobalOffsetDelta = tonumber( self.Values[i] )
+					PREFSMAN:SetPreference( "GlobalOffsetSeconds", globaloffset + gmods.GlobalOffsetDelta )
+					MESSAGEMAN:Broadcast("GlobalOffsetChanged")
+				end
+			end
+		end,
+	},
+	-------------------------------------------------------------------------
 	Vocalization = {
 		Choices = function()
 			-- Allow users to arbitrarily add new vocalizations to ./Simply Love/Other/Vocalize/
@@ -412,7 +457,7 @@ local Overrides = {
 	-------------------------------------------------------------------------
 	ScreenAfterPlayerOptions = {
 		Values = function()
-			local choices = { "Gameplay", "Select Music", "Options2", "Options3"  }
+			local choices = { "Gameplay", "Select Music", "Options2" }
 			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
 			return choices
 		end,
@@ -427,17 +472,16 @@ local Overrides = {
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions = SelectMusicOrCourse() end
 				if list[3] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions2" end
-				if list[4] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions3" end
 			else
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions2" end
-				if list[3] then SL.Global.ScreenAfter.PlayerOptions = "ScreenPlayerOptions3" end
 			end
 		end
 	},
 	-------------------------------------------------------------------------
+	-- this is so dumb; I need to find time to completely rewrite ScreenPlayerOptions :(
 	ScreenAfterPlayerOptions2 = {
 		Values = function()
-			local choices = { "Gameplay", "Select Music", "Options1", "Options3"  }
+			local choices = { "Gameplay", "Select Music", "Options1" }
 			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
 			return choices
 		end,
@@ -452,39 +496,11 @@ local Overrides = {
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions2 = SelectMusicOrCourse() end
 				if list[3] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions" end
-				if list[4] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions3" end
 			else
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions" end
-				if list[3] then SL.Global.ScreenAfter.PlayerOptions2 = "ScreenPlayerOptions3" end
 			end
 		end
 	},
-	-------------------------------------------------------------------------
-	-- this is so dumb; I need to find time to completely rewrite ScreenPlayerOptions :(
-	ScreenAfterPlayerOptions3 = {
-		Values = function()
-			local choices = { "Gameplay", "Select Music", "Options1", "Options2"  }
-			if SL.Global.MenuTimer.ScreenSelectMusic < 1 then table.remove(choices, 2) end
-			return choices
-		end,
-		OneChoiceForAllPlayers = true,
-		LoadSelections = function(self, list, pn)
-			list[1] = true
-			return list
-		end,
-		SaveSelections = function(self, list, pn)
-			if list[1] then SL.Global.ScreenAfter.PlayerOptions3 = Branch.GameplayScreen() end
-
-			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
-				if list[2] then SL.Global.ScreenAfter.PlayerOptions3 = SelectMusicOrCourse() end
-				if list[3] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions" end
-				if list[4] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions2" end
-			else
-				if list[2] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions" end
-				if list[3] then SL.Global.ScreenAfter.PlayerOptions3 = "ScreenPlayerOptions2" end
-			end
-		end
-	}
 	-------------------------------------------------------------------------
 }
 

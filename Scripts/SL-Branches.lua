@@ -77,6 +77,9 @@ end
 
 
 Branch.AfterGameplay = function()
+	-- We need to check if the offset changed during gameplay after each song and if it did
+	-- update the default value. (See Scripts/SL-Helpers.lua)
+	UpdateDefaultGlobalOffset()
 	if THEME:GetMetric("ScreenHeartEntry", "HeartEntryEnabled") then
 		local go_to_heart= false
 		for i, pn in ipairs(GAMESTATE:GetEnabledPlayers()) do

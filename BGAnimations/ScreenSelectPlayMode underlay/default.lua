@@ -1,15 +1,18 @@
-local choices, choice_actors = {}, {}
+local choices, choice_actors, choice_positions, choice_widths = {}, {}, {}, {}
 local TopScreen = nil
 -- give this a value now, before the TopScreen has been prepared and we can fetch its name
 -- we'll reassign it appropriately below, once the TopScreen is available
 local ScreenName = "ScreenSelectPlayMode"
 
 local cursor = {
-	h = 40,
+	h = 30,
 	index = 0,
-	-- the width of the cursor will be clamped to exist between these two values
-	min_w = 90, max_w = 170,
 }
+
+-- the width of the choice_actors multiplied by 0.386 gives us aproximately the width of the text icons
+-- we add 30 to have a pretty margin around it 
+local iconWidthScale = 0.386
+local cursorMargin = 30
 
 local Update = function(af, delta)
 	local index = TopScreen:GetSelectionIndex( GAMESTATE:GetMasterPlayerNumber() )
@@ -30,8 +33,7 @@ end
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:SetUpdateFunction( Update )
-			:xy(_screen.cx+90, _screen.cy)
-			:zoom(1.25)
+			:xy(_screen.cx, _screen.cy)
 	end,
 	OnCommand=function(self)
 		-- Get the Topscreen and its name, now that that TopScreen itself actually exists
@@ -44,6 +46,8 @@ local t = Def.ActorFrame{
 		for choice in THEME:GetMetric(ScreenName, "ChoiceNames"):gmatch('([^,]+)') do
 			choices[#choices+1] = choice
 			choice_actors[#choice_actors+1] = TopScreen:GetChild("IconChoice"..choice)
+			choice_positions[#choice_positions+1] = THEME:GetMetric(ScreenName, "IconChoice"..choice.."X") - _screen.w/2
+			choice_widths[#choice_widths+1] = choice_actors[#choice_actors]:GetWidth()
 		end
 
 		self:queuecommand("Update")
@@ -60,46 +64,58 @@ local t = Def.ActorFrame{
 		end
 	end,
 
-	-- side mask
-	Def.Quad{
-		InitCommand=function(self) self:zoomto(450, 450):diffuse(1,1,1,1):x(375):MaskSource() end
-	},
 	-- lower mask
 	Def.Quad{
-		InitCommand=function(self) self:zoomto(450, 450):diffuse(1,1,1,1):xy(74,305):MaskSource() end
+		InitCommand=function(self) self:zoomto(338, 338):diffuse(1,1,1,1):xy(74,229):MaskSource() end
 	},
 
 	-- gray backgrounds
 	Def.ActorFrame{
-		InitCommand=function(self) self:x(-188) end,
+		InitCommand=function(self) self:y(75) end,
+		-- ScreenSelectPlayMode
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(-60) end,
+			OnCommand=function(self)
+				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(-20) end,
+			OnCommand=function(self)
+				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
+		},
+		-- ScreenSelectPlayMode2
+		Def.Quad{
+			OnCommand=function(self)
+				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(20) end,
-			OnCommand=function(self) if choices[3]==nil then self:visible(false) end end,
-			OffCommand=function(self) self:sleep(0.2):linear(0.1):diffusealpha(0) end
-		},
-		Def.Quad{
-			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomto(90,38):y(60) end,
-			OnCommand=function(self) if choices[4]==nil then self:visible(false) end end,
-			OffCommand=function(self) self:sleep(0.1):linear(0.1):diffusealpha(0) end
+			OnCommand=function(self)
+				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode2" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
 		},
 	},
 
 	-- border
 	Def.Quad{
-		InitCommand=function(self) self:zoomto(302, 162):diffuse(1,1,1,1) end,
+		InitCommand=function(self) self:zoomto(227, 122):diffuse(1,1,1,1) end,
 		OffCommand=function(self) self:sleep(0.6):linear(0.2):cropleft(1) end
 	},
 	-- background
 	Def.Quad{
-		InitCommand=function(self) self:zoomto(300, 160):diffuse(0,0,0,1) end,
+		InitCommand=function(self) self:zoomto(225, 120):diffuse(0,0,0,1) end,
 		OffCommand=function(self) self:sleep(0.6):linear(0.2):cropleft(1) end
 	},
 
@@ -108,7 +124,7 @@ local t = Def.ActorFrame{
 	Def.BitmapText{
 		Font="Common Normal",
 		InitCommand=function(self)
-			self:zoom(0.825):halign(0):valign(0):xy(-130,-60)
+			self:zoom(0.5):halign(0):valign(0):xy(-95,-40)
 		end,
 		UpdateCommand=function(self)
 			self:settext( THEME:GetString("ScreenSelectPlayMode", choices[cursor.index+1] .. "Description") )
@@ -127,21 +143,22 @@ local t = Def.ActorFrame{
 			if ScreenName == "ScreenSelectPlayMode" then
 				cursor.index = (FindInTable(ThemePrefs.Get("DefaultGameMode"), choices) or 1) - 1
 			end
-			self:x(-150):y( -60 + (cursor.h * cursor.index) )
+			self:x( choice_positions[cursor.index+1] ):y(75)
 		end,
 		UpdateCommand=function(self)
+			cursor.w = choice_widths[cursor.index+1] * iconWidthScale + cursorMargin
 			self:stoptweening():linear(0.1)
-				:y( -60 + (cursor.h * cursor.index) )
+				:x( choice_positions[cursor.index+1] )
 		end,
 
 		Def.Quad{
-			InitCommand=function(self) self:zoomtoheight(cursor.h+2):diffuse(1,1,1,1):x(-1):halign(1) end,
-			UpdateCommand=function(self) self:zoomtowidth( clamp( choice_actors[cursor.index+1]:GetWidth()/1.4, cursor.min_w, cursor.max_w) ) end,
+			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(1,1,1,1):y(1) end,
+			UpdateCommand=function(self) self:zoomtowidth( cursor.w +2 ) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
 		},
 		Def.Quad{
-			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1):halign(1) end,
-			UpdateCommand=function(self) self:zoomtowidth( clamp(choice_actors[cursor.index+1]:GetWidth()/1.4, cursor.min_w, cursor.max_w) ) end,
+			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1) end,
+			UpdateCommand=function(self) self:zoomtowidth( cursor.w ) end,
 			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
 		}
 	},
@@ -150,7 +167,7 @@ local t = Def.ActorFrame{
 	Def.BitmapText{
 		Font="_wendy monospace numbers",
 		InitCommand=function(self)
-			self:zoom(0.225):xy(124,-68):diffusealpha(0)
+			self:zoom(0.17):xy(93,-51):diffusealpha(0)
 		end,
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
@@ -179,7 +196,7 @@ local t = Def.ActorFrame{
 	-- LifeMeter
 	Def.ActorFrame{
 		Name="LifeMeter",
-		InitCommand=function(self) self:diffusealpha(0) end,
+		InitCommand=function(self) self:diffusealpha(0):xy(51,-48):zoom(0.75) end,
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
 			if ScreenName == "ScreenSelectPlayMode" then
@@ -198,61 +215,29 @@ local t = Def.ActorFrame{
 		end,
 		-- lifemeter white border
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(60,16):xy(68,-64) end
+			InitCommand=function(self) self:zoomto(60,16) end
 		},
 		-- lifemeter black bg
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(58,14):xy(68,-64):diffuse(0,0,0,1) end
+			InitCommand=function(self) self:zoomto(58,14):diffuse(0,0,0,1) end
 		},
 		-- lifemeter colored quad
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(40,14):xy(59,-64):diffuse( GetCurrentColor() ) end
+			InitCommand=function(self) self:zoomto(40,14):x(-9):diffuse( GetCurrentColor() ) end
 		},
 		-- life meter animated swoosh
 		LoadActor(THEME:GetPathB("ScreenGameplay", "underlay/PerPlayer/LifeMeter/swoosh.png"))..{
-			InitCommand=function(self) self:zoomto(40,14):diffusealpha(0.45):xy(59,-64) end,
+			InitCommand=function(self) self:zoomto(40,14):diffusealpha(0.45):x(-9) end,
 			OnCommand=function(self)
 				self:customtexturerect(0,0,1,1):texcoordvelocity(-2,0)
 			end,
 		},
 	},
-	--StomperZLifeMeter
-	Def.ActorFrame{
-		Name="StomperZLifeMeter",
-		InitCommand=function(self) self:diffusealpha(0) end,
-		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
-		UpdateCommand=function(self)
-			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "StomperZ" then
-					self:stoptweening():linear(0.25):diffusealpha(1)
-				else
-					self:stoptweening():linear(0.25):diffusealpha(0)
-				end
-			else
-				if SL.Global.GameMode == "StomperZ" then
-					self:diffusealpha(1)
-				end
-			end
-		end,
-		LoadActor(THEME:GetPathG("", "Triangles.png"))..{
-			InitCommand=function(self) self:zoom(0.25):xy(200,10) end,
-			OnCommand=function(self)
-				self:MaskDest()
-			end,
-		},
-		-- StomperZLifeMeter left
-		Def.Quad{
-			InitCommand=function(self) self:zoomto(24,160):xy(50,28):diffuse(1,0,1,0.75):MaskDest():faderight(1) end,
-			OnCommand=function(self) self:diffuseshift():effectcolor1(1,0,1,0.75):effectcolor2(1,0,1,0.45) end
-		},
-		-- StomperZLifeMeter right
-		Def.Quad{
-			InitCommand=function(self) self:zoomto(24,160):xy(140,28):diffuse(1,0,1,0.75):MaskDest():fadeleft(1) end,
-			OnCommand=function(self) self:diffuseshift():effectcolor1(1,0,1,0.75):effectcolor2(1,0,1,0.45) end
-		},
-	}
 }
 
-t[#t+1] = LoadActor("./GameplayDemo.lua" )
+t[#t+1] = Def.ActorFrame{
+	InitCommand=function(self) self:zoom(0.75) end,
+	LoadActor("./GameplayDemo.lua"),
+}
 
 return t

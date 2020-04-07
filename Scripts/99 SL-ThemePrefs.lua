@@ -181,6 +181,18 @@ local SL_CustomPrefs =
 		Choices = range(0, 22, 1),
 		Values = range(0, 22, 1),
 	},
+	-- - - - - - - - - - - - - - - - - - - -
+	-- Default Global Offset.
+	-- If players manipulate Global Offset via Advanced Options, return to this
+	-- value after their set is finished.
+	-- NOTE: changing this value here will have no effect. It's here to generate
+	-- the corresponding record in ThemePrefs.ini. The theme will manipulate the
+	-- value in ThemePrefs directly.
+	DefaultGlobalOffsetSeconds = {
+		-- The default value should not make it to gameplay, set to something nice
+		-- and easy to notice in case it goes wrong.
+		Default = 6.969
+	}
 }
 
 -- We need to InitAll() now so that ./Scripts/SL_Init.lua can use
