@@ -11,6 +11,13 @@ local Update = function(af, dt)
 	end
 end
 
+local GetDeltaString = function()
+	delta = SL.Global.ActiveModifiers.GlobalOffsetDelta * 1000
+	form = delta > 0 and "+%d ms" or "%d ms"
+	str = string.format(form, delta):gsub("^0.*", "")
+	return str
+end
+
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		if PREFSMAN:GetPreference("EventMode") and SL.Global.GameMode ~= "Casual" then
@@ -79,15 +86,14 @@ local t = Def.ActorFrame{
 t[#t+1] = LoadFont("_wendy small")..{
 	Name="CustomGlobalOffset",
 	InitCommand=function(self)
-		self:diffusealpha(0):zoom( WideScale(0.5,0.6)):xy(_screen.w-170, 15):halign(1)
+		self:diffusealpha(0):zoom(0.3):xy(_screen.cx+10, 8)
 	end,
 	OnCommand=function(self)
-		self:settext(GetGlobalOffsetDiffString())
+		self:settext(GetDeltaString())
 			:sleep(0.1):decelerate(0.33):diffusealpha(1)
 	end,
-	-- FIXME: Changing global offset via F11/12 will not trigger an update.
 	GlobalOffsetChangedMessageCommand=function(self)
-		self:settext(GetGlobalOffsetDiffString())
+		self:settext(GetDeltaString())
 	end
 }
 
