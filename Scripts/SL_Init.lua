@@ -68,6 +68,7 @@ local GlobalDefaults = {
 			self.ActiveModifiers = {
 				MusicRate = 1.0,
 				WorstTimingWindow = 5,
+				GlobalOffsetDelta = 0,
 			}
 			self.Stages = {
 				PlayedThisGame = 0,
@@ -98,6 +99,9 @@ local GlobalDefaults = {
 		-- These values outside initialize() won't be reset each game cycle,
 		-- but are rather manipulated as needed by the theme.
 		ActiveColorIndex = ThemePrefs.Get("SimplyLoveColor") or 1,
+		-- Default Global Offset. Restore this value before every credit, to reset
+		-- the temporary offset chosen via Advanced Options.
+		DefaultGlobalOffsetSeconds = ThemePrefs.Get("DefaultGlobalOffsetSeconds")
 	}
 }
 
@@ -375,6 +379,13 @@ function InitializeSimplyLove()
 	SL.P1:initialize()
 	SL.P2:initialize()
 	SL.Global:initialize()
+
+	-- - - - - - - - - - - - - - - - - - - - -
+	-- Reset global offset to a pre-stored value.
+	if string.format("%.3f", SL.Global.DefaultGlobalOffsetSeconds) ~= string.format("%.3f", PREFSMAN:GetPreference("GlobalOffsetSeconds")) then
+		PREFSMAN:SetPreference("GlobalOffsetSeconds", SL.Global.DefaultGlobalOffsetSeconds)
+		SM("Offset has been reset to machine standard. (".. string.format("%.3f" ,PREFSMAN:GetPreference("GlobalOffsetSeconds")) .. ")")
+	end
 end
 
 -- TODO: remove this; it's for debugging purposes (Control+F2 to reload scripts) only

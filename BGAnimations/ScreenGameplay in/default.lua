@@ -1,3 +1,6 @@
+-- save the current global offset so at the end of the song we can check if it was changed using F11/12
+StoreCurrentGlobalOffset()
+
 -- code for setting the PlayerOptions string (needed to counteract ITG mod charts)
 -- and the MeasureCounter has been abstracted out to a different file to keep this one simpler.
 local InitializeMeasureCounterAndModsLevel = LoadActor("./MeasureCounterAndModsLevel.lua")

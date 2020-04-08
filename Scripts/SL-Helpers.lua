@@ -632,3 +632,32 @@ GetDifficultyIndex = function(difficulty)
 	local difficulty_index = Difficulty:Reverse()[difficulty]
 	if type(difficulty_index) == "number" then return (difficulty_index + 1) end
 end
+
+-- -----------------------------------------------------------------------
+-- Store the current global offset
+StoreCurrentGlobalOffset = function()
+	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+end
+
+-- -----------------------------------------------------------------------
+-- Update the default global offset in ThemePrefs.ini and the SL table with the current
+-- global offset if it was changed since the last time StoreCurrentGlobalOffset was called
+-- Also set the GlobalOffsetDelta modifier to 0
+-- Since there's no straightforward way to run this consistently after ScreenGameplay and ScreenSaveSync
+-- it has to be placed before Evaluation screen in Scripts/SL-Branches.lua and in ScreenSelectMusic
+UpdateDefaultGlobalOffset = function()
+	if not GAMESTATE:Env()["GlobalOffsetAtSongStart"] then return end
+	offsetAtSongStart = GAMESTATE:Env()["GlobalOffsetAtSongStart"]
+	currentOffset = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+	if currentOffset ~= offsetAtSongStart then
+		ThemePrefs.Set("DefaultGlobalOffsetSeconds", currentOffset)
+		ThemePrefs.Save()
+		SL.Global.DefaultGlobalOffsetSeconds = currentOffset
+		notes = offsetAtSongStart < currentOffset and " (notes earlier)" or " (notes later)"
+		offsetChange = string.format("Default global offset changed from %.3f to %.3f %s",
+			offsetAtSongStart, currentOffset, notes)
+		SM(offsetChange)
+		SL.Global.ActiveModifiers.GlobalOffsetDelta = 0
+	end
+	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = nil
+end
