@@ -1,13 +1,14 @@
 local t = Def.ActorFrame{}
 
--- NumWheelItems under [MusicWheel] in Metrics.ini needs to be 17.
+-- TODO update this comment when settled on the look.
+-- NumWheelItems under [MusicWheel] in Metrics.ini needs to be 19.
 -- Only 15 can be seen onscreen at once, but we use 1 extra on top and
 -- 1 extra at bottom so that MusicWheelItems don't visually
 -- appear/disappear too suddenly while quickly scrolling through the wheel.
 
 -- For this file just use a hardcoded 15, for the sake of animating the
 -- "downward cascade" effect that occurs when SelectMusic first appears.
-local NumWheelItems = 15
+local NumWheelItems = 19
 
 -- Each MusicWheelItem has two Quads drawn in front of it, blocking it from view.
 -- Each of these Quads is half the height of the MusicWheelItem, and their y-coordinates
