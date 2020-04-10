@@ -33,7 +33,9 @@ end
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:SetUpdateFunction( Update )
-			:xy(_screen.cx, _screen.cy)
+			-- changing the position of this actorframe moves everything on this screen except for the
+			-- option icons. The position for those is in metrics.ini
+			:xy(_screen.cx, _screen.cy - 14)
 	end,
 	OnCommand=function(self)
 		-- Get the Topscreen and its name, now that that TopScreen itself actually exists
