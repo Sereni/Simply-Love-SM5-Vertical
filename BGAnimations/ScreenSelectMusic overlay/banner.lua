@@ -5,8 +5,8 @@ local SongOrCourse, banner
 
 local t = Def.ActorFrame{
 	OnCommand=function(self)
-			self:zoom(0.4)
-			self:xy(83.5, 48)
+			self:zoom(0.31)
+			self:xy(62.5, 127)
 	end,
 
 	Def.ActorFrame{
@@ -43,17 +43,17 @@ local t = Def.ActorFrame{
 	-- the MusicRate Quad and text
 	Def.ActorFrame{
 		InitCommand=function(self)
-			self:visible( SL.Global.ActiveModifiers.MusicRate ~= 1 ):y(75)
+			self:visible( SL.Global.ActiveModifiers.MusicRate ~= 1 ):y(70)
 		end,
 
 		--quad behind the music rate text
 		Def.Quad{
-			InitCommand=function(self) self:diffuse( color("#1E282FCC") ):zoomto(418,14) end
+			InitCommand=function(self) self:diffuse( color("#1E282FCC") ):zoomto(418,25) end
 		},
 
 		--the music rate text
 		LoadFont("Common Normal")..{
-			InitCommand=function(self) self:shadowlength(1):zoom(0.85) end,
+			InitCommand=function(self) self:shadowlength(1):zoom(1.1) end,
 			OnCommand=function(self)
 				self:settext(("%g"):format(SL.Global.ActiveModifiers.MusicRate) .. "x " .. THEME:GetString("OptionTitles", "MusicRate"))
 			end
