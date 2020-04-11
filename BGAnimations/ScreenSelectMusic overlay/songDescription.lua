@@ -33,7 +33,7 @@ end
 local t = Def.ActorFrame{
 
 	OnCommand=function(self)
-		self:xy(63.5, 164.5)
+		self:xy(62.5, 164)
 	end,
 
 	-- ----------------------------------------
@@ -50,7 +50,7 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			InitCommand=function(self)
 				self:diffuse(color("#1e282f"))
-					:zoomto( 128, 24 )
+					:zoomto( 125, 25 )
 
 				if ThemePrefs.Get("RainbowMode") then
 					self:diffusealpha(0.75)
