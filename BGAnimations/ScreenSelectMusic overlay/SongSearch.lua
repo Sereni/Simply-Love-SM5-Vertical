@@ -39,7 +39,7 @@ t = Def.ActorFrame{
                                         f:Open(filepath, 2) -- 2 = write
                                         f:PutLine("---Search Results") -- folder name
                                         for i, song in ipairs(results) do
-                                                f:PutLine(song:GetGroupName().."/"..song:GetDisplayMainTitle()) -- song
+                                                f:PutLine(song:GetGroupName().."/"..song:GetDisplayFullTitle()) -- song
                                         end
                                         f:Close()
                                         f:destroy()
