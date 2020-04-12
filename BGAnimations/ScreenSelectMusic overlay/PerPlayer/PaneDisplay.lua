@@ -3,16 +3,25 @@ local pn = ToEnumShortString(player)
 local p = PlayerNumber:Reverse()[player]
 
 local rv
-local zoom_factor = WideScale(0.8,0.9)
+local zoom_factor = 0.5
+local quadX = -25
+local quadY = _screen.h/2 - 156.5
+local labelSpacing = 5
 
-local labelX_col1 = WideScale(-70,-90)
-local dataX_col1  = WideScale(-75,-96)
+local labelX_col1 = quadX - 25
+local dataX_col1  = labelX_col1 - labelSpacing
 
-local labelX_col2 = WideScale(10,20)
-local dataX_col2  = WideScale(5,15)
+local labelX_col2 = labelX_col1 + 50
+local dataX_col2  = labelX_col2 - labelSpacing
 
-local highscoreX = WideScale(56, 80)
-local highscorenameX = WideScale(61, 97)
+local highscorenameX = labelX_col1
+local highscoreX = highscorenameX - labelSpacing
+
+local rowOneY = quadY - 16
+local rowHeight = 10
+
+local quadWidth = 125
+local quadHeight = 49
 
 local PaneItems = {}
 
@@ -21,11 +30,11 @@ PaneItems[THEME:GetString("RadarCategory","Taps")] = {
 	rc = 'RadarCategory_TapsAndHolds',
 	label = {
 		x = labelX_col1,
-		y = 150,
+		y = rowOneY
 	},
 	data = {
 		x = dataX_col1,
-		y = 150
+		y = rowOneY
 	}
 }
 
@@ -33,11 +42,11 @@ PaneItems[THEME:GetString("RadarCategory","Mines")] = {
 	rc = 'RadarCategory_Mines',
 	label = {
 		x = labelX_col2,
-		y = 150,
+		y = rowOneY
 	},
 	data = {
 		x = dataX_col2,
-		y = 150
+		y = rowOneY
 	}
 }
 
@@ -45,11 +54,11 @@ PaneItems[THEME:GetString("RadarCategory","Jumps")] = {
 	rc = 'RadarCategory_Jumps',
 	label = {
 		x = labelX_col1,
-		y = 168,
+		y = rowOneY + rowHeight
 	},
 	data = {
 		x = dataX_col1,
-		y = 168
+		y = rowOneY + rowHeight
 	}
 }
 
@@ -57,11 +66,11 @@ PaneItems[THEME:GetString("RadarCategory","Hands")] = {
 	rc = 'RadarCategory_Hands',
 	label = {
 		x = labelX_col2,
-		y = 168,
+		y = rowOneY + rowHeight
 	},
 	data = {
 		x = dataX_col2,
-		y = 168
+		y = rowOneY + rowHeight
 	}
 }
 
@@ -69,11 +78,11 @@ PaneItems[THEME:GetString("RadarCategory","Holds")] = {
 	rc = 'RadarCategory_Holds',
 	label = {
 		x = labelX_col1,
-		y = 186,
+		y = rowOneY + rowHeight * 2
 	},
 	data = {
 		x = dataX_col1,
-		y = 186
+		y = rowOneY + rowHeight * 2
 	}
 }
 
@@ -81,11 +90,11 @@ PaneItems[THEME:GetString("RadarCategory","Rolls")] = {
 	rc = 'RadarCategory_Rolls',
 	label = {
 		x = labelX_col2,
-		y = 186,
+		y = rowOneY + rowHeight * 2
 	},
 	data = {
 		x = dataX_col2,
-		y = 186
+		y = rowOneY + rowHeight * 2
 	}
 }
 
@@ -102,11 +111,11 @@ local GetNameAndScore = function(profile)
 		local topscore = scores[1]
 
 		if topscore then
-			score = string.format("%.2f%%", topscore:GetPercentDP()*100.0)
-			if SL[pn].ActiveModifiers.DoNotJudgeMe then score = "??.??%" end
+			score = string.format("%.2f", topscore:GetPercentDP()*100.0)
+			if SL[pn].ActiveModifiers.DoNotJudgeMe then score = "??.??" end
 			name = topscore:GetName()
 		else
-			score = string.format("%.2f%%", 0)
+			score = string.format("%.2f", 0)
 			name = "????"
 		end
 	end
@@ -116,31 +125,12 @@ end
 
 
 local af = Def.ActorFrame{
-	Name="PaneDisplay"..ToEnumShortString(player),
+	Name="PaneDisplay",
 
 	InitCommand=function(self)
 		self:visible(GAMESTATE:IsHumanPlayer(player))
-
-		if player == PLAYER_1 then
-			self:x(_screen.w * 0.25 - 5)
-		elseif player == PLAYER_2 then
-			self:x( _screen.w * 0.75 + 5)
-		end
-
+	  self:x(_screen.w * 0.25 + 20)
 		self:y(_screen.cy + 5)
-	end,
-
-	PlayerJoinedMessageCommand=function(self, params)
-		if player==params.Player then
-			self:visible(true)
-				:zoom(0):croptop(0):bounceend(0.3):zoom(1)
-				:playcommand("Set")
-		end
-	end,
-	PlayerUnjoinedMessageCommand=function(self, params)
-		if player==params.Player then
-			self:accelerate(0.3):croptop(1):sleep(0.01):zoom(0)
-		end
 	end,
 
 	-- These playcommand("Set") need to apply to the ENTIRE panedisplay
@@ -172,7 +162,7 @@ local af = Def.ActorFrame{
 -- colored background for chart statistics
 af[#af+1] = Def.Quad{
 	Name="BackgroundQuad",
-	InitCommand=function(self) self:zoomto(_screen.w/2-10, _screen.h/8):y(_screen.h/2 - 67) end,
+	InitCommand=function(self) self:zoomto(quadWidth, quadHeight):xy(quadX,quadY) end,
 	SetCommand=function(self, params)
 		if GAMESTATE:IsHumanPlayer(player) then
 			local StepsOrTrail = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player) or GAMESTATE:GetCurrentSteps(player)
@@ -194,7 +184,6 @@ for key, item in pairs(PaneItems) do
 	af[#af+1] = Def.ActorFrame{
 
 		Name=key,
-		OnCommand=function(self) self:xy(-_screen.w/20, 6) end,
 
 		-- label
 		LoadFont("Common Normal")..{
@@ -224,43 +213,29 @@ for key, item in pairs(PaneItems) do
 	}
 end
 
--- chart difficulty meter
-af[#af+1] = LoadFont("_wendy small")..{
-	Name="DifficultyMeter",
-	InitCommand=function(self) self:horizalign(right):diffuse(Color.Black):xy(_screen.w/4 - 10, _screen.h/2 - 65):queuecommand("Set") end,
-	SetCommand=function(self)
-		local SongOrCourse = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
-		if not SongOrCourse then self:settext(""); return end
-
-		local StepsOrTrail = GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player) or GAMESTATE:GetCurrentSteps(player)
-		local meter = StepsOrTrail and StepsOrTrail:GetMeter() or "?"
-		self:settext( meter )
-	end
-}
-
 --MACHINE high score
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="MachineHighScore",
-	InitCommand=function(self) self:x(highscoreX):y(156):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
+	InitCommand=function(self) self:x(labelX_col1 - labelSpacing):y(rowOneY + rowHeight * 3 + 2):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
 }
 
 --MACHINE highscore name
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="MachineHighScoreName",
-	InitCommand=function(self) self:x(highscorenameX):y(156):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
+	InitCommand=function(self) self:x(dataX_col1 + labelSpacing):y(rowOneY + rowHeight * 3 + 2):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
 }
 
 
 --PLAYER PROFILE high score
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="PlayerHighScore",
-	InitCommand=function(self) self:x(highscoreX):y(176):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
+	InitCommand=function(self) self:x(labelX_col2 - labelSpacing):y(rowOneY + rowHeight * 3 + 2):zoom(zoom_factor):diffuse(Color.Black):horizalign(right) end
 }
 
 --PLAYER PROFILE highscore name
 af[#af+1] = LoadFont("Common Normal")..{
 	Name="PlayerHighScoreName",
-	InitCommand=function(self) self:x(highscorenameX):y(176):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
+	InitCommand=function(self) self:x(dataX_col2 + labelSpacing):y(rowOneY + rowHeight * 3 + 2):zoom(zoom_factor):diffuse(Color.Black):horizalign(left):maxwidth(80) end
 }
 
 return af
