@@ -31,7 +31,7 @@ if not GAMESTATE:IsCourseMode() then
 	-- but Sprites are cheaper than BitmapTexts, so we should use them where dynamic text is not needed
 	af[#af+1] = LoadActor( THEME:GetPathG("", "Has Edit (doubleres).png") )..{
 		InitCommand=function(self)
-			self:visible(false):x(WideScale(130,182)):zoom(0.375)
+			self:visible(false):x(40):zoom(0.275)
 			if ThemePrefs.Get("RainbowMode") then self:diffuse(0,0,0,1) end
 		end,
 		SetCommand=function(self, params)
