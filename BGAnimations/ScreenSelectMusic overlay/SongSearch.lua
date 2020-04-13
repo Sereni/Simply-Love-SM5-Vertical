@@ -1,3 +1,5 @@
+if not THEME:GetMetric("ScreenSelectMusic", "EnableSongSearch") then return end
+
 local wheel
 local screen
 
