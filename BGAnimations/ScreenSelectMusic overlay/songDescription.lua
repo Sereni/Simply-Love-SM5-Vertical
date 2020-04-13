@@ -12,6 +12,9 @@
 
 local group_durations = {}
 local stages_remaining = GAMESTATE:GetNumStagesLeft(GAMESTATE:GetMasterPlayerNumber())
+local labelZoom = 0.4
+local labelYOffset = 5
+local labelsXOffset = -40
 
 for _,group_name in ipairs(SONGMAN:GetSongGroupNames()) do
 	group_durations[group_name] = 0
@@ -30,7 +33,7 @@ end
 local t = Def.ActorFrame{
 
 	OnCommand=function(self)
-		self:xy(83.5, 92.5)
+		self:xy(62.5, 164)
 	end,
 
 	-- ----------------------------------------
@@ -47,7 +50,7 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			InitCommand=function(self)
 				self:diffuse(color("#1e282f"))
-					:zoomto( 167, 24 )
+					:zoomto( 125, 25 )
 
 				if ThemePrefs.Get("RainbowMode") then
 					self:diffusealpha(0.75)
@@ -57,23 +60,23 @@ local t = Def.ActorFrame{
 
 		Def.ActorFrame{
 
-			InitCommand=function(self) self:x(-55) end,
+			InitCommand=function(self) self:x(labelsXOffset) end,
 
 			-- Artist Label
 			LoadFont("Common Normal")..{
 				InitCommand=function(self)
 					local text = GAMESTATE:IsCourseMode() and "NumSongs" or "Artist"
 					self:settext( THEME:GetString("SongDescription", text) )
-						:horizalign(right):y(-6)
+						:horizalign(right):y(-labelYOffset)
 						:maxwidth(44)
-						:zoom(0.5)
+						:zoom(labelZoom)
 				end,
 				OnCommand=function(self) self:diffuse(0.5,0.5,0.5,1) end
 			},
 
 			-- Song Artist
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(5,-6):maxwidth(225):zoom(0.5) end,
+				InitCommand=function(self) self:horizalign(left):xy(5,-labelYOffset):maxwidth(225):zoom(labelZoom) end,
 				SetCommand=function(self)
 					if GAMESTATE:IsCourseMode() then
 						local course = GAMESTATE:GetCurrentCourse()
@@ -91,14 +94,14 @@ local t = Def.ActorFrame{
 			LoadFont("Common Normal")..{
 				Text=THEME:GetString("SongDescription", "BPM"),
 				InitCommand=function(self)
-					self:horizalign(right):y(6):zoom(0.5)
+					self:horizalign(right):y(labelYOffset):zoom(labelZoom)
 						:diffuse(0.5,0.5,0.5,1)
 				end
 			},
 
 			-- BPM value
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(5,6):diffuse(1,1,1,1):zoom(0.5) end,
+				InitCommand=function(self) self:horizalign(left):xy(5,labelYOffset):diffuse(1,1,1,1):zoom(labelZoom) end,
 				SetCommand=function(self)
 					--defined in ./Scipts/SL-BPMDisplayHelpers.lua
 					local text = GetDisplayBPMs()
@@ -111,14 +114,14 @@ local t = Def.ActorFrame{
 				Text=THEME:GetString("SongDescription", "Length"),
 				InitCommand=function(self)
 					self:horizalign(right)
-						:x(95):y(6):zoom(0.5)
+						:x(labelsXOffset+110):y(labelYOffset):zoom(labelZoom)
 						:diffuse(0.5,0.5,0.5,1)
 				end
 			},
 
 			-- Song Duration Value
 			LoadFont("Common Normal")..{
-				InitCommand=function(self) self:horizalign(left):xy(95 + 5, 6):zoom(0.5) end,
+				InitCommand=function(self) self:horizalign(left):xy(labelsXOffset + 110 + 5, labelYOffset):zoom(labelZoom) end,
 				SetCommand=function(self)
 					local duration
 
@@ -175,7 +178,7 @@ local t = Def.ActorFrame{
 		-- long/marathon version bubble graphic and text
 		Def.ActorFrame{
 			OnCommand=function(self)
-				self:x( 76 )
+				self:x( 15 ):y(-4)
 			end,
 			SetCommand=function(self)
 				local song = GAMESTATE:GetCurrentSong()

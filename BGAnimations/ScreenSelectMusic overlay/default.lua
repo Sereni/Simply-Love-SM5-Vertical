@@ -29,8 +29,6 @@ local t = Def.ActorFrame{
 	LoadActor("./PerPlayer/Under.lua"),
 	-- grid of Difficulty Blocks (normal) or CourseContentsList (CourseMode)
 	LoadActor("./StepsDisplayList/default.lua"),
-	-- elements we need two of that draw over the StepsDisplayList (just the bouncing cursors, really)
-	LoadActor("./PerPlayer/Over.lua"),
 
 	-- Graphical Banner
 	LoadActor("./Banner.lua"),

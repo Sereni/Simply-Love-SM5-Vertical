@@ -54,10 +54,10 @@ TextBannerAfterSet = function(self)
 
 	-- if the Subtitle isn't an empty string
 	if Subtitle:GetText() ~= "" then
-		-- offset the Title's y() by -6 pixels
-		Title:y(-6)
-		-- and offset the Subtitle's y() by 6 pixels
-		Subtitle:y(6)
+		-- offset the Title's y() by -4 pixels
+		Title:y(-4)
+		-- and offset the Subtitle's y() by 4 pixels
+		Subtitle:y(4)
 	end
 end
 

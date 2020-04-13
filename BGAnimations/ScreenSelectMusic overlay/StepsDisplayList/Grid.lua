@@ -1,14 +1,16 @@
 local num_rows    = 5
 local num_columns = 20
-local GridZoomX = IsUsingWideScreen() and 0.435 or 0.39
-local BlockZoomY = 0.275
+local GridZoomX = 0.39
+local RowHeight = 14
 local StepsToDisplay, SongOrCourse, StepsOrTrails
+local quadHeight = 75
+local quadWidth = 125
 
 local GetStepsToDisplay = LoadActor("./StepsToDisplay.lua")
 
 local t = Def.ActorFrame{
 	Name="StepsDisplayList",
-	InitCommand=function(self) self:vertalign(top):xy(_screen.cx-170, _screen.cy + 70) end,
+	InitCommand=function(self) self:vertalign(top):xy(quadWidth/2, _screen.cy) end,
 	-- - - - - - - - - - - - - -
 
 	OnCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
@@ -30,18 +32,17 @@ local t = Def.ActorFrame{
 				StepsToDisplay = GetStepsToDisplay(StepsOrTrails)
 
 				for RowNumber=1,num_rows do
-					if StepsToDisplay[RowNumber] then
+					chart = StepsToDisplay[RowNumber]
+					if chart then
 						-- if this particular song has a stepchart for this row, update the Meter
-						-- and BlockRow coloring appropriately
-						local meter = StepsToDisplay[RowNumber]:GetMeter()
-						local difficulty = StepsToDisplay[RowNumber]:GetDifficulty()
+						local meter = chart:GetMeter()
+						local difficulty = chart:GetDifficulty()
 						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Set", {Meter=meter, Difficulty=difficulty})
-						self:GetChild("Grid"):GetChild("Blocks_"..RowNumber):playcommand("Set", {Meter=meter, Difficulty=difficulty})
+						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Set", {Chart=chart})
 					else
-						-- otherwise, set the meter to an empty string and hide this particular colored BlockRow
+						-- otherwise, set the meter to an empty string
 						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Unset")
-						self:GetChild("Grid"):GetChild("Blocks_"..RowNumber):playcommand("Unset")
-
+						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Unset")
 					end
 				end
 			end
@@ -57,7 +58,7 @@ local t = Def.ActorFrame{
 	Def.Quad{
 		Name="Background",
 		InitCommand=function(self)
-			self:diffuse(color("#1e282f")):zoomto(320, 96)
+			self:diffuse(color("#1e282f")):zoomto(quadWidth, quadHeight)
 			if ThemePrefs.Get("RainbowMode") then
 				self:diffusealpha(0.75)
 			end
@@ -68,59 +69,44 @@ local t = Def.ActorFrame{
 
 local Grid = Def.ActorFrame{
 	Name="Grid",
-	InitCommand=function(self) self:horizalign(left):vertalign(top):xy(8, -52 ) end,
-}
-
-
--- A grid of decorative faux-blocks that will exist
--- behind the changing difficulty blocks.
-Grid[#Grid+1] = Def.Sprite{
-	Name="BackgroundBlocks",
-	Texture=THEME:GetPathB("ScreenSelectMusic", "overlay/StepsDisplayList/_block.png"),
-
-	InitCommand=function(self) self:diffuse(color("#182025")) end,
-	OnCommand=function(self)
-		local width = self:GetWidth()
-		local height= self:GetHeight()
-		self:zoomto(width * num_columns * GridZoomX, height * num_rows * BlockZoomY)
-		self:y( 3 * height * BlockZoomY )
-		self:customtexturerect(0, 0, num_columns, num_rows)
-	end
+	InitCommand=function(self) self:horizalign(left):vertalign(top):xy(8, -quadHeight/2-5) end,
 }
 
 for RowNumber=1,num_rows do
 
-	Grid[#Grid+1] =	Def.Sprite{
-		Name="Blocks_"..RowNumber,
-		Texture=THEME:GetPathB("ScreenSelectMusic", "overlay/StepsDisplayList/_block.png"),
+	Grid[#Grid+1] =	LoadFont("Common Normal")..{
+		Name="StepArtist_"..RowNumber,
 
-		InitCommand=function(self) self:diffusealpha(0) end,
 		OnCommand=function(self)
-			local width = self:GetWidth()
-			local height= self:GetHeight()
-			self:y( RowNumber * height * BlockZoomY)
-			self:zoomto(width * num_columns * GridZoomX, height * BlockZoomY)
+			self:y(RowNumber * RowHeight)
+			self:x(-quadWidth/2+13)
+			self:horizalign(left)
+			self:maxwidth(195)
+			self:zoom(0.5)
 		end,
 		SetCommand=function(self, params)
-			-- the engine's Steps::TidyUpData() method ensures that difficulty meters are positive
-			-- (and does not seem to enforce any upper bound that I can see)
-			self:customtexturerect(0, 0, num_columns, 1)
-			self:cropright( 1 - (params.Meter * (1/num_columns)) )
-			self:diffuse( DifficultyColor(params.Difficulty) )
+			-- always stop tweening when steps change in case a MarqueeCommand is queued
+			self:stoptweening()
+
+			-- Display stepartist name.
+			-- TODO: Display other available chart data.
+			stepartist = params.Chart:GetAuthorCredit()
+			self:settext(stepartist)
+			DiffuseEmojis(self, stepartist)
 		end,
 		UnsetCommand=function(self)
-			self:customtexturerect(0,0,0,0)
-		end
+			self:settext("")
+		end,
+		OffCommand=function(self) self:stoptweening() end
 	}
 
 	Grid[#Grid+1] = LoadFont("_wendy small")..{
 		Name="Meter_"..RowNumber,
 		InitCommand=function(self)
-			local height = self:GetParent():GetChild("Blocks_"..RowNumber):GetHeight()
 			self:horizalign(right)
-			self:y(RowNumber * height * BlockZoomY)
-			self:x( IsUsingWideScreen() and -140 or -126 )
-			self:zoom(0.3)
+			self:y(RowNumber * RowHeight)
+			self:x(-quadWidth/2+7)
+			self:zoom(0.2)
 		end,
 		SetCommand=function(self, params)
 			-- diffuse and set each chart's difficulty meter

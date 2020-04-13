@@ -23,7 +23,7 @@ local state
 
 return Def.Sprite{
 	Texture=THEME:GetPathG("MusicWheelItem","Grades/grades 1x18.png"),
-	InitCommand=function(self) self:zoom( WideScale(0.18, 0.3) ):animate(0) end,
+	InitCommand=function(self) self:zoom(0.15):animate(0) end,
 	SetGradeCommand=function(self, params)
 		state = grades[params.Grade]
 
