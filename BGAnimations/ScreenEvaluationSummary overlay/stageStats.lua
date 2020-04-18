@@ -2,6 +2,10 @@ local position_on_screen = ...
 
 local Players = GAMESTATE:GetHumanPlayers()
 local song, StageNum, LetterGradesAF
+local bannerZoom = 0.27
+local quadWidth = _screen.w-40
+local quadHeight = 75
+local bannerXOffset = -quadWidth/4+10
 
 local path = "/"..THEME:GetCurrentThemeDirectory().."Graphics/_FallbackBanners/"..ThemePrefs.Get("VisualTheme")
 local banner_directory = FILEMAN:DoesFileExist(path) and path or THEME:GetPathG("","_FallbackBanners/Arrows")
@@ -13,7 +17,7 @@ local t = Def.ActorFrame{
 	DrawPageCommand=function(self, params)
 		self:sleep(position_on_screen*0.05):linear(0.15):diffusealpha(0)
 
-		StageNum = ((params.Page-1)*4) + position_on_screen
+		StageNum = ((params.Page-1)*params.SongsPerPage) + position_on_screen
 		local stage = SL.Global.Stages.Stats[StageNum]
 		song = stage ~= nil and stage.song or nil
 
@@ -29,19 +33,19 @@ local t = Def.ActorFrame{
 
 	-- black quad
 	Def.Quad{
-		InitCommand=function(self) self:zoomto( _screen.w-40, 94):diffuse(0,0,0,0.5):y(-6) end
+		InitCommand=function(self) self:zoomto( quadWidth, quadHeight ):diffuse(0,0,0,0.5):y(-6) end
 	},
 
 	--fallback banner
 	LoadActor(banner_directory.."/banner"..SL.Global.ActiveColorIndex.." (doubleres).png")..{
-		InitCommand=function(self) self:y(-6):zoom(0.333) end,
+		InitCommand=function(self) self:xy(bannerXOffset, -4):zoom(bannerZoom) end,
 		DrawStageCommand=function(self) self:visible(song ~= nil and not song:HasBanner()) end
 	},
 
 	-- the banner, if there is one
 	Def.Banner{
 		Name="Banner",
-		InitCommand=function(self) self:y(-6) end,
+		InitCommand=function(self) self:xy(bannerXOffset, -4) end,
 		DrawStageCommand=function(self)
 			if song then
 				if GAMESTATE:IsCourseMode() then
@@ -49,14 +53,14 @@ local t = Def.ActorFrame{
 				else
 					self:LoadFromSong(song)
 				end
-				self:setsize(418,164):zoom(0.333)
+				self:setsize(418,164):zoom(bannerZoom)
 			end
 		end
 	},
 
 	-- the title of the song
 	LoadFont("Common Normal")..{
-		InitCommand=function(self) self:zoom(0.8):y(-43):maxwidth(350) end,
+		InitCommand=function(self) self:zoom(0.58):xy(bannerXOffset, -quadHeight/2 + 3):maxwidth(200) end,
 		DrawStageCommand=function(self)
 			if song then self:settext(song:GetDisplayFullTitle()) end
 		end
@@ -64,7 +68,7 @@ local t = Def.ActorFrame{
 
 	-- the BPM(s) of the song
 	LoadFont("Common Normal")..{
-		InitCommand=function(self) self:zoom(0.6):y(30):maxwidth(350) end,
+		InitCommand=function(self) self:zoom(0.45):xy(bannerXOffset, quadHeight/3):maxwidth(200) end,
 		DrawStageCommand=function(self)
 			if song then
 				local text = ""
@@ -104,21 +108,12 @@ for player in ivalues(Players) do
 	local playerStats, difficultyMeter, difficulty, stepartist, grade, score
 	local TNSTypes = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' }
 
-	-- variables for positioning and horizalign, dependent on playernumber
-	local col1x, col2x, gradex, align1, align2
-	if player == PLAYER_1 then
-		col1x =  -90
-		col2x =  -_screen.w/2.5
-		gradex = -_screen.w/3.33
+	-- variables for positioning and horizalign
+	local col1x, col2x, align1, align2
+		col1x =  quadWidth/2 - 10
+		col2x =  20
 		align1 = right
 		align2 = left
-	elseif player == PLAYER_2 then
-		col1x = 90
-		col2x = _screen.w/2.5
-		gradex = _screen.w/3.33
-		align1= left
-		align2 = right
-	end
 
 
 	local PlayerStatsAF = Def.ActorFrame{
@@ -137,7 +132,7 @@ for player in ivalues(Players) do
 
 	--percent score
 	PlayerStatsAF[#PlayerStatsAF+1] = LoadFont("_wendy small")..{
-		InitCommand=function(self) self:zoom(0.5):horizalign(align1):x(col1x):y(-24) end,
+		InitCommand=function(self) self:zoom(0.4):horizalign(align1):x(col1x):y(-quadHeight/2+19) end,
 		DrawStageCommand=function(self)
 			if playerStats and score then
 
@@ -158,25 +153,9 @@ for player in ivalues(Players) do
 		end
 	}
 
-	-- letter grade
-	if SL.Global.GameMode ~= "StomperZ" then
-		PlayerStatsAF[#PlayerStatsAF+1] = Def.ActorProxy{
-			InitCommand=function(self)
-				self:zoom(WideScale(0.275,0.3)):x( WideScale(194,250) * (player==PLAYER_1 and -1 or 1) ):y(-6)
-			end,
-			DrawStageCommand=function(self)
-				if playerStats and grade then
-					self:SetTarget( LetterGradesAF:GetChild(grade) ):visible(true)
-				else
-					self:visible(false)
-				end
-			end
-		}
-	end
-
 	-- difficulty meter
 	PlayerStatsAF[#PlayerStatsAF+1] = LoadFont("_wendy small")..{
-		InitCommand=function(self) self:zoom(0.4):horizalign(align1):x(col1x):y(4) end,
+		InitCommand=function(self) self:zoom(0.3):horizalign(align1):x(col1x):y(quadHeight/2-35) end,
 		DrawStageCommand=function(self)
 			if playerStats and difficultyMeter then
 				self:diffuse(DifficultyColor(difficulty)):settext(difficultyMeter)
@@ -188,7 +167,7 @@ for player in ivalues(Players) do
 
 	-- stepartist
 	PlayerStatsAF[#PlayerStatsAF+1] = LoadFont("Common Normal")..{
-		InitCommand=function(self) self:zoom(0.65):horizalign(align1):x(col1x):y(28) end,
+		InitCommand=function(self) self:zoom(0.55):horizalign(align1):x(col1x):y(quadHeight/2-20):maxwidth(130) end,
 		DrawStageCommand=function(self)
 			if playerStats and stepartist then
 				self:settext(stepartist)
@@ -203,7 +182,7 @@ for player in ivalues(Players) do
 
 		PlayerStatsAF[#PlayerStatsAF+1] = LoadFont("_wendy small")..{
 			InitCommand=function(self)
-				self:zoom(0.28):horizalign(align2):x(col2x):y(i*13 - 50)
+				self:zoom(0.2):horizalign(align2):x(col2x):y(i*11-45)
 					:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
 			end,
 			DrawStageCommand=function(self)

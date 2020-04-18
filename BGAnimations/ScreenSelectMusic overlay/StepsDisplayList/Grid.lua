@@ -85,9 +85,6 @@ for RowNumber=1,num_rows do
 			self:zoom(0.5)
 		end,
 		SetCommand=function(self, params)
-			-- always stop tweening when steps change in case a MarqueeCommand is queued
-			self:stoptweening()
-
 			-- Display stepartist name.
 			-- TODO: Display other available chart data.
 			stepartist = params.Chart:GetAuthorCredit()

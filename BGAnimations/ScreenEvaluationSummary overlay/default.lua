@@ -1,7 +1,8 @@
 local numStages = SL.Global.Stages.PlayedThisGame
 
+local num_songs = 5
 local page = 1
-local pages = math.ceil(numStages/4)
+local pages = math.ceil(numStages/num_songs)
 local next_page
 
 -- assume that the player has dedicated MenuButtons
@@ -62,26 +63,22 @@ local t = Def.ActorFrame{
 	}
 }
 
-if SL.Global.GameMode ~= "StomperZ" then
-	t[#t+1] = LoadActor("./LetterGrades.lua")
-end
-
 -- i will increment so that we progress down the screen from top to bottom
 -- first song of the round at the top, more recently played song at the bottom
-for i=1,4 do
+for i=1, num_songs do
 
 	t[#t+1] = LoadActor("StageStats.lua", i)..{
 		Name="StageStats_"..i,
 		InitCommand=function(self) self:diffusealpha(0) end,
 		OnCommand=function(self)
-			self:xy(_screen.cx, ((_screen.h/4.75) * i))
+			self:xy(_screen.cx, ((_screen.h/num_songs - 10) * i) - 5)
 				:queuecommand("Hide")
 		end,
 		ShowCommand=function(self)
-			self:sleep(i*0.05):linear(0.15):diffusealpha(1)
+			self:sleep(i*0.04):linear(0.15):diffusealpha(1)
 		end,
 		HideCommand=function(self)
-			self:playcommand("DrawPage", {Page=page})
+			self:playcommand("DrawPage", {Page=page, SongsPerPage=num_songs})
 		end,
 	}
 
