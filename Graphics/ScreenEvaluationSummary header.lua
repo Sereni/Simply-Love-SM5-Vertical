@@ -6,7 +6,7 @@ return Def.ActorFrame{
 		Name="GameModeText",
 		Font="_wendy small",
 		InitCommand=function(self)
-			self:diffusealpha(0):zoom( WideScale(0.5,0.6)):xy(_screen.w-70, 15):halign(1)
+			self:diffusealpha(0):zoom( 0.3 ):xy(_screen.w-70, 7.5):halign(1)
 			if not PREFSMAN:GetPreference("MenuTimer") then
 				self:x(_screen.w-10)
 			end
