@@ -22,14 +22,37 @@ t = Def.ActorFrame{
                         Question = "Song name",
                         MaxInputLength = 255,
                         OnOK = function(answer)
-				-- case insensitive search for a string
-				-- in every song's title and subtitle
+				-- A song is a match if either the whole search query is a substring of
+				-- its full title (title+subtitle) or if each word in the search query
+				-- is found in at least one of its charts' AuthorCredit + Description
+				-- This search is case insensitive
                                 local results = {}
                                 for i, Song in ipairs(SONGMAN:GetAllSongs()) do
+					local match = false
                                         title = Song:GetDisplayFullTitle():lower()
+					-- the query "xl grind" will match a song called "Axle Grinder" no matter
+					-- what the chart info says
                                         if title:match(answer:lower()) then
                                                 results[#results+1] = Song
+						match = true
                                         end
+					if not match then
+						for i, steps in ipairs(Song:GetStepsByStepsType("StepsType_Dance_Single")) do
+							local chartStr = steps:GetAuthorCredit().." "..steps:GetDescription()
+							match = true
+							-- the query "br xo fs" will match any song with at least one chart that
+							-- has "br", "xo" and "fs" in its AuthorCredit + Description
+							for word in answer:gmatch("%S+") do
+								if not chartStr:lower():match(word:lower()) then
+									match = false
+									break
+								end
+							end
+							if match then
+								results[#results+1] = Song
+							end
+						end
+					end
                                 end
 
 				-- here we create a file in the "Other/" folder in the theme for every 
