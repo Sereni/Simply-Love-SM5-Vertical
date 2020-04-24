@@ -191,7 +191,7 @@ local SL_CustomPrefs =
 	DefaultGlobalOffsetSeconds = {
 		-- The default value should not make it to gameplay, set to something nice
 		-- and easy to notice in case it goes wrong.
-		Default = 6.969
+		Default = PREFSMAN:GetPreference("GlobalOffsetSeconds")
 	}
 }
 
