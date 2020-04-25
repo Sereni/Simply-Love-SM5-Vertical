@@ -96,30 +96,29 @@ local t = Def.ActorFrame {
 
 local path = "/"..THEME:GetCurrentThemeDirectory().."Graphics/_FallbackBanners/"..ThemePrefs.Get("VisualTheme")
 local banner_directory = FILEMAN:DoesFileExist(path) and path or THEME:GetPathG("","_FallbackBanners/Arrows")
+local bannerZoom = 0.478
+local bannerY = 110
 
 -- Things that are constantly on the screen (fallback banner + masks)
 t[#t+1] = Def.ActorFrame {
 
 	--fallback banner
 	LoadActor(banner_directory .."/banner"..SL.Global.ActiveColorIndex.." (doubleres).png")..{
-		OnCommand=function(self) self:xy(_screen.cx, 121.5):zoom(0.7) end
+		OnCommand=function(self) self:xy(_screen.cx, bannerY):zoom(bannerZoom) end
 	},
 
+  -- FIXME: These quads are masking flickering wheel items on the sides.
+	-- Investigate changing animation / looping on the wheel to remove flickering.
 	Def.Quad{
-		Name="LeftMask";
-		InitCommand=function(self) self:horizalign(left) end,
-		OnCommand=function(self) self:xy(0, _screen.cy):zoomto(_screen.cx-272, _screen.h):MaskSource() end
-	},
-
-	Def.Quad{
-		Name="CenterMask",
-		OnCommand=function(self) self:Center():zoomto(110, _screen.h):MaskSource() end
+		Name="LeftMask",
+		InitCommand=function(self) self:horizalign(right) end,
+		OnCommand=function(self) self:xy(_screen.cx - 60, _screen.cy):zoomto(_screen.w/2, _screen.h):diffuse(0,0,0,1):MaskSource() end
 	},
 
 	Def.Quad{
 		Name="RightMask",
 		InitCommand=function(self) self:horizalign(right) end,
-		OnCommand=function(self) self:xy(_screen.w, _screen.cy):zoomto(_screen.cx-272, _screen.h):MaskSource() end
+		OnCommand=function(self) self:xy(_screen.w + 65, _screen.cy):zoomto(_screen.w/2, _screen.h):MaskSource() end
 	}
 }
 
@@ -151,7 +150,7 @@ for i=1,NumStages do
 	-- song name
 	SongNameAndBanner[#SongNameAndBanner+1] = LoadFont("Common Normal")..{
 		Name="SongName"..i,
-		InitCommand=function(self) self:xy(_screen.cx, 54):maxwidth(294):shadowlength(0.333) end,
+		InitCommand=function(self) self:xy(_screen.cx, bannerY-50):zoom(0.8):maxwidth(200):shadowlength(0.333) end,
 		OnCommand=function(self)
 			if SongOrCourse then
 				self:settext( GAMESTATE:IsCourseMode() and SongOrCourse:GetDisplayFullTitle() or SongOrCourse:GetDisplayMainTitle() )
@@ -162,7 +161,7 @@ for i=1,NumStages do
 	-- song banner
 	SongNameAndBanner[#SongNameAndBanner+1] = Def.Banner{
 		Name="SongBanner"..i,
-		InitCommand=function(self) self:xy(_screen.cx, 121.5) end,
+		InitCommand=function(self) self:xy(_screen.cx, bannerY) end,
 		OnCommand=function(self)
 			if SongOrCourse then
 				if GAMESTATE:IsCourseMode() then
@@ -170,7 +169,7 @@ for i=1,NumStages do
 				else
 					self:LoadFromSong(SongOrCourse)
 				end
-				self:setsize(418,164):zoom(0.7)
+				self:setsize(418,164):zoom(bannerZoom)
 			end
 		end
 	}
@@ -182,7 +181,6 @@ end
 
 for player in ivalues(Players) do
 	local pn = ToEnumShortString(player)
-	local x_offset = (player == PLAYER_1 and -120) or 200
 
 	t[#t+1] = LoadActor("PlayerNameAndDecorations.lua", player)
 	t[#t+1] = LoadActor("./HighScores.lua", player)
@@ -197,7 +195,7 @@ for player in ivalues(Players) do
 	--		x position
 	--		y position
 	if SL[pn].HighScores.EnteringName then
-		t[#t+1] = AlphabetWheels[pn]:create_actors( "AlphabetWheel_"..pn, 7, alphabet_character_mt, _screen.cx + x_offset, _screen.cy+38)
+		t[#t+1] = AlphabetWheels[pn]:create_actors( "AlphabetWheel_"..pn, 7, alphabet_character_mt, _screen.cx+25, _screen.cy+5)
 	end
 end
 
