@@ -38,7 +38,7 @@ for player in ivalues(Players) do
 	-- first, check if this player is using a profile (local or MemoryCard)
 	if PROFILEMAN:IsPersistentProfile(player) then
 
-	  -- Change layout to accommodate two columns
+	  -- Change layout to accommodate more stats into two columns
 		x_col1 = _screen.cx - x_offset
 		x_col2 = _screen.cx + x_offset
 
