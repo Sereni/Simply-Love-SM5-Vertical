@@ -2,6 +2,8 @@ local Player = ...
 local pn = ToEnumShortString(Player)
 local CanEnterName = SL[pn].HighScores.EnteringName
 
+local paneWidth = 200
+
 if CanEnterName then
 	SL[pn].HighScores.Name = ""
 end
@@ -10,47 +12,46 @@ if PROFILEMAN:IsPersistentProfile(Player) then
 	SL[pn].HighScores.Name = PROFILEMAN:GetProfile(Player):GetLastUsedHighScoreName()
 end
 
+local yOffset = _screen.cy - 40
+local cursorYOffset = 44
+
 local t = Def.ActorFrame{
 	Name="PlayerNameAndDecorations_"..pn,
 	InitCommand=function(self)
-		if Player == PLAYER_1 then
-			self:x(_screen.cx-160)
-		elseif Player == PLAYER_2 then
-			self:x(_screen.cx+160)
-		end
-		self:y(_screen.cy-20)
+	  self:x(_screen.cx)
+		self:y(yOffset)
 	end,
 
 
 	-- the quad behind the playerName
 	Def.Quad{
-		InitCommand=function(self) self:diffuse(0,0,0,0.75):zoomto(300, _screen.h/7) end,
+		InitCommand=function(self) self:diffuse(0,0,0,0.75):zoomto(paneWidth, 48) end,
 	},
 
 	-- the quad behind the scrolling alphabet
 	Def.Quad{
-		InitCommand=function(self) self:diffuse(0,0,0,0.5):zoomto(300, _screen.h/10) end,
-		OnCommand=function(self) self:y(58) end
+		InitCommand=function(self) self:diffuse(0,0,0,0.5):zoomto(paneWidth, 40) end,
+		OnCommand=function(self) self:y(cursorYOffset) end
 	},
 
 	-- the quad behind the highscore list
 	Def.Quad{
-		InitCommand=function(self) self:diffuse(0,0,0,0.25):zoomto(300, _screen.h/4) end,
-		OnCommand=function(self) self:y(142) end
+		InitCommand=function(self) self:diffuse(0,0,0,0.25):zoomto(paneWidth, 160) end,
+		OnCommand=function(self) self:y(cursorYOffset + 100) end
 	}
 }
 
 
 t[#t+1] = LoadActor("Cursor.png")..{
 	Name="Cursor",
-	InitCommand=function(self) self:diffuse(PlayerColor(Player)):zoom(0.5) end,
-	OnCommand=function(self) self:visible( CanEnterName ):y(58) end,
+	InitCommand=function(self) self:diffuse(PlayerColor(Player)):zoom(0.35) end,
+	OnCommand=function(self) self:visible( CanEnterName ):y(cursorYOffset) end,
 	HideCommand=function(self) self:linear(0.25):diffusealpha(0) end
 }
 
 t[#t+1] = LoadFont("_wendy white")..{
 	Name="PlayerName",
-	InitCommand=function(self) self:zoom(0.75):halign(0):xy(-80,0) end,
+	InitCommand=function(self) self:zoom(0.5) end,
 	OnCommand=function(self)
 		self:visible( CanEnterName )
 		self:settext( SL[pn].HighScores.Name or "" )
@@ -62,7 +63,7 @@ t[#t+1] = LoadFont("_wendy white")..{
 
 t[#t+1] = LoadFont("_wendy small")..{
 	Text=ScreenString("OutOfRanking"),
-	OnCommand=function(self) self:zoom(0.7):diffuse(PlayerColor(Player)):y(58):visible(not CanEnterName) end
+	OnCommand=function(self) self:zoom(0.5):diffuse(PlayerColor(Player)):y(cursorYOffset):visible(not CanEnterName) end
 }
 
 return t
