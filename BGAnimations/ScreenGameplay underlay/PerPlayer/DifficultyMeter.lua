@@ -2,7 +2,7 @@ local player = ...
 
 return Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy( _screen.w-16, 16 )
+		self:xy( _screen.w-17, 16 )
 	end,
 
 	-- colored background for player's chart's difficulty meter
