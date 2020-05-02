@@ -25,7 +25,6 @@ local PlayerDefaults = {
 				MeasureCounter = "None",
 				MeasureCounterLeft = true,
 				MeasureCounterUp = false,
-				DataVisualizations = "Disabled",
 				TargetScore = 11,
 				ActionOnMissedTarget = "Nothing",
 				Pacemaker = false,

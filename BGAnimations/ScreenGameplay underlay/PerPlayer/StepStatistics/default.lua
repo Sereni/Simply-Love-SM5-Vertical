@@ -2,6 +2,8 @@ local player = ...
 local pn = ToEnumShortString(player)
 
 -- if the conditions aren't right, don't bother
+-- TODO: Dataviz options disabled in vertical — remove the code.
+if true then return end
 if SL[pn].ActiveModifiers.DataVisualizations ~= "Step Statistics"
 or GAMESTATE:GetCurrentStyle():GetName() ~= "single"
 or SL.Global.GameMode == "Casual"

@@ -288,24 +288,7 @@ local Overrides = {
 			playeroptions:Cover(mods.HideSongBG and 1 or 0)
 		end,
 	},
-	-------------------------------------------------------------------------
-	DataVisualizations = {
-		Values = function()
-			local choices = { "Disabled", "Target Score Graph", "Step Statistics" }
-
-			-- Disabled and Target Score Graph should always be available to players
-			-- but Step Statistics needs a lot of space and isn't always possible
-			-- remove it as an available option if we aren't in single or if the current
-			-- notefield width already uses more than half the screen width
-
-			if GAMESTATE:GetCurrentStyle():GetName() ~= "single"
-			or GetNotefieldWidth( GAMESTATE:GetMasterPlayerNumber() ) > _screen.w/2 then
-				table.remove(choices, 3)
-			end
-
-			return choices
-		end,
-	},
+	
 	-------------------------------------------------------------------------
 	TargetScore = {
 		Values = { 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'S-', 'S', 'S+', '☆', '☆☆', '☆☆☆', '☆☆☆☆', 'Machine best', 'Personal best' },
