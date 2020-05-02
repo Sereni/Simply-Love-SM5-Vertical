@@ -58,7 +58,7 @@ af[#af+1] = Def.ActorFrame{
 			recommended_bmt = self
 
 			self:xy(padding, -bg_height/2 + padding)
-				:valign(0) -- bottom aligned
+				:valign(0) -- top aligned
 				:halign(0) -- left aligned
 				:_wrapwidthpixels(bg_width-padding*2)
 				:zoom(text_zoom)

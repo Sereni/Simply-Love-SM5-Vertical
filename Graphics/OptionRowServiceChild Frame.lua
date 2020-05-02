@@ -12,7 +12,7 @@ t.InitCommand=function(self) self:x(WideScale(12,30)) end
 t[#t+1] = Def.Quad {
 	Name="RowBackgroundQuad",
 	InitCommand=function(self)
-	self:horizalign(center):x(row_bg_x):setsize(row_bg_width, row_bg_height)
+	self:horizalign(center):x(row_bg_x):zoomto(row_bg_width, row_bg_height)
 end
 }
 
