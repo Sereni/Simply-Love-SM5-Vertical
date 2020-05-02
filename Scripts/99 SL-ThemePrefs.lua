@@ -175,13 +175,6 @@ local SL_CustomPrefs =
 		Values  = { 0, 1, 2 }
 	},
 	-- - - - - - - - - - - - - - - - - - - -
-	--- ???
-	RabbitHole = {
-		Default = 0,
-		Choices = range(0, 22, 1),
-		Values = range(0, 22, 1),
-	},
-	-- - - - - - - - - - - - - - - - - - - -
 	-- Default Global Offset.
 	-- If players manipulate Global Offset via Advanced Options, return to this
 	-- value after their set is finished.
