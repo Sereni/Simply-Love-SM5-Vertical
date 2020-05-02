@@ -64,6 +64,11 @@ local RecentMods = function(mods)
 	end
 	text = text .. hideflags .. flags
 
+	-- DataVisualizations should be a string and a specific string at that
+	if mods.DataVisualizations=="Target Score Graph" or mods.DataVisualizations=="Step Statistics" then
+		text = text .. THEME:GetString("SLPlayerOptions", mods.DataVisualizations)..", "
+	end
+
 	-- remove trailing comma and whitespace
 	text = text:sub(1,-3)
 
