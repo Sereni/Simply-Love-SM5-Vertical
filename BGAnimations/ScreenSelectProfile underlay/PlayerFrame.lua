@@ -57,7 +57,7 @@ end
 
 return Def.ActorFrame{
 	Name=ToEnumShortString(player) .. "Frame",
-	InitCommand=function(self) self:xy(_screen.cx+(150*(player==PLAYER_1 and -1 or 1)), _screen.cy) end,
+	InitCommand=function(self) self:xy(_screen.cx, _screen.cy) end,
 
 	OffCommand=function(self)
 		if GAMESTATE:IsSideJoined(player) then

@@ -1,13 +1,12 @@
 -- ----------------------------------------------------
 -- local tables containing NoteSkins and JudgmentGraphics available to SL
--- wW'll compare values from profiles against these "master" tables as it
+-- we'll compare values from profiles against these "master" tables as it
 -- seems to be disconcertingly possible for user data to contain errata, typos, etc.
 
 local noteskins = NOTESKIN:GetNoteSkinNames()
 local judgment_graphics = {
 	ITG=GetJudgmentGraphics("ITG"),
 	["FA+"]=GetJudgmentGraphics("FA+"),
-	StomperZ=GetJudgmentGraphics("StomperZ"),
 }
 
 -- ----------------------------------------------------

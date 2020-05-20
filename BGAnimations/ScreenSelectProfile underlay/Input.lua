@@ -14,7 +14,6 @@ for profile in ivalues(profile_data) do
 	end
 end
 
-local AutoStyle = ThemePrefs.Get("AutoStyle")
 local mpn = GAMESTATE:GetMasterPlayerNumber()
 
 local Handle = {}
@@ -105,21 +104,12 @@ Handle.MenuDown = Handle.MenuRight
 Handle.DownRight = Handle.MenuRight
 
 Handle.Back = function(event)
-	if GAMESTATE:GetNumPlayersEnabled()==0 then
 		SCREENMAN:GetTopScreen():Cancel()
-	else
-		MESSAGEMAN:Broadcast("BackButton")
-		-- ScreenSelectProfile:SetProfileIndex() will interpret -2 as
-		-- "Unjoin this player and unmount their USB stick if there is one"
-		-- see ScreenSelectProfile.cpp for details
-		SCREENMAN:GetTopScreen():SetProfileIndex(event.PlayerNumber, -2)
-	end
 end
-
 
 local InputHandler = function(event)
 	if not event or not event.button then return false end
-	if (AutoStyle=="single" or AutoStyle=="double") and event.PlayerNumber ~= mpn then return false	end
+	if event.PlayerNumber ~= mpn then return false	end
 
 	if event.type ~= "InputEventType_Release" then
 		if Handle[event.GameButton] then Handle[event.GameButton](event) end
