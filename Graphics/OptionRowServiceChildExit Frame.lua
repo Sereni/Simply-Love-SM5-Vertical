@@ -1,3 +1,7 @@
+local row_bg_width = 358
+local row_bg_height = 30
+local row_bg_x = _screen.cx+72.5
+
 return Def.Quad {
-	InitCommand=function(self) self:zoomto(_screen.w * WideScale(0.475,0.54), _screen.h*0.0625):halign(0):x(WideScale(12,30)) end
+	InitCommand=function(self) self:zoomto(row_bg_width, row_bg_height):x(row_bg_x) end
 }

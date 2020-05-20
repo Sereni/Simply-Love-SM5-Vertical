@@ -25,7 +25,6 @@ local profile_whitelist = {
 	HideComboExplosions = "boolean",
 
 	LifeMeterType = "string",
-	DataVisualizations = "string",
 	TargetScore = "number",
 	ActionOnMissedTarget = "string",
 

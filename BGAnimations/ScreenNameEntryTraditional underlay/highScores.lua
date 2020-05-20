@@ -22,8 +22,7 @@ for i=1,NumStages do
 		list.Name = "HighScoreList" .. i .. ToEnumShortString(player)
 
 		list.InitCommand=function(self)
-			self:zoom(0.95):y(_screen.cy+60)
-			self:x(_screen.cx + 160 * (player==PLAYER_1 and -1 or 1))
+			self:zoom(0.65):xy(_screen.cx, _screen.cy+25)
 		end
 		list.OnCommand=function(self)
 			self:visible(false)
