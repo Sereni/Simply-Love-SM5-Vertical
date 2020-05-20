@@ -96,7 +96,7 @@ end
 
 local player_af = Def.ActorFrame{
 	OnCommand=function(self)
-		self:xy(_screen.w-7, 60):zoom(0.25)
+		self:xy(_screen.w-7, 58):zoom(0.25)
 	end,
 	-- any time we receive a judgment
 	JudgmentMessageCommand=function(self,params)
