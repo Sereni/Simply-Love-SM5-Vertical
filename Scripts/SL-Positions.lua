@@ -58,32 +58,6 @@ Positions.ScreenGameplay.ScoreZoom = function()
   end
 end
 
-Positions.ScreenGameplay.ScoreX = function(player)
-  if IsVerticalScreen() then return _screen.w - 8 end
-
-  if SL.Global.GameMode == "StomperZ" then
-    if player == PLAYER_1 then
-      return WideScale(160, 214)
-    else
-      return _screen.w - WideScale(50, 104)
-    end
-  else  -- Not StomperZ
-    if player == PLAYER_1 then
-      return _screen.cx - _screen.w/4.3
-    else
-      return _screen.cx + _screen.w/2.75
-    end
-  end
-end
-
-Positions.ScreenGameplay.ScoreY = function()
-  if SL.Global.GameMode == "StomperZ" then
-    return 20
-  else
-    return 56
-  end
-end
-
 ---------- ScreenTitleMenu ----------
 Positions.ScreenTitleMenu = {}
 
@@ -95,4 +69,3 @@ Positions.ScreenTitleMenu.ScrollerY = function()
     return _screen.cy+_screen.h/3.8
   end
 end
-

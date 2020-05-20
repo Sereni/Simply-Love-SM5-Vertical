@@ -27,9 +27,9 @@ return LoadFont("_wendy monospace numbers")..{
 	Name=pn.."Score",
 	InitCommand=function(self)
 		self:valign(1):halign(1)
-                self:zoom(Positions.ScreenGameplay.ScoreZoom())
-                self:x(Positions.ScreenGameplay.ScoreX(player))
-                self:y(Positions.ScreenGameplay.ScoreY())
+                self:zoom(0.3)
+                self:x(_screen.w-6)
+                self:y(40)
 	end,
 	JudgmentMessageCommand=function(self) self:queuecommand("RedrawScore") end,
 	RedrawScoreCommand=function(self)
