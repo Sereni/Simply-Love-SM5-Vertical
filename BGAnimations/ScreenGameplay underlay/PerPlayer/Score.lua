@@ -14,7 +14,6 @@ then return end
 if #GAMESTATE:GetHumanPlayers() == 1
 and SL.Global.GameMode ~= "StomperZ"
 and mods.NPSGraphAtTop
-and mods.DataVisualizations ~= "Step Statistics"
 and not center1p
 then return end
 
