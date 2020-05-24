@@ -64,6 +64,51 @@ local t = Def.ActorFrame{
 			end
 		end
 	},
+
+	Def.Quad{
+		Name="Cursor",
+		InitCommand=function(self)
+	    self:x(0)
+			self:diffuse(color("#ffffff")):diffusealpha(0.3):zoomto(quadWidth, RowHeight)
+		end,
+		OnCommand=function(self) self:queuecommand("Set") end,
+		CurrentSongChangedMessageCommand=function(self) self:queuecommand("Set") end,
+		CurrentCourseChangedMessageCommand=function(self) self:queuecommand("Set") end,
+		CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+		CurrentTrailP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+		CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+		CurrentTrailP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+
+		SetCommand=function(self)
+			local song = GAMESTATE:GetCurrentSong()
+
+			if song then
+				local player = GAMESTATE:GetMasterPlayerNumber()
+				local allSteps = SongUtil.GetPlayableSteps(song)
+				local stepsToDisplay = GetStepsToDisplay(allSteps)
+				local currentSteps = GAMESTATE:GetCurrentSteps(player)
+
+				for i,chart in pairs(stepsToDisplay) do
+					if chart == currentSteps then
+						RowIndex = i
+						break
+					end
+				end
+			end
+
+			-- keep within reasonable limits because Edit charts are a thing
+			RowIndex = clamp(RowIndex, 1, 5)
+
+			-- update cursor y position
+			-- FIXME: Animation looks weird in this case:
+			-- 1. Select a beginner difficulty in one pack
+			-- 2. Open another pack where the first song only has expert
+			-- 3. The cursor will appear from the non-existant beginner difficulty
+			-- and scroll down to expert.
+			self:stoptweening():linear(0.1):y(RowHeight * (RowIndex - 3))
+			if song then self:visible(true) else self:visible(false) end
+		end
+	}
 }
 
 
