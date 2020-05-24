@@ -68,7 +68,7 @@ local t = Def.ActorFrame{
 	Def.Quad{
 		Name="Cursor",
 		InitCommand=function(self)
-	    self:x(0)
+			self:x(0)
 			self:diffuse(color("#ffffff")):diffusealpha(0.3):zoomto(quadWidth, RowHeight)
 		end,
 		OnCommand=function(self) self:queuecommand("Set") end,
@@ -100,12 +100,8 @@ local t = Def.ActorFrame{
 			RowIndex = clamp(RowIndex, 1, 5)
 
 			-- update cursor y position
-			-- FIXME: Animation looks weird in this case:
-			-- 1. Select a beginner difficulty in one pack
-			-- 2. Open another pack where the first song only has expert
-			-- 3. The cursor will appear from the non-existant beginner difficulty
-			-- and scroll down to expert.
-			self:stoptweening():linear(0.1):y(RowHeight * (RowIndex - 3))
+			local animationSpeed = self:GetVisible() and 0.1 or 0
+			self:stoptweening():linear(animationSpeed):y(RowHeight * (RowIndex - 3))
 			if song then self:visible(true) else self:visible(false) end
 		end
 	}
