@@ -126,14 +126,42 @@ for RowNumber=1,num_rows do
 			self:zoom(0.5)
 		end,
 		SetCommand=function(self, params)
-			-- Display stepartist name.
-			-- TODO: Display other available chart data.
-			stepartist = params.Chart:GetAuthorCredit()
-			self:settext(stepartist)
-			DiffuseEmojis(self, stepartist)
+			player = GAMESTATE:GetMasterPlayerNumber()
+			chart = params.Chart
+			self:stoptweening()
+
+			-- Display all available data for the selected chart
+			if chart == GAMESTATE:GetCurrentSteps(player) then
+				text_table = GetStepsCredit(player)
+					marquee_index = 0
+					-- only queue a marquee if there are things in the text_table to display
+					if #text_table > 0 then
+						self:queuecommand("Marquee")
+					else
+						self:settext("")
+					end
+				-- Only display stepartist for all other charts
+				else
+					stepartist = chart:GetAuthorCredit()
+					self:settext(stepartist)
+					DiffuseEmojis(self, stepartist)
+				end
 		end,
 		UnsetCommand=function(self)
+			self:stoptweening()
 			self:settext("")
+		end,
+		MarqueeCommand=function(self)
+			marquee_index = (marquee_index % #text_table) + 1
+			-- retrieve the text we want to display
+			local text = text_table[marquee_index]
+			self:settext( text )
+			DiffuseEmojis(self, text)
+
+			-- sleep 2 seconds before queueing the next Marquee command to do this again
+			if #text_table > 1 then
+				self:sleep(2):queuecommand("Marquee")
+			end
 		end,
 		OffCommand=function(self) self:stoptweening() end
 	}
