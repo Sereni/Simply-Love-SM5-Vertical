@@ -8,6 +8,10 @@ local t = Def.ActorFrame{
 		self:playcommand("StepsHaveChanged", params)
 	end,
 
+	PlayerJoinedMessageCommand=function(self, params)
+		UnjoinLateJoinedPlayer(params.Player)
+	end,
+
 	-- ---------------------------------------------------
 	--  first, load files that contain no visual elements, just code that needs to run
 
