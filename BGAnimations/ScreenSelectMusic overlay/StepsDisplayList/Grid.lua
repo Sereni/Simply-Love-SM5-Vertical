@@ -1,5 +1,4 @@
 local num_rows    = 5
-local num_columns = 20
 local GridZoomX = 0.39
 local RowHeight = 14
 local StepsToDisplay, SongOrCourse, StepsOrTrails

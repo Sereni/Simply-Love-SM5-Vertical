@@ -1,8 +1,11 @@
 local numItemsToDraw = 8
 local scrolling_down = true
+local quadHeight = 75
+local quadWidth = 125
+local maskHeight = 150
 
 local transform_function = function(self,offsetFromCenter,itemIndex,numitems)
-	self:y( offsetFromCenter * 23 )
+	self:y( offsetFromCenter * 17 )
 end
 
 -- ccl is a reference to the CourseContentsList actor that this update function is called on
@@ -28,7 +31,7 @@ end
 
 local af = Def.ActorFrame{
 	InitCommand=function(self)
-		self:xy(_screen.cx-170, _screen.cy + 40)
+		self:xy(quadWidth/2, _screen.cy)
 	end,
 
 	---------------------------------------------------------------------
@@ -44,8 +47,8 @@ local af = Def.ActorFrame{
 	-- lower mask
 	Def.Quad{
 		InitCommand=function(self)
-			self:xy(IsUsingWideScreen() and -44 or 0,98)
-				:zoomto(_screen.w/2, 40)
+			self:y(quadHeight/2 + maskHeight/2)
+				:zoomto(quadWidth, maskHeight)
 				:MaskSource()
 		end
 	},
@@ -54,19 +57,17 @@ local af = Def.ActorFrame{
 	Def.Quad{
 		InitCommand=function(self)
 			self:vertalign(bottom)
-				:xy(IsUsingWideScreen() and -44 or 0,-18)
-				:zoomto(_screen.w/2, 100)
+				:y(-quadHeight/2)
+				:zoomto(quadWidth, maskHeight)
 				:MaskSource()
 		end
 	},
 	---------------------------------------------------------------------
-
-	-- gray background Quad
+	-- background
 	Def.Quad{
+		Name="Background",
 		InitCommand=function(self)
-			self:diffuse(color("#1e282f")):zoomto(320, 96)
-				:xy(0, 30)
-
+			self:diffuse(color("#1e282f")):zoomto(quadWidth, quadHeight)
 			if ThemePrefs.Get("RainbowMode") then
 				self:diffusealpha(0.75)
 			end
@@ -83,8 +84,7 @@ af[#af+1] = Def.CourseContentsList {
 	NumItemsToDraw=numItemsToDraw,
 
 	InitCommand=function(self)
-		self:xy(40,-4)
-			:SetUpdateFunction( update )
+		self:SetUpdateFunction( update ):vertalign(top)
 	end,
 
 	CurrentTrailP1ChangedMessageCommand=function(self) self:playcommand("Set") end,
@@ -126,9 +126,11 @@ af[#af+1] = Def.CourseContentsList {
 		Def.BitmapText{
 			Font="Common Normal",
 			InitCommand=function(self)
-				self:xy(-160, 0)
+				self:xy(-quadWidth/2+20, -quadHeight/2+7)
 					:horizalign(left)
-					:maxwidth(240)
+					:vertalign(top)
+					:maxwidth(195)
+					:zoom(0.5)
 			end,
 			SetSongCommand=function(self, params)
 				if params.Song then
@@ -139,31 +141,19 @@ af[#af+1] = Def.CourseContentsList {
 			end
 		},
 
-		-- PLAYER_1 song difficulty
+		-- Song difficulty
 		Def.BitmapText{
-			Font="Common Normal",
+			Font="_wendy small",
 			InitCommand=function(self)
-				self:xy(-170, 0):horizalign(right)
+				self:xy(-quadWidth/2+15, -quadHeight/2+7)
+				:horizalign(right)
+				:vertalign(top)
+				:zoom(0.2)
 			end,
 			SetSongCommand=function(self, params)
-				if params.PlayerNumber ~= PLAYER_1 then return end
-
 				self:settext( params.Meter or "?" ):diffuse( CustomDifficultyToColor(params.Difficulty) )
 			end
 		},
-
-		-- PLAYER_2 song difficulty
-		Def.BitmapText{
-			Font="Common Normal",
-			InitCommand=function(self)
-				self:xy(114,0):horizalign(right)
-			end,
-			SetSongCommand=function(self, params)
-				if params.PlayerNumber ~= PLAYER_2 then return end
-
-				self:settext( params.Meter or "?" ):diffuse( CustomDifficultyToColor(params.Difficulty) )
-			end
-		}
 	}
 }
 
