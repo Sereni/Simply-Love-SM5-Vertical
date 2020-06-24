@@ -47,8 +47,7 @@ if PREFSMAN:GetPreference("EventMode") then
 		Name="Session Timer",
 		InitCommand=function(self)
 			bmt_actor = self
-			self:zoom( WideScale(0.3,0.36) ):y( WideScale(3.15,3.5)/self:GetZoom() )
-			self:diffusealpha(0):x(_screen.cx)
+			self:diffusealpha(0):zoom(0.2):horizalign(left):xy(10, 4.5)
 		end,
 		OnCommand=function(self)
 			self:sleep(0.1):decelerate(0.33):diffusealpha(1)
@@ -62,8 +61,7 @@ else
 		Name="Stage Number",
 		Text=SSM_Header_StageText(),
 		InitCommand=function(self)
-			self:zoom( WideScale(0.5,0.6) ):y( WideScale(7.5,9)/self:GetZoom() )
-			self:diffusealpha(0):x(_screen.cx)
+			self:diffusealpha(0):zoom( 0.2 ):xy(_screen.cx, 4.5)
 		end,
 		OnCommand=function(self)
 			self:sleep(0.1):decelerate(0.33):diffusealpha(1)
