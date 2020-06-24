@@ -200,7 +200,7 @@ SL_CustomPrefs.Get = function()
 		-- existing value in ThemePrefs directly.
 		DefaultGlobalOffsetSeconds = {
 			Default = PREFSMAN:GetPreference("GlobalOffsetSeconds")
-		}
+		},
 	}
 end
 
