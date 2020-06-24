@@ -1,5 +1,3 @@
-if not THEME:GetMetric("ScreenSelectMusic", "EnableSongSearch") then return end
-
 local wheel
 local screen
 
@@ -59,7 +57,7 @@ t = Def.ActorFrame{
 				-- search. you'll have to use an external tool to clean this folder since
 				-- the theme can't delete files
                                 if #results > 0 then
-                                        filepath = THEME:GetCurrentThemeDirectory().."Other/SongManager "..answer..".txt"
+                                        filepath = THEME:GetCurrentThemeDirectory().."Other/SongManager SearchResults.txt"
                                         f = RageFileUtil.CreateRageFile()
                                         f:Open(filepath, 2) -- 2 = write
                                         f:PutLine("---Search Results") -- folder name
@@ -68,7 +66,7 @@ t = Def.ActorFrame{
                                         end
                                         f:Close()
                                         f:destroy()
-                                        SONGMAN:SetPreferredSongs(answer..".txt")
+                                        SONGMAN:SetPreferredSongs("SearchResults.txt")
                                         wheel:ChangeSort("SortOrder_Preferred")
 					screen:SetNextScreenName("ScreenSelectMusic")
 					screen:StartTransitioningScreen("SM_GoToNextScreen")

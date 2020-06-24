@@ -732,3 +732,17 @@ UpdateDefaultGlobalOffset = function()
 	end
 	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = nil
 end
+
+-- -----------------------------------------------------------------------
+-- Unjoins the specified player and displays an error message.
+UnjoinLateJoinedPlayer = function(player)
+	GAMESTATE:UnjoinPlayer(player)
+	-- TODO localize this error message.
+	-- Better yet, find a way to prevent joining altogether, instead of canceling it.
+	-- Known issues with this solution:
+	-- - The wheel scrolls to the first pack/course on join+unjoin
+  -- - The other player's controls remain active (but enter is blocked)
+	-- - Second player name overlaps in the bottom bar
+	-- - On game over screen, both players' stats can sometimes shown
+	SM("Cannot join 2nd player in vertical mode.")
+end

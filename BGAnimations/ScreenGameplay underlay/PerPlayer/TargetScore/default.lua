@@ -123,7 +123,7 @@ local player_af = Def.ActorFrame{
 -- I don't have the time to fully detangle all this so it's staying this way until
 -- someone rewrites this file OR human civilization ends in fire paving the way for GNU/Hurd.
 
-if SL[pn].ActiveModifiers.Pacemaker or FailOnMissedTarget or RestartOnMissedTarget then
+if not SL[pn].ActiveModifiers.DoNotJudgeMe and (SL[pn].ActiveModifiers.Pacemaker or FailOnMissedTarget or RestartOnMissedTarget) then
 
 	-- pacemaker text
 	player_af[#player_af+1] = Def.BitmapText{

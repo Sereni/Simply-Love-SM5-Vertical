@@ -10,7 +10,7 @@ local cursor = {
 }
 
 -- the width of the choice_actors multiplied by 0.386 gives us aproximately the width of the text icons
--- we add 30 to have a pretty margin around it 
+-- we add 30 to have a pretty margin around it
 local iconWidthScale = 0.386
 local cursorMargin = 30
 
@@ -64,6 +64,9 @@ local t = Def.ActorFrame{
 			-- and reload the theme's Metrics
 			THEME:ReloadMetrics()
 		end
+	end,
+	PlayerJoinedMessageCommand=function(self, params)
+		UnjoinLateJoinedPlayer(params.Player)
 	end,
 
 	-- lower mask

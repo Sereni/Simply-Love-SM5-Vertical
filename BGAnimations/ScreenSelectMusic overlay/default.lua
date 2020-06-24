@@ -9,6 +9,10 @@ local t = Def.ActorFrame{
 	-- time ScreenGameplay loads, it should have a properly animated entrance.
 	InitCommand=function(self) SL.Global.GameplayReloadCheck = false end,
 
+	PlayerJoinedMessageCommand=function(self, params)
+		UnjoinLateJoinedPlayer(params.Player)
+	end,
+
 	-- ---------------------------------------------------
 	--  first, load files that contain no visual elements, just code that needs to run
 
