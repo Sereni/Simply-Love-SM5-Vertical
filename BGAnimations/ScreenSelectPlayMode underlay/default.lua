@@ -19,7 +19,7 @@ local Update = function(af, delta)
 	if index ~= cursor.index then
 		cursor.index = index
 
-		-- queue the appropiate command to the faux playfield, if needed
+		-- queue the appropriate command to the faux playfield, if needed
 		if choices[cursor.index+1] == "Marathon" or choices[cursor.index+1] == "Regular" then
 			af:queuecommand("FirstLoop"..choices[cursor.index+1])
 		end
@@ -208,11 +208,7 @@ local t = Def.ActorFrame{
 					self:stoptweening():linear(0.25):diffusealpha(0)
 				end
 			else
-				if SL.Global.GameMode == "StomperZ" then
-					self:diffusealpha(0)
-				else
-					self:diffusealpha(1)
-				end
+				self:diffusealpha(1)
 			end
 		end,
 		-- lifemeter white border

@@ -87,11 +87,11 @@ local t = Def.ActorFrame{
 		if PREFSMAN:GetPreference("Center1Player") and #GAMESTATE:GetHumanPlayers() == 1 then
 			local mpn = GAMESTATE:GetMasterPlayerNumber()
 			if SL[ToEnumShortString(mpn)].ActiveModifiers.NPSGraphAtTop then
-				self:x(_screen.cx + GetNotefieldWidth(mpn) * (mpn==PLAYER_1 and 1 or -1))
+				self:x(_screen.cx + GetNotefieldWidth() * (mpn==PLAYER_1 and 1 or -1))
 			end
 		end
 
-		self:zoom(SL.Global.GameMode == "StomperZ" and font_size or 1.33)
+		self:zoom(1.33)
 	end,
 
 	LoadFont("Common Normal")..{
@@ -103,14 +103,6 @@ local t = Def.ActorFrame{
 		end
 	}
 }
-
-if SL.Global.GameMode == "StomperZ" then
-	t[#t+1] = Def.Quad{
-		InitCommand=function(self)
-			self:diffuse(0,0,0,0.85):zoomto(66,40):valign(0):xy( 0, -20 )
-		end
-	}
-end
 
 
 if #Players == 1 then

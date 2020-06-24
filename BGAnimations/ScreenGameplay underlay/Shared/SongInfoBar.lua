@@ -2,9 +2,14 @@ local xOffset = _screen.cx-12.5
 local yOffset = 16
 local barLength = _screen.w-45
 
+-- Song Completion Meter
 return Def.ActorFrame{
 	Name="SongMeter",
 	InitCommand=function(self) self:xy(xOffset, yOffset) end,
+
+	-- border
+	Def.Quad{ InitCommand=function(self) self:zoomto(w, h) end },
+	Def.Quad{ InitCommand=function(self) self:zoomto(w-4, h-4):diffuse(0,0,0,1) end },
 
 	Def.SongMeterDisplay{
 		StreamWidth=(barLength),

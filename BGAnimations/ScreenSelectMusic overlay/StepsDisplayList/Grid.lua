@@ -1,3 +1,8 @@
+-- this difficulty grid doesn't support CourseMode
+-- CourseContentsList.lua should be used instead
+if GAMESTATE:IsCourseMode() then return end
+-- ----------------------------------------------
+
 local num_rows    = 5
 local num_columns = 20
 local GridZoomX = 0.39
@@ -11,43 +16,40 @@ local GetStepsToDisplay = LoadActor("./StepsToDisplay.lua")
 local t = Def.ActorFrame{
 	Name="StepsDisplayList",
 	InitCommand=function(self) self:vertalign(top):xy(quadWidth/2, _screen.cy) end,
-	-- - - - - - - - - - - - - -
 
 	OnCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	CurrentSongChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	CurrentCourseChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	StepsHaveChangedCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-
-	-- - - - - - - - - - - - - -
+	CurrentSongChangedMessageCommand=function(self)    self:queuecommand("RedrawStepsDisplay") end,
+	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
+	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
 
 	RedrawStepsDisplayCommand=function(self)
 
-		SongOrCourse = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
+		local song = GAMESTATE:GetCurrentSong()
 
-		if SongOrCourse then
-			StepsOrTrails = (GAMESTATE:IsCourseMode() and SongOrCourse:GetAllTrails()) or SongUtil.GetPlayableSteps( SongOrCourse )
+		if song then
+			local steps = SongUtil.GetPlayableSteps( song )
 
-			if StepsOrTrails then
+			if steps then
+				local StepsToDisplay = GetStepsToDisplay(steps)
 
-				StepsToDisplay = GetStepsToDisplay(StepsOrTrails)
-
-				for RowNumber=1,num_rows do
-					chart = StepsToDisplay[RowNumber]
+				for i=1,num_rows do
+					chart = StepsToDisplay[i]
 					if chart then
 						-- if this particular song has a stepchart for this row, update the Meter
+						-- and BlockRow coloring appropriately
 						local meter = chart:GetMeter()
 						local difficulty = chart:GetDifficulty()
-						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Set", {Meter=meter, Difficulty=difficulty})
-						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Set", {Chart=chart})
+						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Set", {Meter=meter, Difficulty=difficulty})
+						self:GetChild("Grid"):GetChild("Blocks_"..i):playcommand("Set", {Chart=chart})
 					else
-						-- otherwise, set the meter to an empty string
-						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Unset")
-						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Unset")
+						-- otherwise, set the meter to an empty string and hide this particular colored BlockRow
+						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Unset")
+						self:GetChild("Grid"):GetChild("Blocks_"..i):playcommand("Unset")
+
 					end
 				end
 			end
 		else
-			StepsOrTrails, StepsToDisplay = nil, nil
 			self:playcommand("Unset")
 		end
 	end,
@@ -60,7 +62,7 @@ local t = Def.ActorFrame{
 		InitCommand=function(self)
 			self:diffuse(color("#1e282f")):zoomto(quadWidth, quadHeight)
 			if ThemePrefs.Get("RainbowMode") then
-				self:diffusealpha(0.75)
+				self:diffusealpha(0.9)
 			end
 		end
 	},
