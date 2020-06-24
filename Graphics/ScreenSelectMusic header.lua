@@ -74,12 +74,14 @@ af[#af+1] = LoadFont("_wendy small")..{
 	Name="GameModeText",
 	Text=THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode),
 	InitCommand=function(self)
-		self:diffusealpha(0):zoom(0.3):halign(1):xy(_screen.w-70, 7.5):y(15)
+		local x = _screen.w - 20
 
 		-- move the GameMode text further left if MenuTimer is enabled
-		if not PREFSMAN:GetPreference("MenuTimer") then
-			self:x(_screen.w-10)
+		if PREFSMAN:GetPreference("MenuTimer") then
+			x = x - 60
 		end
+
+		self:diffusealpha(0):zoom(0.3):xy(x, 7.5):halign(1)
 	end,
 	OnCommand=function(self)
 		self:settext(THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode))
@@ -93,8 +95,15 @@ af[#af+1] = LoadFont("_wendy small")..{
 -- P1 pad
 af[#af+1] = DrawNinePanelPad()..{
 	InitCommand=function(self)
-		self:x(_screen.w - (PREFSMAN:GetPreference("MenuTimer") and WideScale(90,105) or WideScale(35, 41)))
-		self:y( WideScale(22, 23.5) ):zoom(0.24)
+		local x = _screen.w - 10
+
+		-- move the GameMode text further left if MenuTimer is enabled
+		if PREFSMAN:GetPreference("MenuTimer") then
+			x = x - 60
+		end
+
+		self:zoom(0.24):xy(x, 12):halign(1)
+
 		self:playcommand("Set", {Player=PLAYER_1})
 	end,
 	PlayerJoinedMessageCommand=function(self, params)
