@@ -116,45 +116,8 @@ local t = Def.ActorFrame{
 						return
 					end
 
-					-- if only one player is joined, stringify the DisplayBPMs and return early
-					if #GAMESTATE:GetHumanPlayers() == 1 then
-						-- StringifyDisplayBPMs() is defined in ./Scipts/SL-BPMDisplayHelpers.lua
-						self:settext(StringifyDisplayBPMs() or ""):zoom(1)
-						return
-					end
-
-					-- otherwise there is more than one player joined and the possibility of split BPMs
-					local p1bpm = StringifyDisplayBPMs(PLAYER_1)
-					local p2bpm = StringifyDisplayBPMs(PLAYER_2)
-
-					-- it's likely that BPM range is the same for both charts
-					-- no need to show BPM ranges for both players if so
-					if p1bpm == p2bpm then
-						self:settext(p1bpm):zoom(1)
-
-					-- different BPM ranges for the two players
-					else
-						-- show the range for both P1 and P2 split by a newline characters, shrunk slightly to fit the space
-						self:settext( "P1 ".. p1bpm .. "\n" .. "P2 " .. p2bpm ):zoom(0.8)
-						-- the "P1 " and "P2 " segments of the string should be grey
-						self:AddAttribute(0,             {Length=3, Diffuse={0.60,0.60,0.60,1}})
-						self:AddAttribute(3+p1bpm:len(), {Length=3, Diffuse={0.60,0.60,0.60,1}})
-
-						if GAMESTATE:IsCourseMode() then
-							-- P1 and P2's BPM text in CourseMode is white until I have time to figure CourseMode out
-							self:AddAttribute(3,             {Length=p1bpm:len(), Diffuse={1,1,1,1}})
-							self:AddAttribute(7+p1bpm:len(), {Length=p2bpm:len(), Diffuse={1,1,1,1}})
-
-						else
-							-- P1 and P2's BPM text is the color of their difficulty
-							if GAMESTATE:GetCurrentSteps(PLAYER_1) then
-								self:AddAttribute(3,             {Length=p1bpm:len(), Diffuse=DifficultyColor(GAMESTATE:GetCurrentSteps(PLAYER_1):GetDifficulty())})
-							end
-							if GAMESTATE:GetCurrentSteps(PLAYER_2) then
-								self:AddAttribute(7+p1bpm:len(), {Length=p2bpm:len(), Diffuse=DifficultyColor(GAMESTATE:GetCurrentSteps(PLAYER_2):GetDifficulty())})
-							end
-						end
-					end
+					-- StringifyDisplayBPMs() is defined in ./Scipts/SL-BPMDisplayHelpers.lua
+					self:settext(StringifyDisplayBPMs() or ""):zoom(labelZoom)
 				end
 			},
 
