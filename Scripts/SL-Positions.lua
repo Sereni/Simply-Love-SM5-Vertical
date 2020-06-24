@@ -21,7 +21,6 @@ end
 
 Positions.ScreenGameplay.DifficultyMeterY = function()
   if IsVerticalScreen() then return 20 end
-  if SL.Global.GameMode == "StomperZ" then return 20 end
   return 56
 end
 
@@ -51,11 +50,7 @@ end
 -- Score position (big white numbers)
 Positions.ScreenGameplay.ScoreZoom = function()
   if IsVerticalScreen() then return 0.35 end
-  if SL.Global.GameMode == "StomperZ" then
-    return 0.4
-  else
-    return 0.5
-  end
+  return 0.5
 end
 
 ---------- ScreenTitleMenu ----------
