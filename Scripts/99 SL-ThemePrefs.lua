@@ -183,25 +183,26 @@ SL_CustomPrefs.Get = function()
 			Values	= { true, false }
 		},
 
-	-- - - - - - - - - - - - - - - - - - - -
-	-- nice meme
-	-- 0 is off, 1 is visuals only, 2 is visuals and sound.
-	nice = {
-		Default = 0,
-		Choices = { THEME:GetString("ThemePrefs","Off"), THEME:GetString("ThemePrefs","On"), THEME:GetString("ThemePrefs","OnWithSound") },
-		Values  = { 0, 1, 2 }
-	},
-	-- - - - - - - - - - - - - - - - - - - -
-	-- Default Global Offset.
-	-- If players manipulate Global Offset via Advanced Options, return to this
-	-- value after their set is finished.
-	-- NOTE: this value will only be used when the corresponding ThemePrefs section
-	-- is initially generated. If it already exists, the theme will manipulate the
-	-- existing value in ThemePrefs directly.
-	DefaultGlobalOffsetSeconds = {
-		Default = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+		-- - - - - - - - - - - - - - - - - - - -
+		-- nice meme
+		-- 0 is off, 1 is visuals only, 2 is visuals and sound.
+		nice = {
+			Default = 0,
+			Choices = { THEME:GetString("ThemePrefs","Off"), THEME:GetString("ThemePrefs","On"), THEME:GetString("ThemePrefs","OnWithSound") },
+			Values  = { 0, 1, 2 }
+		},
+		-- - - - - - - - - - - - - - - - - - - -
+		-- Default Global Offset.
+		-- If players manipulate Global Offset via Advanced Options, return to this
+		-- value after their set is finished.
+		-- NOTE: this value will only be used when the corresponding ThemePrefs section
+		-- is initially generated. If it already exists, the theme will manipulate the
+		-- existing value in ThemePrefs directly.
+		DefaultGlobalOffsetSeconds = {
+			Default = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+		}
 	}
-}
+end
 
 -- We need to InitAll() now so that ./Scripts/SL_Init.lua can use
 -- this theme's ThemePrefs shortly after.
