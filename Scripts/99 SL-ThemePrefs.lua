@@ -206,7 +206,7 @@ end
 
 -- We need to InitAll() now so that ./Scripts/SL_Init.lua can use
 -- this theme's ThemePrefs shortly after.
-ThemePrefs.InitAll(SL_CustomPrefs)
+ThemePrefs.InitAll(SL_CustomPrefs.Get())
 
 SL_CustomPrefs.Validate = function()
 	local file = IniFile.ReadFile("Save/ThemePrefs.ini")
