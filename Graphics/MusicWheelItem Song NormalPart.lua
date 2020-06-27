@@ -9,7 +9,7 @@ local stepstype = GAMESTATE:GetCurrentStyle():GetStepsType()
 af[#af+1] = Def.Sprite{
 	Texture=THEME:GetPathG("", "Has Edit (doubleres).png"),
 	InitCommand=function(self)
-		self:visible(false):x(40):zoom(0.275)
+		self:visible(false):x(115):zoom(0.275)
 		if DarkUI() then self:diffuse(0,0,0,1) end
 	end,
 	SetCommand=function(self, params)
