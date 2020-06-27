@@ -64,7 +64,7 @@ return Def.ActorFrame {
         InitCommand=function(self)
             self:zoomto(histogramWidth, 20)
                 :diffuse(color("#000000"))
-                :diffusealpha(0.8)
+                :diffusealpha(0.4)
                 :align(0, 0)
                 :y(histogramHeight - 20)
         end,
