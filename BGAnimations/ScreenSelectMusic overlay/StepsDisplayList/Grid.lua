@@ -6,7 +6,7 @@ if GAMESTATE:IsCourseMode() then return end
 local num_rows    = 5
 local GridZoomX = 0.39
 local RowHeight = 14
-local StepsToDisplay, SongOrCourse, StepsOrTrails
+local StepsToDisplay, song, steps
 local quadHeight = 75
 local quadWidth = 125
 
@@ -23,32 +23,32 @@ local t = Def.ActorFrame{
 
 	RedrawStepsDisplayCommand=function(self)
 
-		local song = GAMESTATE:GetCurrentSong()
+		song = GAMESTATE:GetCurrentSong()
 
 		if song then
-			local steps = SongUtil.GetPlayableSteps( song )
+			steps = SongUtil.GetPlayableSteps( song )
 
 			if steps then
-				local StepsToDisplay = GetStepsToDisplay(steps)
+				StepsToDisplay = GetStepsToDisplay(steps)
 
 				for i=1,num_rows do
 					chart = StepsToDisplay[i]
 					if chart then
 						-- if this particular song has a stepchart for this row, update the Meter
-						-- and BlockRow coloring appropriately
 						local meter = chart:GetMeter()
 						local difficulty = chart:GetDifficulty()
 						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Set", {Meter=meter, Difficulty=difficulty})
-						self:GetChild("Grid"):GetChild("Blocks_"..i):playcommand("Set", {Chart=chart})
+						self:GetChild("Grid"):GetChild("StepArtist_"..i):playcommand("Set", {Chart=chart})
 					else
-						-- otherwise, set the meter to an empty string and hide this particular colored BlockRow
+						-- otherwise, set the meter to an empty string
 						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Unset")
-						self:GetChild("Grid"):GetChild("Blocks_"..i):playcommand("Unset")
+						self:GetChild("Grid"):GetChild("StepArtist_"..i):playcommand("Unset")
 
 					end
 				end
 			end
 		else
+			steps, StepsToDisplay = nil, nil
 			self:playcommand("Unset")
 		end
 	end,
@@ -61,7 +61,7 @@ local t = Def.ActorFrame{
 		InitCommand=function(self)
 			self:diffuse(color("#1e282f")):zoomto(quadWidth, quadHeight)
 			if ThemePrefs.Get("RainbowMode") then
-				self:diffusealpha(0.9)
+				self:diffusealpha(0.75)
 			end
 		end
 	},
@@ -74,11 +74,8 @@ local t = Def.ActorFrame{
 		end,
 		OnCommand=function(self) self:queuecommand("Set") end,
 		CurrentSongChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentCourseChangedMessageCommand=function(self) self:queuecommand("Set") end,
 		CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentTrailP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
 		CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentTrailP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
 
 		SetCommand=function(self)
 			local song = GAMESTATE:GetCurrentSong()

@@ -1,17 +1,17 @@
 local show = true
-local player = PLAYER_1
+local player = GAMESTATE:GetMasterPlayerNumber()
 
 local histogramWidth = 417
 local histogramHeight = 86
 local histogram = NPS_Histogram(player, histogramWidth, histogramHeight)
- 
+
 -- don't do anything when song changes
 histogram.CurrentSongChangedMessageCommand=nil
 
 return Def.ActorFrame {
     InitCommand=function(self)
         local zoom = 0.3
-	local xPos = 0
+        local xPos = 0
         local yPos = 278
 
         self:zoom(zoom)
@@ -21,15 +21,13 @@ return Def.ActorFrame {
     end,
 
     CurrentSongChangedMessageCommand=function(self, params)
-        if show then
-            self:queuecommand("UpdateGraphState")
-        end
+        self:queuecommand("UpdateGraphState")
     end,
-    
-    StepsHaveChangedCommand=function(self, params)
-        if show then
-            self:queuecommand("UpdateGraphState")
-        end
+    CurrentStepsP1ChangedMessageCommand=function(self, params)
+        self:queuecommand("UpdateGraphState")
+    end,
+    CurrentStepsP2ChangedMessageCommand=function(self, params)
+        self:queuecommand("UpdateGraphState")
     end,
 
     UpdateGraphStateCommand=function(self, params)
@@ -71,7 +69,7 @@ return Def.ActorFrame {
                 :y(histogramHeight - 20)
         end,
     },
-    
+
     Def.BitmapText{
         Font="_miso",
         InitCommand=function(self)
@@ -84,26 +82,26 @@ return Def.ActorFrame {
                 :Stroke(color("#000000"))
         end,
 
-        StepsHaveChangedCommand=function(self, params)
-            if show then
-                self:queuecommand("UpdateGraphState")
-            end
+        CurrentStepsP1ChangedMessageCommand=function(self, params)
+            self:queuecommand("UpdateGraphState")
+        end,
+        CurrentStepsP2ChangedMessageCommand=function(self, params)
+            self:queuecommand("UpdateGraphState")
         end,
 
         UpdateGraphStateCommand=function(self)
             if show and not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
-                local song_dir = GAMESTATE:GetCurrentSong():GetSongDir()
                 local steps = GAMESTATE:GetCurrentSteps(player)
                 local steps_type = ToEnumShortString( steps:GetStepsType() ):gsub("_", "-"):lower()
                 local difficulty = ToEnumShortString( steps:GetDifficulty() )
-                local breakdown = GetStreamBreakdown(song_dir, steps_type, difficulty)
-                
+                local breakdown = GetStreamBreakdown(steps, steps_type, difficulty)
+
                 if breakdown == "" then
                     self:settext("No streams!")
                 else
                     self:settext(breakdown)
                 end
-                
+
                 return true
             end
         end

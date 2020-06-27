@@ -332,10 +332,10 @@ end
 
 
 -- Returns the stream breakdown string for a chart
-function GetStreamBreakdown(SongDir, StepsType, Difficulty)
+function GetStreamBreakdown(Steps, StepsType, Difficulty)
 	local NotesPerMeasure = 16
 	local MeasureSequenceThreshold = 2
-	local streams = GetStreams(SongDir, StepsType, Difficulty, NotesPerMeasure, MeasureSequenceThreshold)
+	local streams = GetStreams(Steps, StepsType, Difficulty, NotesPerMeasure, MeasureSequenceThreshold)
 
 	if not streams then
 		return ""
