@@ -92,7 +92,7 @@ af[#af+1] = LoadFont("_wendy small")..{
 	end
 }
 
--- P1 pad
+-- Pad image
 af[#af+1] = DrawNinePanelPad()..{
 	InitCommand=function(self)
 		local x = _screen.w - 10
@@ -104,12 +104,10 @@ af[#af+1] = DrawNinePanelPad()..{
 
 		self:zoom(0.24):xy(x, 12):halign(1)
 
-		self:playcommand("Set", {Player=PLAYER_1})
+		self:playcommand("Set", {Player=GAMESTATE:GetMasterPlayerNumber()})
 	end,
 	PlayerJoinedMessageCommand=function(self, params)
-		if params.Player == PLAYER_1 then
-			self:playcommand("Set", {Player=PLAYER_1})
-		end
+		self:playcommand("Set", {Player=params.Player})
 	end
 }
 
