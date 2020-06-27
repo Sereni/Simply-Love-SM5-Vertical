@@ -34,7 +34,7 @@ local MusicWheel, SelectedType
 local t = Def.ActorFrame{
 
 	OnCommand=function(self)
-		self:xy(62.5, 164)
+		self:xy(62.25, 164)
 	end,
 
 	-- ----------------------------------------
