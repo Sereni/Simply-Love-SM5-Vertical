@@ -195,29 +195,28 @@ local t = Def.ActorFrame{
 				self:visible( song and (song:IsLong() or song:IsMarathon()) or false )
 			end,
 
-			-- TODO: This is probably going to be misaligned
-			--       We'll fix it once the merge is done and we can actually load the theme
 			Def.ActorMultiVertex{
 				InitCommand=function(self)
 					-- these coordinates aren't neat and tidy, but they do create three triangles
 					-- that fit together to approximate hurtpiggypig's original png asset
 					local verts = {
 					 	--  x  y   z    r,g,b,a
-					 	{{-113, 81, 0}, {1,1,1,1}},
-					 	{{ 113, 81, 0}, {1,1,1,1}},
-					 	{{ 113, 50, 0}, {1,1,1,1}},
+					 	{{-50, 40, 0}, {1,1,1,1}},
+					 	{{ 50, 40, 0}, {1,1,1,1}},
+					 	{{ 50, 25, 0}, {1,1,1,1}},
 
-					 	{{ 113, 50, 0}, {1,1,1,1}},
-					 	{{-113, 50, 0}, {1,1,1,1}},
-					 	{{-113, 81, 0}, {1,1,1,1}},
+					 	{{ 50, 25, 0}, {1,1,1,1}},
+					 	{{-50, 25, 0}, {1,1,1,1}},
+					 	{{-50, 40, 0}, {1,1,1,1}},
 
-					 	{{ -98, 50, 0}, {1,1,1,1}},
-					 	{{ -78, 50, 0}, {1,1,1,1}},
-					 	{{ -88, 37, 0}, {1,1,1,1}},
+					 	{{ 45, 26, 0}, {1,1,1,1}},
+					 	{{ 35, 26, 0}, {1,1,1,1}},
+					 	{{ 40, 19, 0}, {1,1,1,1}},
 					}
+
 					self:SetDrawState({Mode="DrawMode_Triangles"}):SetVertices(verts)
 					self:diffuse(GetCurrentColor())
-					self:xy(0,0):zoom(0.5)
+					self:xy(0,4):zoom(0.6)
 				end
 			},
 
