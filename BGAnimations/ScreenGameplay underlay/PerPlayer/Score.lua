@@ -5,10 +5,7 @@ local center1p = PREFSMAN:GetPreference("Center1Player")
 
 if mods.HideScore then return end
 if mods.DoNotJudgeMe then return end
-
-if #GAMESTATE:GetHumanPlayers() > 1
-and mods.NPSGraphAtTop
-then return end
+if mods.NPSGraphAtTop then return end
 
 local dance_points, percent
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
