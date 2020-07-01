@@ -35,7 +35,7 @@ local af = Def.ActorFrame{
 
 --percent score
 af[#af+1] = LoadFont("_wendy small")..{
-	InitCommand=function(self) self:zoom(0.5):horizalign(align1):x(col1x):y(-quadHeight/2+19) end,
+	InitCommand=function(self) self:zoom(0.4):horizalign(align1):x(col1x):y(-quadHeight/2+19) end,
 	DrawStageCommand=function(self)
 		if playerStats and score then
 
@@ -56,37 +56,6 @@ af[#af+1] = LoadFont("_wendy small")..{
 	end
 }
 
--- stepchart style ("single" or "double" or etc.)
--- difficulty text ("beginner" or "expert" or etc.)
-af[#af+1] = LoadFont("Common Normal")..{
-	InitCommand=function(self)
-		self:y(17)
-		self:x(col1x + (player==PLAYER_1 and -1 or 1))
-		self:horizalign(align1):zoom(0.65)
-	end,
-	DrawStageCommand=function(self)
-		if playerStats==nil then self:settext(""); return end
-
-		local stepstype = ""
-		if steps then
-			-- get the StepsType for the stepchart that was played
-			-- this will be a string from the StepsType enum like "StepsType_Dance_Single"
-			stepstype = steps:GetStepsType()
-			-- remove the first two sections, transforming something like "StepsType_Dance_Single" into "Single"
-			stepstype = stepstype:gsub("%w+_%w+_", "")
-			-- localize
-			stepstype = THEME:GetString("ScreenSelectMusic", stepstype)
-		end
-
-		local diff_text = ""
-		if difficulty then
-			diff_text = THEME:GetString("Difficulty", ToEnumShortString(difficulty))
-		end
-
-		self:settext( ("%s / %s"):format(stepstype, diff_text))
-	end
-}
-
 -- difficulty meter
 af[#af+1] = LoadFont("_wendy small")..{
 	InitCommand=function(self) self:zoom(0.3):horizalign(align1):x(col1x):y(quadHeight/2-35) end,
@@ -101,7 +70,7 @@ af[#af+1] = LoadFont("_wendy small")..{
 
 -- stepartist
 af[#af+1] = LoadFont("Common Normal")..{
-	InitCommand=function(self) self:zoom(0.55):horizalign(align1):x(col1x):y(quadHeight/2-20):maxwidth(130) end,
+	InitCommand=function(self) self:zoom(0.5):horizalign(align1):x(col1x):y(quadHeight/2-20):maxwidth(130) end,
 	DrawStageCommand=function(self)
 		if playerStats and stepartist then
 			self:settext(stepartist)
@@ -116,7 +85,7 @@ for i=1,#TNSTypes do
 
 	af[#af+1] = LoadFont("_wendy small")..{
 		InitCommand=function(self)
-			self:zoom(0.28):horizalign(align2):x(col2x):y(i*11-45)
+			self:zoom(0.2):horizalign(align2):x(col2x):y(i*11-45)
 				:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
 		end,
 		DrawStageCommand=function(self, params)

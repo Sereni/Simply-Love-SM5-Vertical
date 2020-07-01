@@ -65,7 +65,7 @@ t[#t+1] = Def.Banner{
 -- the title of the song
 t[#t+1] = LoadFont("Common Normal")..{
 	Name="SongTitle",
-	InitCommand=function(self) self:zoom(0.58):xy(bannerXOffset, quadHeight/2 + 3):maxwidth(200) end,
+	InitCommand=function(self) self:zoom(0.58):xy(bannerXOffset, -quadHeight/2 + 3):maxwidth(200) end,
 	DrawStageCommand=function(self)
 		if SongOrCourse then self:settext(SongOrCourse:GetDisplayFullTitle()) end
 	end
