@@ -57,7 +57,7 @@ end
 
 af[#af+1] = LoadFont("Common Normal")..{
 	Text=ScreenString("ThemeDesign"),
-	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0) end,
+	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0):zoom(0.8) end,
 	OnCommand=function(self) self:sleep(3):linear(0.25):diffusealpha(1) end,
 	OffCommand=function(self) self:linear(0.25):diffusealpha(0) end,
 }
