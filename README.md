@@ -19,7 +19,7 @@ The theme is currently in alpha, and does not have released versions. To install
 - Only ITG/FA+ modes are available
 - Edit mode is not functional
 - Data visualizations and target score graph are not avialable
-- Other features are up to Simply Love 4.8.6
+- Other features are up to Simply Love 4.8.7
 
 ## Additional features
 
@@ -34,5 +34,5 @@ We are actively developing this very much unfinished theme. Check the Issues tab
 ## Thanks
 - Pluto for "what if we turned it sideways?"
 - Fieoner for relentless feature work and code reviews
-- Roujo for testing and feedback
+- Roujo for handling World's Biggest Merge, testing, and feedback
 - hurtpiggypig, quietly-turning, and all contributors to Simply Love
