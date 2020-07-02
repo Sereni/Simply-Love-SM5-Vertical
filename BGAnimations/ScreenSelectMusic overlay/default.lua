@@ -3,16 +3,19 @@
 UpdateDefaultGlobalOffset()
 
 local t = Def.ActorFrame{
+	-- GameplayReloadCheck is a kludgy global variable used in ScreenGameplay in.lua to check
+	-- if ScreenGameplay is being entered "properly" or being reloaded by a scripted mod-chart.
+	-- If we're here in SelectMusic, set GameplayReloadCheck to false, signifying that the next
+	-- time ScreenGameplay loads, it should have a properly animated entrance.
 	InitCommand=function(self) SL.Global.GameplayReloadCheck = false end,
-	ChangeStepsMessageCommand=function(self, params)
-		self:playcommand("StepsHaveChanged", params)
+
+	PlayerJoinedMessageCommand=function(self, params)
+		UnjoinLateJoinedPlayer(params.Player)
 	end,
 
 	-- ---------------------------------------------------
 	--  first, load files that contain no visual elements, just code that needs to run
 
-	-- MenuButton code for backing out of SelectMusic when in EventMode
-	LoadActor("./EscapeFromEventMode.lua"),
 	-- MenuTimer code for preserving SSM's timer value
 	LoadActor("./MenuTimer.lua"),
 	-- Apply player modifiers from profile
@@ -44,6 +47,9 @@ local t = Def.ActorFrame{
 	LoadActor("./SortMenu/default.lua"),
 	-- a Test Input overlay can (maybe) be accessed from the SortMenu
 	LoadActor("./TestInput.lua"),
+	-- a yes/no prompt overlay for backing out of SelectMusic when in EventMode can be
+	-- activated via "CodeEscapeFromEventMode" under [ScreenSelectMusic] in Metrics.ini
+	LoadActor("./EscapeFromEventMode.lua"),
 }
 
 return t

@@ -10,7 +10,7 @@ local cursor = {
 }
 
 -- the width of the choice_actors multiplied by 0.386 gives us aproximately the width of the text icons
--- we add 30 to have a pretty margin around it 
+-- we add 30 to have a pretty margin around it
 local iconWidthScale = 0.386
 local cursorMargin = 30
 
@@ -19,7 +19,7 @@ local Update = function(af, delta)
 	if index ~= cursor.index then
 		cursor.index = index
 
-		-- queue the appropiate command to the faux playfield, if needed
+		-- queue the appropriate command to the faux playfield, if needed
 		if choices[cursor.index+1] == "Marathon" or choices[cursor.index+1] == "Regular" then
 			af:queuecommand("FirstLoop"..choices[cursor.index+1])
 		end
@@ -64,6 +64,9 @@ local t = Def.ActorFrame{
 			-- and reload the theme's Metrics
 			THEME:ReloadMetrics()
 		end
+	end,
+	PlayerJoinedMessageCommand=function(self, params)
+		UnjoinLateJoinedPlayer(params.Player)
 	end,
 
 	-- lower mask
@@ -208,11 +211,7 @@ local t = Def.ActorFrame{
 					self:stoptweening():linear(0.25):diffusealpha(0)
 				end
 			else
-				if SL.Global.GameMode == "StomperZ" then
-					self:diffusealpha(0)
-				else
-					self:diffusealpha(1)
-				end
+				self:diffusealpha(1)
 			end
 		end,
 		-- lifemeter white border

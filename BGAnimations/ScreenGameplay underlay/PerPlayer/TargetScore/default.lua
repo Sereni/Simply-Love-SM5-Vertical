@@ -7,6 +7,16 @@
 
 local player = ...
 local pn = ToEnumShortString(player)
+
+-- Make sure that someone requested something from this file.
+-- (There's a lot. See the long note near the end, just above the pacemaker implementation.)
+local Pacemaker = SL[pn].ActiveModifiers.Pacemaker
+local WantsTargetGraph = SL[pn].ActiveModifiers.DataVisualizations == "Target Score Graph"
+local FailOnMissedTarget = PREFSMAN:GetPreference("EventMode") and SL[pn].ActiveModifiers.ActionOnMissedTarget == "Fail"
+local RestartOnMissedTarget = PREFSMAN:GetPreference("EventMode") and SL[pn].ActiveModifiers.ActionOnMissedTarget == "Restart"
+-- if none of them apply, bail now
+if not (Pacemaker or WantsTargetGraph or FailOnMissedTarget or RestartOnMissedTarget) then return end
+
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
 -- ---------------------------------------------------------------
@@ -55,9 +65,6 @@ end
 
 -- ---------------------------------------------------------------
 -- flags for fail/restart behavior
-
-local FailOnMissedTarget = PREFSMAN:GetPreference("EventMode") and SL[pn].ActiveModifiers.ActionOnMissedTarget == "Fail"
-local RestartOnMissedTarget = PREFSMAN:GetPreference("EventMode") and SL[pn].ActiveModifiers.ActionOnMissedTarget == "Restart"
 
 -- ---------------------------------------------------------------
 -- possible targets, as defined in ./Scripts/SL-PlayerOptions.lua within TargetScore.Values()
@@ -116,7 +123,7 @@ local player_af = Def.ActorFrame{
 -- I don't have the time to fully detangle all this so it's staying this way until
 -- someone rewrites this file OR human civilization ends in fire paving the way for GNU/Hurd.
 
-if SL[pn].ActiveModifiers.Pacemaker or FailOnMissedTarget or RestartOnMissedTarget then
+if not SL[pn].ActiveModifiers.DoNotJudgeMe and (SL[pn].ActiveModifiers.Pacemaker or FailOnMissedTarget or RestartOnMissedTarget) then
 
 	-- pacemaker text
 	player_af[#player_af+1] = Def.BitmapText{
