@@ -49,8 +49,8 @@ if ProductVersion():find("git") then
 end
 -- - - - - - - - - - - - - - - - - - - - -
 -- Constants defining UI element positions depending on horizontal or vertical mode.
-local song_stats_zoom		= (IsVerticalScreen() and 0.67 or 0.8)
-local song_stats_y		= (IsVerticalScreen() and -75 or -120)
+local song_stats_zoom		= (IsVerticalScreen() and 0.6 or 0.8)
+local song_stats_y		= (IsVerticalScreen() and -70 or -120)
 local logos_x			= (IsVerticalScreen() and 2 or 0)
 local logos_y			= (IsVerticalScreen() and -10 or -16)
 local logos_zoom_itg		= (IsVerticalScreen() and 0.114 or 0.2)
