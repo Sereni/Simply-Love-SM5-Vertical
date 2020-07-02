@@ -2,8 +2,6 @@
 -- TODO(Sereni): Find a space for letter grade or delete this file.
 if true then return end
 
-if SL.Global.GameMode == "StomperZ" then return end
-
 local player = ...
 local mods = SL[ToEnumShortString(player)].ActiveModifiers
 -- No letter grade in DoNotJudgeMe mode.

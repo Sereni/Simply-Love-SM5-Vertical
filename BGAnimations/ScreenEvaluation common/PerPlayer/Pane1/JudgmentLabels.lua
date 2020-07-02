@@ -46,12 +46,12 @@ local t = Def.ActorFrame{
 	end
 }
 
-local worst = SL.Global.ActiveModifiers.WorstTimingWindow
+local windows = SL.Global.ActiveModifiers.TimingWindows
 
 -- labels: W1 ---> Miss
 for i=1, #TapNoteScores.Types do
--- no need to add BitmapText actors for TimingWindows that were turned off
-	if i <= worst or i==#TapNoteScores.Types then
+	-- no need to add BitmapText actors for TimingWindows that were turned off
+	if windows[i] or i==#TapNoteScores.Types then
 
 		local window = TapNoteScores.Types[i]
 		local label = getStringFromTheme( window )
@@ -63,9 +63,7 @@ for i=1, #TapNoteScores.Types do
 				self:y((i-1)*28)
 
 				-- diffuse the JudgmentLabels the appropriate colors for the current GameMode
-				if SL.Global.GameMode ~= "ITG" then
-					self:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
-				end
+				self:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )
 			end
 		}
 	end

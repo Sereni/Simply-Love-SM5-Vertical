@@ -1,7 +1,12 @@
+-- this difficulty grid doesn't support CourseMode
+-- CourseContentsList.lua should be used instead
+if GAMESTATE:IsCourseMode() then return end
+-- ----------------------------------------------
+
 local num_rows    = 5
 local GridZoomX = 0.39
 local RowHeight = 14
-local StepsToDisplay, SongOrCourse, StepsOrTrails
+local StepsToDisplay, song, steps
 local quadHeight = 75
 local quadWidth = 125
 
@@ -10,43 +15,40 @@ local GetStepsToDisplay = LoadActor("./StepsToDisplay.lua")
 local t = Def.ActorFrame{
 	Name="StepsDisplayList",
 	InitCommand=function(self) self:vertalign(top):xy(quadWidth/2, _screen.cy) end,
-	-- - - - - - - - - - - - - -
 
 	OnCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	CurrentSongChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	CurrentCourseChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-	StepsHaveChangedCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
-
-	-- - - - - - - - - - - - - -
+	CurrentSongChangedMessageCommand=function(self)    self:queuecommand("RedrawStepsDisplay") end,
+	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
+	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
 
 	RedrawStepsDisplayCommand=function(self)
 
-		SongOrCourse = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentCourse()) or GAMESTATE:GetCurrentSong()
+		song = GAMESTATE:GetCurrentSong()
 
-		if SongOrCourse then
-			StepsOrTrails = (GAMESTATE:IsCourseMode() and SongOrCourse:GetAllTrails()) or SongUtil.GetPlayableSteps( SongOrCourse )
+		if song then
+			steps = SongUtil.GetPlayableSteps( song )
 
-			if StepsOrTrails then
+			if steps then
+				StepsToDisplay = GetStepsToDisplay(steps)
 
-				StepsToDisplay = GetStepsToDisplay(StepsOrTrails)
-
-				for RowNumber=1,num_rows do
-					chart = StepsToDisplay[RowNumber]
+				for i=1,num_rows do
+					chart = StepsToDisplay[i]
 					if chart then
 						-- if this particular song has a stepchart for this row, update the Meter
 						local meter = chart:GetMeter()
 						local difficulty = chart:GetDifficulty()
-						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Set", {Meter=meter, Difficulty=difficulty})
-						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Set", {Chart=chart})
+						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Set", {Meter=meter, Difficulty=difficulty})
+						self:GetChild("Grid"):GetChild("StepArtist_"..i):playcommand("Set", {Chart=chart})
 					else
 						-- otherwise, set the meter to an empty string
-						self:GetChild("Grid"):GetChild("Meter_"..RowNumber):playcommand("Unset")
-						self:GetChild("Grid"):GetChild("StepArtist_"..RowNumber):playcommand("Unset")
+						self:GetChild("Grid"):GetChild("Meter_"..i):playcommand("Unset")
+						self:GetChild("Grid"):GetChild("StepArtist_"..i):playcommand("Unset")
+
 					end
 				end
 			end
 		else
-			StepsOrTrails, StepsToDisplay = nil, nil
+			steps, StepsToDisplay = nil, nil
 			self:playcommand("Unset")
 		end
 	end,
@@ -72,11 +74,8 @@ local t = Def.ActorFrame{
 		end,
 		OnCommand=function(self) self:queuecommand("Set") end,
 		CurrentSongChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentCourseChangedMessageCommand=function(self) self:queuecommand("Set") end,
 		CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentTrailP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
 		CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
-		CurrentTrailP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
 
 		SetCommand=function(self)
 			local song = GAMESTATE:GetCurrentSong()

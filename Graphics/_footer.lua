@@ -1,4 +1,5 @@
-local dark = {0,0,0,0.9}
+-- tables of rgba values
+local dark  = {0,0,0,0.9}
 local light = {0.65,0.65,0.65,1}
 
 return Def.Quad{
@@ -6,7 +7,7 @@ return Def.Quad{
 	InitCommand=function(self)
 		self:draworder(90):zoomto(_screen.w, 16):vertalign(bottom):y(16)
 
-		if ThemePrefs.Get("RainbowMode") then
+		if DarkUI() then
 			self:diffuse(dark)
 		else
 			self:diffuse(light)
