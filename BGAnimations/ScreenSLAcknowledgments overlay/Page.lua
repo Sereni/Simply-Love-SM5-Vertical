@@ -4,9 +4,9 @@ local people   = args[2]
 
 local padding = 10
 local header_height = 32
-local space = { w=640, h=_screen.h - header_height }
+local space = { w=_screen.w, h=_screen.h - header_height }
 local box_height = (space.h - (padding * (#people+1))) / math.max(#people,2)
-local img_width = box_height-padding*4
+local img_width = (box_height-padding*4) * 0.5
 local src_width, src_height, img_height
 
 local fade_time = 0.25
@@ -127,7 +127,7 @@ for i=1, #people do
 		Font="Common Normal",
 		Text=people[i].Name,
 		InitCommand=function(self)
-			local zoom_factor = scale(#people,2,5,1,0.75)
+			local zoom_factor = 0.6
 			self:valign(0)
 				:zoom( zoom_factor )
 				:maxwidth((img_width + padding) * 1/zoom_factor)
@@ -140,8 +140,8 @@ for i=1, #people do
 	local about = Def.BitmapText{
 		Font="Common Normal",
 		InitCommand=function(self)
-			self:valign(0):halign(0):zoom(0.8)
-				:_wrapwidthpixels((space.w - padding*4 - img_width) * (1/0.85) )
+			self:valign(0):halign(0):zoom(0.45)
+				:_wrapwidthpixels((space.w - padding*4 - img_width) * (1/0.55) )
 				:x(-space.w/2 + padding*4 + img_width)
 				:y(padding + quad_y )
 
