@@ -66,7 +66,7 @@ local wheel_item_mt = {
 				InitCommand=function(subself)
 					self.heart = subself
 					subself:diffusealpha(0)
-					subself:zoom(0.25)
+					subself:zoom(0.13)
 				end,
 				OnCommand=function(subself)
 					subself:sleep(0.2)
