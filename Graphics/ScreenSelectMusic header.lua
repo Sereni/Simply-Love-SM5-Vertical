@@ -78,7 +78,7 @@ af[#af+1] = LoadFont("_wendy small")..{
 
 		-- move the GameMode text further left if MenuTimer is enabled
 		if PREFSMAN:GetPreference("MenuTimer") then
-			x = x - 60
+			x = x - 40
 		end
 
 		self:diffusealpha(0):zoom(0.3):xy(x, 7.5):halign(1)
@@ -99,7 +99,7 @@ af[#af+1] = DrawNinePanelPad()..{
 
 		-- move the GameMode text further left if MenuTimer is enabled
 		if PREFSMAN:GetPreference("MenuTimer") then
-			x = x - 60
+			x = x - 40
 		end
 
 		self:zoom(0.24):xy(x, 12):halign(1)
