@@ -47,7 +47,7 @@ if EarnedMachineRecord or EarnedPersonalRecord then
 	local t = Def.ActorFrame{
 		InitCommand=function(self) self:zoom(0.225) end,
 		OnCommand=function(self)
-			self:x( _screen.cx -55 )
+			self:x( _screen.cx -30 )
 			self:y( _screen.cy -70 )
 		end
 	}
