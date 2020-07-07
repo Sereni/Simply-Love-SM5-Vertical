@@ -217,11 +217,13 @@ SL_CustomPrefs.Validate = function()
 	if file[theme_name] then
 		-- loop through key/value pairs retrieved and do some basic validation
 		for k,v in pairs( file[theme_name] ) do
-			if sl_prefs[k] then
+			local pref = sl_prefs[k]
+			if pref then
 				-- if we reach here, the setting exists in both the master definition as well as the user's ThemePrefs.ini
 				-- so perform some rudimentary validation; check for both type mismatch and presence in sl_prefs
-				if type( v ) ~= type( sl_prefs[k].Default )
-				or not FindInTable(v, (sl_prefs[k].Values or sl_prefs[k].Choices))
+				local valid_values = pref.Values or pref.Choices
+				if type( v ) ~= type( pref.Default )
+				or (valid_values and not FindInTable(v, valid_values))
 				then
 					-- overwrite the user's erroneous setting with the default value
 					ThemePrefs.Set(k, sl_prefs[k].Default)
