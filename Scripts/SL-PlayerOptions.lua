@@ -364,7 +364,26 @@ local Overrides = {
 			playeroptions:Cover(mods.HideSongBG and 1 or 0)
 		end,
 	},
+	-------------------------------------------------------------------------
+	DataVisualizations = {
+		Values = function()
+			local choices = { "None", "Target Score Graph", "Step Statistics" }
 
+			-- None and Target Score Graph should always be available to players
+			-- but Step Statistics needs a lot of space and isn't always possible
+			-- remove it as an available option if we aren't in single or if the current
+			-- notefield width already uses more than half the screen width
+			local style = GAMESTATE:GetCurrentStyle()
+			local notefieldwidth = GetNotefieldWidth()
+
+			if style and style:GetName() ~= "single"
+					or notefieldwidth and notefieldwidth > _screen.w/2 then
+				table.remove(choices, 3)
+			end
+
+			return choices
+		end,
+	},
 	-------------------------------------------------------------------------
 	TargetScore = {
 		Values = { 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'S-', 'S', 'S+', '☆', '☆☆', '☆☆☆', '☆☆☆☆', 'Machine best', 'Personal best' },
@@ -387,15 +406,8 @@ local Overrides = {
 	GameplayExtras = {
 		SelectType = "SelectMultiple",
 		Values = function()
-			-- GameplayExtras will be presented as a single OptionRow when WideScreen
 			return { "ColumnFlashOnMiss", "SubtractiveScoring", "Pacemaker", "MissBecauseHeld", "NPSGraphAtTop", "DoNotJudgeMe" }
 		end,
-	},
-
-	-- this is defined in metrics.ini to only appear when not IsUsingWideScreen()
-	GameplayExtrasB = {
-		SelectType = "SelectMultiple",
-		Values = { "MissBecauseHeld", "NPSGraphAtTop" }
 	},
 	-------------------------------------------------------------------------
 	MeasureCounter = {
@@ -511,6 +523,10 @@ local Overrides = {
 			return choices
 		end,
 		OneChoiceForAllPlayers = true,
+		LoadSelections = function(self, list, pn)
+			list[1] = true
+			return list
+		end,
 		SaveSelections = function(self, list, pn)
 			if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.GameplayScreen() end
 
@@ -531,6 +547,10 @@ local Overrides = {
 			return choices
 		end,
 		OneChoiceForAllPlayers = true,
+		LoadSelections = function(self, list, pn)
+			list[1] = true
+			return list
+		end,
 		SaveSelections = function(self, list, pn)
 			if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.GameplayScreen() end
 
