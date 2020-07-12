@@ -1,8 +1,7 @@
+-- Pane5 displays TestInput.
+
 if SL.Global.GameMode == "Casual" then return end
 
--- only show TestInput pane in EventMode; public arcades probably don't want random
--- players attempting to diagnose the pads...
-if not GAMESTATE:IsEventMode() then return end
 -- DedicatedMenu buttons are necessary here to prevent players from getting stuck in this pane
 if not PREFSMAN:GetPreference("OnlyDedicatedMenuButtons") then return end
 

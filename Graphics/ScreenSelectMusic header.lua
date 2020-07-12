@@ -1,4 +1,5 @@
 local bmt_actor
+local DrawNinePanelPad = LoadActor( THEME:GetPathB("ScreenSelectStyle", "underlay/pad.lua") )
 
 local Update = function(af, dt)
 	local seconds = GetTimeSinceStart() - SL.Global.TimeAtSessionStart
@@ -18,72 +19,99 @@ local GetDeltaString = function()
 	return str
 end
 
-local t = Def.ActorFrame{
-	InitCommand=function(self)
-		if PREFSMAN:GetPreference("EventMode") and SL.Global.GameMode ~= "Casual" then
-			-- TimeAtSessionStart will be reset to nil between game sesssions
-			-- thus, if it's currently nil, we're loading ScreenSelectMusic
-			-- for the first time this particular game session
-			if SL.Global.TimeAtSessionStart == nil then
-				SL.Global.TimeAtSessionStart = GetTimeSinceStart()
-			end
+local af = Def.ActorFrame{ OffCommand=function(self) self:linear(0.1):diffusealpha(0) end }
 
-			self:SetUpdateFunction( Update )
+-- only add this InitCommand to the main ActorFrame in EventMode
+if PREFSMAN:GetPreference("EventMode") then
+	af.InitCommand=function(self)
+		-- TimeAtSessionStart will be reset to nil between game sessions
+		-- thus, if it's currently nil, we're loading ScreenSelectMusic
+		-- for the first time this particular game session
+		if SL.Global.TimeAtSessionStart == nil then
+			SL.Global.TimeAtSessionStart = GetTimeSinceStart()
 		end
-	end,
-	OffCommand=function(self)
-		local topscreen = SCREENMAN:GetTopScreen()
-		if topscreen then
-			if topscreen:GetName() == "ScreenEvaluationStage" or topscreen:GetName() == "ScreenEvaluationNonstop" then
-				SL.Global.Stages.PlayedThisGame = SL.Global.Stages.PlayedThisGame + 1
-			else
-				self:linear(0.1)
-				self:diffusealpha(0)
-			end
-		end
-	end,
 
-	LoadActor( THEME:GetPathG("", "_header.lua") ),
+		self:SetUpdateFunction( Update )
+	end
+end
 
-	Def.BitmapText{
-		Font=PREFSMAN:GetPreference("EventMode") and "_wendy monospace numbers" or "_wendy small",
-		Name="Stage Number",
+
+-- generic header elements (background Def.Quad, left-aligned screen name)
+af[#af+1] = LoadActor( THEME:GetPathG("", "_header.lua") )
+
+-- centered text
+-- session timer in EventMode
+if PREFSMAN:GetPreference("EventMode") then
+
+	af[#af+1] = LoadFont("_wendy monospace numbers")..{
+		Name="Session Timer",
 		InitCommand=function(self)
 			bmt_actor = self
-			if PREFSMAN:GetPreference("EventMode") then
-				self:diffusealpha(0):zoom( 0.2 ):horizalign(left):xy(10, 4.5)
-			else
-				self:diffusealpha(0):zoom( 0.2 ):xy(_screen.cx, 4.5)
-			end
+			self:diffusealpha(0):zoom(0.2):horizalign(left):xy(10, 4.5)
 		end,
 		OnCommand=function(self)
-			if not PREFSMAN:GetPreference("EventMode") then
-				self:settext( SSM_Header_StageText() )
-			end
-
 			self:sleep(0.1):decelerate(0.33):diffusealpha(1)
 		end,
-	},
+	}
 
-	LoadFont("_wendy small")..{
-		Name="GameModeText",
+-- stage number when not EventMode
+else
+
+	af[#af+1] = LoadFont("_wendy small")..{
+		Name="Stage Number",
+		Text=SSM_Header_StageText(),
 		InitCommand=function(self)
-			self:diffusealpha(0):zoom( 0.3 ):xy(_screen.w-70, 7.5):halign(1)
-			if not PREFSMAN:GetPreference("MenuTimer") then
-				self:x(_screen.w-10)
-			end
+			self:diffusealpha(0):zoom( 0.2 ):xy(_screen.cx, 4.5)
 		end,
 		OnCommand=function(self)
-			self:settext(THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode))
-				:sleep(0.1):decelerate(0.33):diffusealpha(1)
+			self:sleep(0.1):decelerate(0.33):diffusealpha(1)
 		end,
-		UpdateHeaderTextCommand=function(self)
-			self:settext(THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode))
-		end
 	}
+end
+
+-- "ITG" or "FA+"; aligned to right of screen
+af[#af+1] = LoadFont("_wendy small")..{
+	Name="GameModeText",
+	Text=THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode),
+	InitCommand=function(self)
+		local x = _screen.w - 20
+
+		-- move the GameMode text further left if MenuTimer is enabled
+		if PREFSMAN:GetPreference("MenuTimer") then
+			x = x - 40
+		end
+
+		self:diffusealpha(0):zoom(0.3):xy(x, 7.5):halign(1)
+	end,
+	OnCommand=function(self)
+		self:settext(THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode))
+			:sleep(0.1):decelerate(0.33):diffusealpha(1)
+	end,
+	SLGameModeChangedMessageCommand=function(self)
+		self:settext(THEME:GetString("ScreenSelectPlayMode", SL.Global.GameMode))
+	end
 }
 
-t[#t+1] = LoadFont("_wendy small")..{
+-- Pad image
+af[#af+1] = DrawNinePanelPad()..{
+	InitCommand=function(self)
+		local x = _screen.w - 10
+
+		-- move the GameMode text further left if MenuTimer is enabled
+		if PREFSMAN:GetPreference("MenuTimer") then
+			x = x - 40
+		end
+
+		self:zoom(0.24):xy(x, 12):halign(1)
+
+		self:playcommand("Set", {Player=GAMESTATE:GetMasterPlayerNumber()})
+	end,
+	PlayerJoinedMessageCommand=function(self, params)
+		self:playcommand("Set", {Player=params.Player})
+	end
+}
+
+af[#af+1] = LoadFont("_wendy small")..{
 	Name="CustomGlobalOffset",
 	InitCommand=function(self)
 		self:diffusealpha(0):zoom(0.3):xy(_screen.cx+10, 8)
@@ -97,4 +125,4 @@ t[#t+1] = LoadFont("_wendy small")..{
 	end
 }
 
-return t
+return af

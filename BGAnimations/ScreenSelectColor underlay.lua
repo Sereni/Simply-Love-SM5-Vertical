@@ -51,7 +51,7 @@ local wheel_item_mt = {
 				Name=name,
 				InitCommand=function(subself)
 					self.container = subself
-					if ThemePrefs.Get("VisualTheme")=="Gay" then
+					if ThemePrefs.Get("VisualTheme")=="Gay" and not HolidayCheer() then
 						subself:bob():effectmagnitude(0,0,0):effectclock('bgm'):effectperiod(0.666)
 					end
 				end,
@@ -66,7 +66,7 @@ local wheel_item_mt = {
 				InitCommand=function(subself)
 					self.heart = subself
 					subself:diffusealpha(0)
-					subself:zoom(0.25)
+					subself:zoom(0.13)
 				end,
 				OnCommand=function(subself)
 					subself:sleep(0.2)

@@ -22,7 +22,7 @@ t[#t+1] = Def.Quad {
 	OnCommand=function(self)
 		self:setsize(title_bg_width, _screen.h*0.0625)
 			:halign(0):x(title_bg_x)
-			:diffuse(Color.Black):diffusealpha( BrighterOptionRows() and 0.75 or 0.25)
+			:diffuse(Color.Black):diffusealpha( DarkUI() and 0.75 or 0.25)
 	end
 }
 

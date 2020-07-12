@@ -1,8 +1,14 @@
 local TextColor = (ThemePrefs.Get("RainbowMode") and (not HolidayCheer()) and Color.Black) or Color.White
 
-local SongStats = SONGMAN:GetNumSongs() .. " songs in "
-SongStats = SongStats .. SONGMAN:GetNumSongGroups() .. " groups, "
-SongStats = SongStats .. #SONGMAN:GetAllCourses(PREFSMAN:GetPreference("AutogenGroupCourses")) .. " courses"
+-- generate a string like "7741 songs in 69 groups, 10 courses"
+local SongStats = ("%i %s %i %s, %i %s"):format(
+	SONGMAN:GetNumSongs(),
+	THEME:GetString("ScreenTitleMenu", "songs in"),
+	SONGMAN:GetNumSongGroups(),
+	THEME:GetString("ScreenTitleMenu", "groups"),
+	#SONGMAN:GetAllCourses(PREFSMAN:GetPreference("AutogenGroupCourses")),
+	THEME:GetString("ScreenTitleMenu", "courses")
+)
 
 -- - - - - - - - - - - - - - - - - - - - -
 local game = GAMESTATE:GetCurrentGame():GetName();
@@ -43,8 +49,8 @@ if ProductVersion():find("git") then
 end
 -- - - - - - - - - - - - - - - - - - - - -
 -- Constants defining UI element positions depending on horizontal or vertical mode.
-local song_stats_zoom		= (IsVerticalScreen() and 0.67 or 0.8)
-local song_stats_y		= (IsVerticalScreen() and -75 or -120)
+local song_stats_zoom		= (IsVerticalScreen() and 0.6 or 0.8)
+local song_stats_y		= (IsVerticalScreen() and -70 or -120)
 local logos_x			= (IsVerticalScreen() and 2 or 0)
 local logos_y			= (IsVerticalScreen() and -10 or -16)
 local logos_zoom_itg		= (IsVerticalScreen() and 0.114 or 0.2)
@@ -65,7 +71,7 @@ end
 
 local af = Def.ActorFrame{
 	InitCommand=function(self)
-		--see: ./Scripts/SL_Initialize.lua
+		--see: ./Scripts/SL_Init.lua
 		InitializeSimplyLove()
 
 		self:Center()
