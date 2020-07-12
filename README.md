@@ -3,7 +3,7 @@
 ![Arrow Logo](https://i.imgur.com/oZmxyGo.png)
 ======================
 
-Simply Love Vertical is designed for single-player setups with monitors in portrait mode. Turning the monitor sideways increases the arrow scrolling space by 1.7x, meaning that a 23" monitor gains as much vertical play area as a 39" monitor.
+Simply Love Vertical is a Stepmania theme designed for single-player setups with monitors in portrait mode. Turning the monitor sideways increases the arrow scrolling space by 1.7x, meaning that a 23" monitor gains as much vertical play area as a 39" monitor.
 
 ![main-screen](https://user-images.githubusercontent.com/4284741/80278102-83821b80-86eb-11ea-81f6-b64b177926d9.jpg)
 
@@ -11,7 +11,14 @@ Simply Love Vertical is designed for single-player setups with monitors in portr
 
 This theme is based on [quietly-turning's Simply-Love-SM5](https://github.com/quietly-turning/Simply-Love-SM5) and the readme assumes you are familiar with it. If not, check out the original repo.
 
-The theme is currently in alpha, and does not have released versions. To install, download/clone the repository, add the contents to your Themes/ folder, then switch to the theme in Stepmania options.
+The theme is currently in alpha, and does not have released versions. To install:
+1. Download/clone the repository
+1. Add the contents to your Themes/ folder
+1. In your Preferences.ini file, find the following lines and set them to your monitor specs (example values for 1080p below). If you skip this step, Stepmania will not recognize the portrait orientation of the monitor, and everything will look off.
+    * `DisplayAspectRatio=0.562500`
+    * `DisplayHeight=1920`
+    * There's also a `DisplayWidth` setting, but it will be ignored
+1. Switch to the theme in Stepmania options
 
 ## Limitations compared to Simply Love
 
