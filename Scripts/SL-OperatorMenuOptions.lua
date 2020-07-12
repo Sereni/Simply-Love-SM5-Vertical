@@ -417,8 +417,8 @@ end
 OperatorMenuOptionRows.DisplayResolution = function()
   -- This option actually only deals with DisplayHeight, since DisplayWidth is
 	-- calculated via height and aspect ratio. The width preference is ignored.
-	local choices = {"1080x1920", "900x1600", "756x1344", "720x1280", "576x1024"}
-	local values = {1920, 1600, 1344, 1280, 1024}
+	local choices = {"1440x2560", "1080x1920", "900x1600", "756x1344", "720x1280", "576x1024"}
+	local values = {2560, 1920, 1600, 1344, 1280, 1024}
 
 	return {
 		Name="DisplayResolution",
