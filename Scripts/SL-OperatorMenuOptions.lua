@@ -385,3 +385,60 @@ OperatorMenuOptionRows.CustomSongsLoadTimeout = function()
 		end,
 	}
 end
+
+OperatorMenuOptionRows.DisplayAspectRatio = function()
+
+	local choices = {"9:16", "10:16"}
+	local values = {0.5625, 0.625}
+
+	return {
+		Name="DisplayAspectRatio",
+		Choices=choices,
+		LayoutType = "ShowOneInRow",
+		SelectType = "SelectOne",
+		OneChoiceForAllPlayers = true,
+		ExportOnChange = false,
+		LoadSelections = function(self, list, pn)
+			local aspectRatio = PREFSMAN:GetPreference("DisplayAspectRatio")
+			local i = FindInTable(aspectRatio, values) or 1
+			list[i] = true
+		end,
+		SaveSelections = function(self, list, pn)
+			for i=1, #choices do
+				if list[i] then
+					PREFSMAN:SetPreference("DisplayAspectRatio", values[i])
+					break
+				end
+			end
+		end,
+	}
+end
+
+OperatorMenuOptionRows.DisplayResolution = function()
+  -- This option actually only deals with DisplayHeight, since DisplayWidth is
+	-- calculated via height and aspect ratio. The width preference is ignored.
+	local choices = {"1080x1920", "900x1600", "756x1344", "720x1280", "576x1024"}
+	local values = {1920, 1600, 1344, 1280, 1024}
+
+	return {
+		Name="DisplayResolution",
+		Choices=choices,
+		LayoutType = "ShowOneInRow",
+		SelectType = "SelectOne",
+		OneChoiceForAllPlayers = true,
+		ExportOnChange = false,
+		LoadSelections = function(self, list, pn)
+			local height = PREFSMAN:GetPreference("DisplayHeight")
+			local i = FindInTable(height, values) or 1
+			list[i] = true
+		end,
+		SaveSelections = function(self, list, pn)
+			for i=1, #choices do
+				if list[i] then
+					PREFSMAN:SetPreference("DisplayHeight", values[i])
+					break
+				end
+			end
+		end,
+	}
+end
