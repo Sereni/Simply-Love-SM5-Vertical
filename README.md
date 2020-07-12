@@ -14,11 +14,13 @@ This theme is based on [quietly-turning's Simply-Love-SM5](https://github.com/qu
 The theme is currently in alpha, and does not have released versions. To install:
 1. Download/clone the repository
 1. Add the contents to your Themes/ folder
-1. In your Preferences.ini file, find the following lines and set them to your monitor specs (example values for 1080p below). If you skip this step, Stepmania will not recognize the portrait orientation of the monitor, and everything will look off.
+1. Switch to the theme in Stepmania options
+1. In Graphics/Sound options, select the correct aspect ratio and display resolution. Stepmania may need to be restarted for changes to take effect.
+1. If there is no correct option, open your Preferences.ini file, find the following lines and set them to your monitor specs (example values for 1080p below). If you skip this step, Stepmania will not recognize the portrait orientation of the monitor, and everything will look off.
     * `DisplayAspectRatio=0.562500`
     * `DisplayHeight=1920`
     * There's also a `DisplayWidth` setting, but it will be ignored
-1. Switch to the theme in Stepmania options
+
 
 ## Limitations compared to Simply Love
 
