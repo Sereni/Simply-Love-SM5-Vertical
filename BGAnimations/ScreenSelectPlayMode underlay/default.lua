@@ -20,8 +20,12 @@ local Update = function(af, delta)
 		cursor.index = index
 
 		-- queue the appropriate command to the faux playfield, if needed
-		if choices[cursor.index+1] == "Marathon" or choices[cursor.index+1] == "Regular" then
-			af:queuecommand("FirstLoop"..choices[cursor.index+1])
+		if ScreenName=="ScreenSelectPlayMode2" then
+			if choices[cursor.index+1] == "Marathon" then
+				af:queuecommand("FirstLoopMarathon")
+			else
+				af:queuecommand("FirstLoopRegular")
+			end
 		end
 
 		-- queue an "Update" to the AF containing the cursor, description text, score, and lifemeter actors
@@ -170,7 +174,7 @@ local t = Def.ActorFrame{
 
 	-- Score
 	Def.BitmapText{
-		Font="_wendy monospace numbers",
+		Font="Wendy/_wendy monospace numbers",
 		InitCommand=function(self)
 			self:zoom(0.17):xy(93,-51):diffusealpha(0)
 		end,
@@ -224,7 +228,7 @@ local t = Def.ActorFrame{
 		},
 		-- lifemeter colored quad
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(40,14):x(-9):diffuse( GetCurrentColor() ) end
+			InitCommand=function(self) self:zoomto(40,14):x(-9):diffuse( GetCurrentColor(true) ) end
 		},
 		-- life meter animated swoosh
 		LoadActor(THEME:GetPathB("ScreenGameplay", "underlay/PerPlayer/LifeMeter/swoosh.png"))..{

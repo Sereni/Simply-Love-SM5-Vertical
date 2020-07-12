@@ -34,7 +34,7 @@ local af = Def.ActorFrame{
 }
 
 --percent score
-af[#af+1] = LoadFont("_wendy small")..{
+af[#af+1] = LoadFont("Common Bold")..{
 	InitCommand=function(self) self:zoom(0.4):horizalign(align1):x(col1x):y(-quadHeight/2+19) end,
 	DrawStageCommand=function(self)
 		if playerStats and score then
@@ -57,7 +57,7 @@ af[#af+1] = LoadFont("_wendy small")..{
 }
 
 -- difficulty meter
-af[#af+1] = LoadFont("_wendy small")..{
+af[#af+1] = LoadFont("Common Bold")..{
 	InitCommand=function(self) self:zoom(0.3):horizalign(align1):x(col1x):y(quadHeight/2-35) end,
 	DrawStageCommand=function(self)
 		if playerStats and meter then
@@ -83,7 +83,7 @@ af[#af+1] = LoadFont("Common Normal")..{
 -- numbers
 for i=1,#TNSTypes do
 
-	af[#af+1] = LoadFont("_wendy small")..{
+	af[#af+1] = LoadFont("Common Bold")..{
 		InitCommand=function(self)
 			self:zoom(0.2):horizalign(align2):x(col2x):y(i*11-45)
 				:diffuse( SL.JudgmentColors[SL.Global.GameMode][i] )

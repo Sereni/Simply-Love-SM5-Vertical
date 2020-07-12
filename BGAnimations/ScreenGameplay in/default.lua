@@ -7,10 +7,12 @@ local InitializeMeasureCounterAndModsLevel = LoadActor("./MeasureCounterAndModsL
 
 local text = ""
 local SongNumberInCourse = 0
+local SongsInCourse
 local style = ThemePrefs.Get("VisualTheme")
 
 if GAMESTATE:IsCourseMode() then
-	text = THEME:GetString("Stage", "Stage") .. " 1"
+	SongsInCourse = #GAMESTATE:GetCurrentCourse():GetCourseEntries()
+	text = ("%s 1 / %d"):format(THEME:GetString("Stage", "Stage"), SongsInCourse)
 
 elseif not PREFSMAN:GetPreference("EventMode") then
 	text = THEME:GetString("Stage", "Stage") .. " " .. tostring(SL.Global.Stages.PlayedThisGame + 1)
@@ -50,20 +52,20 @@ af[#af+1] = Def.ActorFrame{
 	},
 
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn splode"))..{
-		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationz(10):zoom(0):diffusealpha(0.9) end,
+		InitCommand=function(self) self:diffuse(GetCurrentColor(true)):Center():rotationz(10):zoom(0):diffusealpha(0.9) end,
 		OnCommand=function(self) self:sleep(0.4):linear(0.6):rotationz(0):zoom(0.7):diffusealpha(0) end
 	},
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn splode"))..{
-		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationy(180):rotationz(-10):zoom(0):diffusealpha(0.8) end,
+		InitCommand=function(self) self:diffuse(GetCurrentColor(true)):Center():rotationy(180):rotationz(-10):zoom(0):diffusealpha(0.8) end,
 		OnCommand=function(self) self:sleep(0.4):decelerate(0.6):rotationz(0):zoom(0.8):diffusealpha(0) end
 	},
 	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/GameplayIn minisplode"))..{
-		InitCommand=function(self) self:diffuse(GetCurrentColor()):Center():rotationz(10):zoom(0) end,
+		InitCommand=function(self) self:diffuse(GetCurrentColor(true)):Center():rotationz(10):zoom(0) end,
 		OnCommand=function(self) self:sleep(0.4):decelerate(0.8):rotationz(0):zoom(0.5):diffusealpha(0) end
 	}
 }
 
-af[#af+1] = LoadFont("_wendy small")..{
+af[#af+1] = LoadFont("Common Bold")..{
 	Text=text,
 	InitCommand=function(self) self:Center():zoom(0.5):diffusealpha(0):shadowlength(1) end,
 	OnCommand=function(self)
@@ -72,12 +74,18 @@ af[#af+1] = LoadFont("_wendy small")..{
 			self:accelerate(0.5):diffusealpha(1):sleep(0.66):accelerate(0.33)
 		end
 		self:zoom(0.2):xy(_screen.w-20, _screen.h-10)
+
+		-- offset "stage i" text to the left or right if only one player is joined, and that player's notefield is centered
+		if #GAMESTATE:GetHumanPlayers() == 1 and GetNotefieldX( GAMESTATE:GetMasterPlayerNumber() ) == _screen.cx then
+			local player = GAMESTATE:GetHumanPlayers()[1]
+			self:x(_screen.cx + (GetNotefieldWidth()*0.5 + self:GetWidth()*0.25) * (player==PLAYER_1 and -1 or 1))
+		end
 	end,
 	CurrentSongChangedMessageCommand=function(self)
 		if GAMESTATE:IsCourseMode() then
 			InitializeMeasureCounterAndModsLevel(SongNumberInCourse)
 			SongNumberInCourse = SongNumberInCourse + 1
-			self:settext( THEME:GetString("Stage", "Stage") .. " " .. SongNumberInCourse )
+			self:settext(("%s %d / %d"):format(THEME:GetString("Stage", "Stage"), SongNumberInCourse, SongsInCourse))
 		end
 	end
 }

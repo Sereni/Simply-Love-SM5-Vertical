@@ -16,7 +16,7 @@ local t = Def.ActorFrame{
 	Name="StepsDisplayList",
 	InitCommand=function(self) self:vertalign(top):xy(quadWidth/2, _screen.cy) end,
 
-	OnCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
+	OnCommand=function(self)                           self:queuecommand("RedrawStepsDisplay") end,
 	CurrentSongChangedMessageCommand=function(self)    self:queuecommand("RedrawStepsDisplay") end,
 	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
 	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("RedrawStepsDisplay") end,
@@ -164,7 +164,7 @@ for RowNumber=1,num_rows do
 		OffCommand=function(self) self:stoptweening() end
 	}
 
-	Grid[#Grid+1] = LoadFont("_wendy small")..{
+	Grid[#Grid+1] = LoadFont("Common Bold")..{
 		Name="Meter_"..RowNumber,
 		InitCommand=function(self)
 			self:horizalign(right)
