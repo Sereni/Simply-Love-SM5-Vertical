@@ -31,9 +31,6 @@ end
 -- ----------------------------------------
 local MusicWheel, SelectedType
 
--- width of background quad
-local _w = IsUsingWideScreen() and 320 or 310
-
 local af = Def.ActorFrame{
 	OnCommand=function(self)
 		self:xy(62.25, 164)
@@ -47,8 +44,8 @@ local af = Def.ActorFrame{
 	CurrentTrailP2ChangedMessageCommand=function(self) self:playcommand("Set") end,
 }
 
-		-- background for Artist, BPM, and Song Length
-		Def.Quad{
+-- background for Artist, BPM, and Song Length
+af[#af+1] =	Def.Quad{
 			InitCommand=function(self)
 				self:diffuse(color("#1e282f"))
 					:zoomto( 125, 25 )
