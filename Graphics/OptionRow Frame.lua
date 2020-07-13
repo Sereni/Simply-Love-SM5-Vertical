@@ -1,9 +1,8 @@
-local padding    = WideScale(12, 28)
-local row_height = 30
-local row_width  = WideScale(582, 776) - (padding * 2)
-local proxy_offset = _screen.cx - WideScale(30,40)
-
-local t = Def.ActorFrame{}
+local t = Def.ActorFrame{
+	InitCommand=function(self)
+		self:x(_screen.cx - 12.5)
+	end
+}
 
 -- a row
 t[#t+1] = Def.Quad {
