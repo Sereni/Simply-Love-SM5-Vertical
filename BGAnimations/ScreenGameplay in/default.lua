@@ -73,13 +73,7 @@ af[#af+1] = LoadFont("Common Bold")..{
 		if not SL.Global.GameplayReloadCheck then
 			self:accelerate(0.5):diffusealpha(1):sleep(0.66):accelerate(0.33)
 		end
-		self:zoom(0.2):xy(_screen.w-20, _screen.h-10)
-
-		-- offset "stage i" text to the left or right if only one player is joined, and that player's notefield is centered
-		if #GAMESTATE:GetHumanPlayers() == 1 and GetNotefieldX( GAMESTATE:GetMasterPlayerNumber() ) == _screen.cx then
-			local player = GAMESTATE:GetHumanPlayers()[1]
-			self:x(_screen.cx + (GetNotefieldWidth()*0.5 + self:GetWidth()*0.25) * (player==PLAYER_1 and -1 or 1))
-		end
+		self:zoom(0.2):xy(_screen.w-25, _screen.h-10)
 	end,
 	CurrentSongChangedMessageCommand=function(self)
 		if GAMESTATE:IsCourseMode() then
