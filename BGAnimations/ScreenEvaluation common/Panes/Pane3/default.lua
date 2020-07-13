@@ -15,7 +15,7 @@ local pane = Def.ActorFrame{
 -- -----------------------------------------------------------------------
 
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
-local NumHighScores = math.min(10, PREFSMAN:GetPreference("MaxHighScoresPerListForMachine"))
+local NumHighScores = math.min(9, PREFSMAN:GetPreference("MaxHighScoresPerListForMachine"))
 
 local HighScoreIndex = {
 	-- Machine HighScoreIndex will always be -1 in EventMode and is effectively useless there
@@ -42,7 +42,7 @@ end
 -- -----------------------------------------------------------------------
 
 local EarnedMachineRecord = GAMESTATE:IsEventMode() and HighScoreIndex.Machine  >= 0 or EarnedMachineHighScoreInEventMode()
-local EarnedTop2Personal  = (HighScoreIndex.Personal >= 0 and HighScoreIndex.Personal < 2)
+local EarnedTop2Personal  = (HighScoreIndex.Personal >= 0 and HighScoreIndex.Personal < 3)
 
 -- -----------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ local EarnedTop2Personal  = (HighScoreIndex.Personal >= 0 and HighScoreIndex.Per
 -- If the player isn't using a profile (local or USB), there won't be any
 -- personal HighScores to compare against.
 --
--- Also, this 8+2 shouldn't show up on privately owned machines where only
+-- Also, this 5+3 shouldn't show up on privately owned machines where only
 -- one person plays, which is a common scenario in 2020.
 --
 -- This idea of showing both machine and personal HighScores to help new players
@@ -71,26 +71,24 @@ local args = { Player=player, RoundsAgo=1, RowHeight=20}
 
 if (not EarnedMachineRecord and EarnedTop2Personal) then
 
-	-- less line spacing between HighScore rows to fit the horizontal line
-	args.RowHeight = 20.25
-
 	-- top 5 machine HighScores
-	args.NumHighScores = 5
+	numHighScores = 5
+	args.NumHighScores = numHighScores
 	pane[#pane+1] = LoadActor(THEME:GetPathB("", "_modules/HighScoreList.lua"), args)
 
 	-- horizontal line visually separating machine HighScores from player HighScores
-	pane[#pane+1] = Def.Quad{ InitCommand=function(self) self:zoomto(100, 1):y(args.RowHeight*9):diffuse(1,1,1,0.33) end }
+	pane[#pane+1] = Def.Quad{ InitCommand=function(self) self:zoomto(100, 1):y(args.RowHeight*(numHighScores+1)):diffuse(1,1,1,0.33) end }
 
 	-- top 3 player HighScores
 	args.NumHighScores = 3
 	args.Profile = PROFILEMAN:GetProfile(player)
 	pane[#pane+1] = LoadActor(THEME:GetPathB("", "_modules/HighScoreList.lua"), args)..{
-		InitCommand=function(self) self:y(args.RowHeight*9) end
+		InitCommand=function(self) self:y(args.RowHeight*(numHighScores+1)) end
 	}
 
 
--- the player did not meet the conditions to show the 8+2 HighScores
--- just show top 10 machine HighScores
+-- the player did not meet the conditions to show the 5+3 HighScores
+-- just show top 9 machine HighScores
 else
 	-- top 9 machine HighScores
 	args.NumHighScores = 9
