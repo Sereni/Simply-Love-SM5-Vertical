@@ -158,7 +158,7 @@ af[#af+1] = Def.CourseContentsList {
 
 		-- Song difficulty
 		Def.BitmapText{
-			Font="_wendy small",
+			Font="Wendy/_wendy small",
 			InitCommand=function(self)
 				self:xy(-quadWidth/2+15, -quadHeight/2+7)
 				:horizalign(right)

@@ -134,7 +134,7 @@ af[#af+1] = DrawNinePanelPad()..{
 	end
 }
 
-af[#af+1] = LoadFont("_wendy small")..{
+af[#af+1] = LoadFont("Wendy/_wendy small")..{
 	Name="CustomGlobalOffset",
 	InitCommand=function(self)
 		self:diffusealpha(0):zoom(0.3):xy(_screen.cx+10, 8)
