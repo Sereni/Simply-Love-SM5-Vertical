@@ -15,7 +15,7 @@ local function CreditsText( player )
 		UpdateTextCommand=function(self)
 			-- this feels like a holdover from SM3.9 that just never got updated
 			local str
-			if GAMESTATE:IsPlayerEnabled(pn) then
+			if GAMESTATE:IsPlayerEnabled(player) then
 				str = ScreenSystemLayerHelpers.GetCreditsMessage(player)
 			else
 				str = ""
