@@ -46,16 +46,11 @@ local font_zoom = 0.5
 local width = THEME:GetMetric("GraphDisplay", "BodyWidth")
 
 return Def.ActorFrame{
-	OnCommand=function(self) self:y(_screen.cy+162.5) end,
+	OnCommand=function(self) self:y(_screen.cy+167) end,
 
 	Def.Quad{
 		InitCommand=function(self)
 			self:diffuse(color("#1E282F")):zoomto(width, 18)
-			if #GAMESTATE:GetHumanPlayers()==1 then
-				-- not quite an even 0.25 because we need to accomodate the extra 10px
-				-- that would normally be between the left and right panes
-				self:addx(width*0.2541)
-			end
 		end
 	},
 

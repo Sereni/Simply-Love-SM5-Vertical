@@ -15,6 +15,6 @@ if disqualified then
 	return LoadFont("Common Bold")..{
 		Name="Disqualified"..ToEnumShortString(player),
 		Text=THEME:GetString("ScreenEvaluation","Disqualified"),
-		InitCommand=function(self) self:diffusealpha(0.7):zoom(0.23):y(_screen.cy+138) end,
+		InitCommand=function(self) self:diffusealpha(0.7):zoom(0.23):y(_screen.cy+185) end,
 	}
 end
