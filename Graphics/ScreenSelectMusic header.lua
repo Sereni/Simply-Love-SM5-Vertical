@@ -125,7 +125,7 @@ af[#af+1] = DrawNinePanelPad()..{
 			x = x - 40
 		end
 
-		self:zoom(0.24):xy(x, 12):halign(1)
+		self:zoom(0.155):xy(x, 12):halign(1)
 
 		self:playcommand("Set", {Player=GAMESTATE:GetMasterPlayerNumber()})
 	end,
