@@ -5,7 +5,7 @@ local calories = round(profile:GetCaloriesBurnedToday())
 local totalSongs = profile:GetNumTotalSongsPlayed()
 
 local lines = {
-	playerName,
+	ScreenString("LastUsedHighScoreName") .. "\n" .. playerName,
 	ScreenString("CaloriesBurned") .. "\n" .. calories,
 	ScreenString("TotalSongsPlayed") .. "\n"..totalSongs,
 }

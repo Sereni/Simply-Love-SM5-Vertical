@@ -23,11 +23,6 @@ local t = Def.ActorFrame{
 	},
 }
 
-local line_height = 58
-local profilestats_y = 138
-local horiz_line_y   = 288
-local normalstats_y  = 268
-
 for player in ivalues(Players) do
 
 	local line_height = 30
@@ -39,7 +34,6 @@ for player in ivalues(Players) do
 	local x_col2 = _screen.cx
 	local PlayerStatsAF = Def.ActorFrame{ Name="PlayerStatsAF_"..ToEnumShortString(player) }
 	local stats
-
 
 	-- first, check if this player is using a profile (local or MemoryCard)
 	if PROFILEMAN:IsPersistentProfile(player) then
@@ -61,13 +55,11 @@ for player in ivalues(Players) do
 						:xy(x_col1, (line_height*(i)) + y_offset)
 						:maxwidth(max_width)
 						:zoom(stat_zoom)
-
-					DiffuseEmojis(self)
+						DiffuseEmojis(self)
 				end
 			}
 		end
 
-		PlayerStatsAF[#PlayerStatsAF+1] = LoadActor("./ProfileAvatar", {player, x_pos})
 	end
 
 	-- retrieve general gameplay session stats for which a profile is not needed
