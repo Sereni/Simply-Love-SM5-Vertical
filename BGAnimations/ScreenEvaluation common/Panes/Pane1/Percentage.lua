@@ -24,7 +24,7 @@ return Def.ActorFrame{
 		Name="Percent",
 		Text=percent,
 		InitCommand=function(self)
-			self:vertalign(middle):horizalign(right):zoom(0.3)
+			self:vertalign(middle):horizalign(right):zoom(0.38)
 			self:x(45)
 		end
 	}
