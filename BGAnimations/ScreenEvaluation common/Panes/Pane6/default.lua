@@ -54,7 +54,6 @@ local qrcode_size = 122
 -- ------------------------------------------
 
 local pane = Def.ActorFrame{
-	InitCommand=function(self) self:visible(false) end,
 	PaneSwitchCommand=function(self)
 		if self:GetVisible() and not ValidForGrooveStats and not X_HasBeenBlinked then
 			self:queuecommand("BlinkX")
