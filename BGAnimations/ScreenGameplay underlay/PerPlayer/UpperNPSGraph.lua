@@ -18,6 +18,8 @@ end
 
 local song_percent, first_second, last_second
 
+-- -----------------------------------------------------------------------
+
 return Def.ActorFrame{
 	InitCommand=function(self)
 		self:y(49)

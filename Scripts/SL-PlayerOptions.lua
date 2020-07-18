@@ -185,6 +185,21 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+	HoldJudgment = {
+		LayoutType = "ShowOneInRow",
+		ExportOnChange = true,
+		Choices = function() return map(StripSpriteHints, GetHoldJudgments()) end,
+		Values = function() return GetHoldJudgments() end,
+		SaveSelections = function(self, list, pn)
+			local mods = SL[ToEnumShortString(pn)].ActiveModifiers
+			for i, val in ipairs(self.Values) do
+				if list[i] then mods.HoldJudgment = val; break end
+			end
+			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the HoldJudgment preview
+			MESSAGEMAN:Broadcast("HoldJudgmentChanged", {Player=pn, HoldJudgment=StripSpriteHints(mods.HoldJudgment)})
+		end
+	},
+	-------------------------------------------------------------------------
 	ComboFont = {
 		LayoutType = "ShowOneInRow",
 		ExportOnChange = true,
@@ -375,9 +390,18 @@ local Overrides = {
 			-- notefield width already uses more than half the screen width
 			local style = GAMESTATE:GetCurrentStyle()
 			local notefieldwidth = GetNotefieldWidth()
+			local IsUltraWide = (GetScreenAspectRatio() > 21/9)
+			local mpn = GAMESTATE:GetMasterPlayerNumber()
 
-			if style and style:GetName() ~= "single"
-					or notefieldwidth and notefieldwidth > _screen.w/2 then
+			-- if not ultrawide, StepStats only in single (not versus, not double)
+			if (not IsUltraWide and style and style:GetName() ~= "single")
+			-- if ultrawide, StepStats only in single and versus (not double)
+			or (IsUltraWide and style and not (style:GetName()=="single" or style:GetName()=="versus"))
+			-- if the notefield takes up more than half the screen width (e.g. single + Center1Player + 4:3)
+					or (notefieldwidth and notefieldwidth > _screen.w/2)
+			-- if the notefield is centered with 4:3 aspect ratio (probably don't need both these conditions)
+			or (mpn and GetNotefieldX(mpn) == _screen.cx and not IsUsingWideScreen())
+			then
 				table.remove(choices, 3)
 			end
 
@@ -416,7 +440,7 @@ local Overrides = {
 	-------------------------------------------------------------------------
 	MeasureCounterOptions = {
 		SelectType = "SelectMultiple",
-		Values = { "MeasureCounterLeft", "MeasureCounterUp", "HideRestCounts" },
+		Values = { "MeasureCounterLeft", "MeasureCounterUp", "HideLookahead" },
 	},
 	-------------------------------------------------------------------------
 	TimingWindows = {

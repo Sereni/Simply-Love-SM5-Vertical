@@ -7,5 +7,7 @@ return Def.Quad{
 		:setsize(233.2, 29)
 		:xy(18.4, _screen.h-80)
 	end,
-	OnCommand=function(self) self:linear(0.2):diffusealpha(0.8) end,
+	OnCommand=function(self)
+		self:linear(0.2):diffusealpha(0.8)
+	end,
 }

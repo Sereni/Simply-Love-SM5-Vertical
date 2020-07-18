@@ -31,9 +31,9 @@ local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local font = mods.ComboFont
 
 -- most ComboFonts have their own dedicated sprite sheets in ./Simply Love/Fonts/_Combo Fonts/
--- "Wendy" and "Wendy (Cursed)" are exceptions for the time being; reroute both to use "_wendy small"
+-- "Wendy" and "Wendy (Cursed)" are exceptions for the time being; reroute both to use "./Fonts/Wendy/_wendy small"
 if font == "Wendy" or font == "Wendy (Cursed)" then
-	font = "_wendy small"
+	font = "Wendy/_wendy small"
 else
 	font = "_Combo Fonts/" .. font .. "/"
 end
@@ -51,6 +51,12 @@ bmt.InitCommand=function(self)
 	local NumColumns = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
 	-- mirror image of MeasureCounter.lua
 	self:xy( GetNotefieldX(player) + (width/NumColumns), _screen.cy )
+
+	-- Fix overlapping issue when MeasureCounter is enabled, not moved up, and displaying lookahead
+	-- since the lookaheads will overlap subtractive scoring.
+	if mods.MeasureCounter ~= "None" and not mods.MeasureCounterUp and not mods.HideLookahead then
+		self:addy(-55)
+	end
 
 	-- Fix overlap issues when MeasureCounter is centered
 	-- since in this case we don't need symmetry.

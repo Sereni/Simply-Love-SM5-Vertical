@@ -1,13 +1,13 @@
 local Players = GAMESTATE:GetHumanPlayers();
 
 local t = Def.ActorFrame{
-	LoadFont("_wendy white")..{
+	LoadFont("Wendy/_wendy white")..{
 		Text="GAME",
 		InitCommand=function(self) self:xy(_screen.cx,_screen.cy-85):croptop(1):fadetop(1):zoom(1):shadowlength(1) end,
 		OnCommand=function(self) self:decelerate(0.5):croptop(0):fadetop(0):glow(1,1,1,1):decelerate(1):glow(1,1,1,1) end,
 		OffCommand=function(self) self:accelerate(0.5):fadeleft(1):cropleft(1) end
 	},
-	LoadFont("_wendy white")..{
+	LoadFont("Wendy/_wendy white")..{
 		Text="OVER",
 		InitCommand=function(self) self:xy(_screen.cx,_screen.cy-15):croptop(1):fadetop(1):zoom(1):shadowlength(1) end,
 		OnCommand=function(self) self:decelerate(0.5):croptop(0):fadetop(0):glow(1,1,1,1):decelerate(1):glow(1,1,1,1) end,
@@ -44,10 +44,10 @@ for player in ivalues(Players) do
 
 		-- if a profile is in use, grab gameplay stats for this session that are pertinent
 		-- to this specific player's profile (highscore name, calories burned, total songs played)
-		stats = LoadActor("PlayerStatsWithProfile.lua", player)
+		local profile_stats = LoadActor("PlayerStatsWithProfile.lua", player)
 
 		-- loop through those stats, adding them to the ActorFrame for this player as BitmapText actors
-		for i,stat in ipairs(stats) do
+		for i,stat in ipairs(profile_stats) do
 			PlayerStatsAF[#PlayerStatsAF+1] = LoadFont("Common Normal")..{
 				Text=stat,
 				InitCommand=function(self)
@@ -55,6 +55,7 @@ for player in ivalues(Players) do
 						:xy(x_col1, (line_height*(i)) + y_offset)
 						:maxwidth(max_width)
 						:zoom(stat_zoom)
+						DiffuseEmojis(self)
 				end
 			}
 		end

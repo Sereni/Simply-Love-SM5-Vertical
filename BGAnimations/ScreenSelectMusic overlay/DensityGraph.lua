@@ -71,7 +71,7 @@ return Def.ActorFrame {
     },
 
     Def.BitmapText{
-        Font="_miso",
+        Font="Miso/_miso",
         InitCommand=function(self)
             self:diffuse(color("#ffffff"))
                 :horizalign("left")

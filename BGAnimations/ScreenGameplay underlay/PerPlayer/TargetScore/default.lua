@@ -1,4 +1,4 @@
--- TargetScore Graphs and Pacemaker contributed by JackG
+-- TargetScore Graphs and Pacemaker contributed by iamjackg
 -- ActionOnMissedTarget contributed by DinsFire64
 -- cleanup + fixes by djpohly and andrewipark
 
@@ -129,7 +129,7 @@ if not SL[pn].ActiveModifiers.DoNotJudgeMe and (SL[pn].ActiveModifiers.Pacemaker
 	player_af[#player_af+1] = Def.BitmapText{
 		-- FIXME this should use Wendy Monospace to prevent flicker whenever a 1 appears.
 		-- For that, need to add +/- signs to the font file.
-		Font="_wendy small",
+		Font="Common Bold",
 		InitCommand=function(self)
 			-- don't draw it if we don't need it
 			self:visible(SL[pn].ActiveModifiers.Pacemaker)
