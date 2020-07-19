@@ -16,9 +16,6 @@ local style = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
 local pane = Def.ActorFrame{
 	Name="Pane5",
-	InitCommand=function(self)
-		self:visible(false)
-	end,
 	-- ExpandForDoubleCommand() does not do anything here, but we check for its presence in
 	-- this ActorFrame in ./InputHandler to determine which panes to expand the background for
 	ExpandForDoubleCommand=function() end,

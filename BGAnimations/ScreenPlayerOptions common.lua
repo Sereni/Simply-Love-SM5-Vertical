@@ -40,6 +40,4 @@ af.OptionRowChangedMessageCommand=function(self, params)
 
 end
 
-LoadActor("ScreenPlayerOptions overlay/ComboFontPreviews.lua", t)
-LoadActor("ScreenPlayerOptions overlay/HoldJudgmentPreviews.lua", t)
 return af
