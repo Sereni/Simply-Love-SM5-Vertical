@@ -27,7 +27,7 @@ local update = function(ccl, dt)
 	-- for it to go negative when it's scrolling up (3 → 2 → 1 → 0 → -0.0012...)
 	--
 	-- if we've reached the bottom of the list and want the CCL to scroll up
-	if math.floor(ccl:GetCurrentItem()) == (ccl:GetNumItems() - 1) then
+	if math.floor(ccl:GetCurrentItem()) == (ccl:GetNumItems() - (numItemsToDraw/2)) then
 		ccl:SetDestinationItem( 0 )
 
 	-- elseif we've reached the top of the list and want the CCL to scroll down
