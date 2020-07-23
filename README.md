@@ -27,7 +27,7 @@ The theme is currently in alpha, and does not have released versions. To install
 - Only single player is supported
 - Only ITG/FA+ modes are available
 - Edit mode is not functional
-- Data visualizations and target score graph are not avialable
+- Data visualizations and target score graph are not available
 - Other features are up to Simply Love 4.8.7
 
 ## Additional features
