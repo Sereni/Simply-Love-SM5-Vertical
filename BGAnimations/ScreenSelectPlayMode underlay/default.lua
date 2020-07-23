@@ -163,12 +163,26 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(1,1,1,1):y(1) end,
 			UpdateCommand=function(self) self:zoomtowidth( cursor.w +2 ) end,
-			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
+			-- The quad above is disappearing at 227 / 0.2 = 1135 px per second.
+			-- Make the cursors disappear with the same velocity, so that the movement is synchronized.
+			OffCommand=function(self)
+				-- If at the 2nd choice, wait for the vanishing line to travel the length
+				-- of the first choice before starting the animation.
+				local sleepOffset = cursor.index == 0 and 0 or (choice_widths[1] * iconWidthScale + cursorMargin) / 1135
+				self:sleep(0.6 + sleepOffset)
+				self:linear((cursor.w + 2) / 1135)
+				self:cropleft(1)
+			end
 		},
 		Def.Quad{
 			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1) end,
 			UpdateCommand=function(self) self:zoomtowidth( cursor.w ) end,
-			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
+			OffCommand=function(self)
+				local sleepOffset = cursor.index == 0 and 0 or (choice_widths[1] * iconWidthScale + cursorMargin) / 1135
+				self:sleep(0.6 + sleepOffset)
+				self:linear(cursor.w / 1135)
+				self:cropleft(1)
+			end
 		}
 	},
 
