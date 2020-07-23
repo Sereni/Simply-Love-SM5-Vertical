@@ -142,8 +142,6 @@ local t = Def.ActorFrame {
 					table.insert(wheel_options, {"ChangeStyle", "Solo"})
 				end
 
-				table.insert(wheel_options, {"ChangeStyle", "Double"})
-
 			elseif style == "double" then
 				table.insert(wheel_options, {"ChangeStyle", "Single"})
 
