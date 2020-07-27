@@ -47,10 +47,6 @@ SelectMusicOrCourse = function()
 	if GAMESTATE:IsCourseMode() then
 		return "ScreenSelectCourse"
 	else
-		if SL.Global.GameMode == "Casual" then
-			return "ScreenSelectMusicCasual"
-		end
-
 		return "ScreenSelectMusic"
 	end
 end
@@ -73,7 +69,7 @@ end
 
 Branch.AfterScreenSelectColor = function()
 	local preferred_style = ThemePrefs.Get("AutoStyle")
-	
+
 	if preferred_style ~= "none"
 	-- AutoStyle should not be possible in pay mode
 	-- it's too confusing for machine operators, novice players, and developers alike
@@ -103,12 +99,7 @@ Branch.AfterScreenSelectColor = function()
 end
 
 Branch.AfterEvaluationStage = function()
-	-- If we're in Casual mode, don't save the profile(s).
-	if SL.Global.GameMode == "Casual" then
-		return Branch.AfterProfileSave()
-	else
-		return "ScreenProfileSave"
-	end
+	return "ScreenProfileSave"
 end
 
 Branch.AfterSelectPlayMode = function()
@@ -169,12 +160,7 @@ end
 
 Branch.AllowScreenNameEntry = function()
 
-	-- If we're in Casual mode, don't allow NameEntry, and don't
-	-- bother saving the profile(s). Skip directly to GameOver.
-	if SL.Global.GameMode == "Casual" then
-		return Branch.AfterProfileSaveSummary()
-
-	elseif ThemePrefs.Get("AllowScreenNameEntry") then
+	if ThemePrefs.Get("AllowScreenNameEntry") then
 		return "ScreenNameEntryTraditional"
 
 	else

@@ -1,11 +1,7 @@
 local player = ...
 local pn = ToEnumShortString(player)
 
-if not SL[pn].ActiveModifiers.NPSGraphAtTop
-or SL.Global.GameMode == "Casual"
-then
-	return
-end
+if not SL[pn].ActiveModifiers.NPSGraphAtTop then return end
 
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 local width = 109

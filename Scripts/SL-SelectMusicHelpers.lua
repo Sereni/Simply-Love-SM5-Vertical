@@ -1,37 +1,3 @@
--- ----------------------------------------------------------------------------------------
--- functions used by ScreenSelectMusicCasual
-
--- used by SSMCasual to play preview music of the current song
--- this is invoked each time the custom MusicWheel changes focus
-play_sample_music = function()
-	if GAMESTATE:IsCourseMode() then return end
-	local song = GAMESTATE:GetCurrentSong()
-
-	if song then
-		local songpath = song:GetMusicPath()
-		local sample_start = song:GetSampleStart()
-		local sample_len = song:GetSampleLength()
-
-		if songpath and sample_start and sample_len then
-			SOUND:DimMusic(PREFSMAN:GetPreference("SoundVolume"), math.huge)
-			SOUND:PlayMusicPart(songpath, sample_start,sample_len, 0.5, 1.5, true, true)
-		else
-			stop_music()
-		end
-	else
-		stop_music()
-	end
-end
-
--- used by SSMCasual to stop playing preview music,
--- this is invoked every time the custom MusicWheel changes focus
--- if the new focus is on song item, play_sample_music() will be invoked immediately afterwards
--- ths is also invoked when the player closes the current group to choose some other group
-stop_music = function()
-	SOUND:PlayMusicPart("", 0, 0)
-end
-
-
 ----------------------------------------------------------------------------------------
 -- functions used by ScreenSelectMusic
 
@@ -60,9 +26,6 @@ TextBannerAfterSet = function(self)
 		Subtitle:y(4)
 	end
 end
-
-----------------------------------------------------------------------------------------
--- functions used by both SSM and SSMCasual
 
 SSM_Header_StageText = function()
 

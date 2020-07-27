@@ -1,12 +1,7 @@
 local bg = LoadActor(THEME:GetPathB("","_shared background"))
 
-
--- don't bother adding support for animated faux screenshot textures to ScreenEval
--- in Casual mode because Casual mode doesn't allow screenshots at all.
-if SL.Global.GameMode ~= "Casual"
 -- SupportsRenderToTexture() is defined in ./Scripts/SL-Helpers.lua; read more details there.
-and SupportsRenderToTexture()
-then
+if SupportsRenderToTexture() then
 
 	-- ActorFrameTextures are neat because they can take their dynamic contents
 	-- (like Sprites, BitmapTexts, NoteSkins, etc., anything really) and create a

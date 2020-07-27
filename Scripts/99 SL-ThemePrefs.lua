@@ -53,11 +53,10 @@ SL_CustomPrefs.Get = function()
 		{
 			Default = "ITG",
 			Choices = {
-				THEME:GetString("ScreenSelectPlayMode", "Casual"),
 				THEME:GetString("ScreenSelectPlayMode", "ITG"),
 				THEME:GetString("ScreenSelectPlayMode", "FA+"),
 			},
-			Values 	= { "Casual", "ITG", "FA+" }
+			Values 	= {"ITG", "FA+" }
 		},
 		AutoStyle =
 		{
@@ -99,12 +98,6 @@ SL_CustomPrefs.Get = function()
 		-- - - - - - - - - - - - - - - - - - - -
 		-- MenuTimer values for various screens
 		ScreenSelectMusicMenuTimer =
-		{
-			Default = 300,
-			Choices = SecondsToMMSS_range(60, 450, 15),
-			Values = range(60, 450, 15),
-		},
-		ScreenSelectMusicCasualMenuTimer =
 		{
 			Default = 300,
 			Choices = SecondsToMMSS_range(60, 450, 15),
@@ -166,13 +159,6 @@ SL_CustomPrefs.Get = function()
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values 	= { true, false }
-		},
-		-- - - - - - - - - - - - - - - - - - - -
-		-- Casual GameMode Settings
-		CasualMaxMeter = {
-			Default = 10,
-			Choices = range(5, 15, 1),
-			Values = range(5, 15, 1)
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -

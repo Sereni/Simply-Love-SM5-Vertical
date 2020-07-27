@@ -4,9 +4,6 @@ local mods = SL[pn].ActiveModifiers
 
 if not mods.SubtractiveScoring then return end
 
--- don't allow SubtractiveScoring to appear in Casual gamemode via profile settings
-if SL.Global.GameMode == "Casual" then return end
-
 -- -----------------------------------------------------------------------
 
 local metrics = SL.Metrics[SL.Global.GameMode]

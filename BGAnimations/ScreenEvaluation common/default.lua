@@ -1,17 +1,13 @@
 local Players = GAMESTATE:GetHumanPlayers()
-local NumPanes = SL.Global.GameMode=="Casual" and 1 or 6
+local NumPanes = 6
 
 local t = Def.ActorFrame{}
 
-if SL.Global.GameMode ~= "Casual" then
-	-- add a lua-based InputCalllback to this screen so that we can navigate
-	-- through multiple panes of information; pass a reference to this ActorFrame
-	-- and the number of panes there are to InputHandler.lua
-	t.OnCommand=function(self)
-		if SL.Global.GameMode ~= "Casual" then
-			SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./InputHandler.lua", {self, NumPanes}) )
-		end
-	end
+-- add a lua-based InputCalllback to this screen so that we can navigate
+-- through multiple panes of information; pass a reference to this ActorFrame
+-- and the number of panes there are to InputHandler.lua
+t.OnCommand=function(self)
+		SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./InputHandler.lua", {self, NumPanes}) )
 end
 
 -- -----------------------------------------------------------------------
@@ -29,9 +25,6 @@ t[#t+1] = LoadActor("./Shared/BPM_RateMod.lua")
 -- store some attributes of this playthrough of this song in the global SL table
 -- for later retrieval on ScreenEvaluationSummary
 t[#t+1] = LoadActor("./Shared/GlobalStorage.lua")
-
--- help text that appears if we're in Casual gamemode
-t[#t+1] = LoadActor("./Shared/CasualHelpText.lua")
 
 -- -----------------------------------------------------------------------
 -- Then, load player-specific actors.
