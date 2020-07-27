@@ -16,7 +16,7 @@ for i=1,NumStages do
 	if stats then
 		StepsOrTrail = stats.steps
 
-		local args = { Player=player, RoundsAgo=(NumStages-(i-1)), SongOrCourse=SongOrCourse, StepsOrTrail=StepsOrTrail }
+		local args = { Player=player, RoundsAgo=(NumStages-(i-1)), SongOrCourse=SongOrCourse, StepsOrTrail=StepsOrTrail, NumHighScores=10 }
 		local list = LoadActor(THEME:GetPathB("", "_modules/HighScoreList.lua"), args)
 
 		list.Name = "HighScoreList" .. i .. ToEnumShortString(player)
