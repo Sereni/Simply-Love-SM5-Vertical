@@ -58,17 +58,6 @@ SL_CustomPrefs.Get = function()
 			},
 			Values 	= {"ITG", "FA+" }
 		},
-		AutoStyle =
-		{
-			Default = "none",
-			Choices = {
-				THEME:GetString("ScreenSelectStyle", "None"),
-				THEME:GetString("ScreenSelectStyle", "Single"),
-				THEME:GetString("ScreenSelectStyle", "Versus"),
-				THEME:GetString("ScreenSelectStyle", "Double")
-			},
-			Values 	= { "none", "single", "versus", "double" }
-		},
 		VisualTheme =
 		{
 			Default = "Hearts",

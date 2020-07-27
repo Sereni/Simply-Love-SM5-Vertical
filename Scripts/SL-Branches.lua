@@ -68,34 +68,20 @@ Branch.AllowScreenSelectColor = function()
 end
 
 Branch.AfterScreenSelectColor = function()
-	local preferred_style = ThemePrefs.Get("AutoStyle")
-
-	if preferred_style ~= "none"
-	-- AutoStyle should not be possible in pay mode
-	-- it's too confusing for machine operators, novice players, and developers alike
-	and GAMESTATE:GetCoinMode() ~= "CoinMode_Pay" then
-
-		-- If "versus" ensure that both players are actually considered joined.
-		if preferred_style == "versus" then
-			GAMESTATE:JoinPlayer(PLAYER_1)
-			GAMESTATE:JoinPlayer(PLAYER_2)
-
-		-- if AutoStyle was "single" but both players are already joined
-		-- (for whatever reason), we're in a bit of a pickle, as there is
-		-- no way to read the player's mind and know which side they really
-		-- want to play on. Unjoin PLAYER_2 for lack of a better solution.
-		elseif preferred_style == "single" and GAMESTATE:GetNumSidesJoined() == 2 then
-			GAMESTATE:UnjoinPlayer(PLAYER_2)
-		end
-
-		-- FIXME: there's probably a more sensible place to set the current style for
-		-- the engine, but I guess we're doing it here, in SL-Branches.lua, for now.
-		GAMESTATE:SetCurrentStyle( preferred_style )
-
-		return "ScreenSelectPlayMode"
+	-- Single is the only supported style in Vertical
+	local preferred_style = "single"
+	-- if AutoStyle was "single" but both players are already joined
+	-- (for whatever reason), we're in a bit of a pickle, as there is
+	-- no way to read the player's mind and know which side they really
+	-- want to play on. Unjoin PLAYER_2 for lack of a better solution.
+	if GAMESTATE:GetNumSidesJoined() == 2 then
+		GAMESTATE:UnjoinPlayer(PLAYER_2)
 	end
 
-	return "ScreenSelectStyle"
+	-- FIXME: there's probably a more sensible place to set the current style for
+	-- the engine, but I guess we're doing it here, in SL-Branches.lua, for now.
+	GAMESTATE:SetCurrentStyle( preferred_style )
+	return "ScreenSelectPlayMode"
 end
 
 Branch.AfterEvaluationStage = function()
