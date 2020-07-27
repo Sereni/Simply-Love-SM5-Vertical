@@ -12,9 +12,7 @@ local title = {
 	zoom = 0.65
 }
 
--- the Quad containing the bpm and music rate doesn't appear in Casual mode
--- so nudge the song title and banner down a bit when in Casual
-local y_offset = SL.Global.GameMode=="Casual" and 50 or 46
+local y_offset = 46
 local banner_y_offset = y_offset + 2.5
 
 local af = Def.ActorFrame{InitCommand=function(self) self:xy(_screen.cx, y_offset) end}

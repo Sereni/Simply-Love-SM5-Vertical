@@ -14,7 +14,7 @@ local getStringFromTheme = function( arg )
 end
 
 --Values above 0 means the user wants to be shown or told they are nice.
-local nice = ThemePrefs.Get("nice") > 0 and SL.Global.GameMode ~= "Casual"
+local nice = ThemePrefs.Get("nice") > 0
 
 -- Iterating through the enum isn't worthwhile because the sequencing is so bizarre...
 local TapNoteScores = {}

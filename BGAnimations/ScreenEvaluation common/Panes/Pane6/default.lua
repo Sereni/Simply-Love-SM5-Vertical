@@ -37,7 +37,7 @@ else
 	for i, passed_check in ipairs(checks) do
 		if passed_check == false and num_failed_checks < max_checks_to_display then
 			num_failed_checks = num_failed_checks + 1
-			-- the 4th check is GameMode (ITG, FA+, Casual, etc.)
+			-- the 4th check is GameMode (ITG, FA+, etc.)
 			if i==4 then
 				-- that string has a %s token so we can pass in the current SL GameMode
 				text = text .. ScreenString("QRInvalidScore"..i):format(SL.Global.GameMode) .. "\n"
