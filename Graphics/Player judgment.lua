@@ -66,15 +66,7 @@ return Def.ActorFrame{
 			-- animate its way through all available frames; we want to control which
 			-- frame displays based on what judgment the player earns
 			self:animate(false):visible(false)
-
-			-- if we are on ScreenEdit, judgment graphic is always "Love"
-			-- because ScreenEdit is a mess and not worth bothering with.
-			if string.match(tostring(SCREENMAN:GetTopScreen()), "ScreenEdit") then
-				self:Load( THEME:GetPathG("", "_judgments/ITG/Love") )
-
-			else
-				self:Load( THEME:GetPathG("", "_judgments/" .. mode .. "/" .. file_to_load) )
-			end
+			self:Load( THEME:GetPathG("", "_judgments/" .. mode .. "/" .. file_to_load) )
 		end,
 		ResetCommand=function(self) self:finishtweening():stopeffect():visible(false) end
 	}
