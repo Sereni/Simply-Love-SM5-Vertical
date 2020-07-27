@@ -47,7 +47,7 @@ local af = Def.ActorFrame {
 		Font=THEME:GetPathF("","Common Normal"),
 		InitCommand=function(self)
 			if ThemePrefs.Get("RainbowMode") then self:diffuse(0,0,0,1) end
-			self:xy(_screen.cx,_screen.h-60):zoom(0.8)
+			self:xy(_screen.cx, 25):zoom(0.5)
 		end
 	}
 }
@@ -59,7 +59,7 @@ if (game=="dance" or game=="pump" or game=="techno") then
 	for player in ivalues( PlayerNumber ) do
 		local pad = LoadActor(THEME:GetPathB("", "_modules/TestInput Pad"), {Player=player, ShowMenuButtons=true, ShowPlayerLabel=true})
 
-		pad.InitCommand=function(self) self:xy(_screen.cx + 150 * (player==PLAYER_1 and -1 or 1), _screen.cy):diffusealpha(0) end
+		pad.InitCommand=function(self) self:xy(_screen.cx, _screen.cy + 150 * (player==PLAYER_1 and -0.5 or 1)):diffusealpha(0):zoom(0.5) end
 		pad.OnCommand=function(self) self:linear(0.3):diffusealpha(1) end
 		pad.OffCommand=function(self) self:linear(0.2):diffusealpha(0) end
 
@@ -71,7 +71,7 @@ if (game=="dance" or game=="pump" or game=="techno") then
 		Font="Common Normal",
 		InitCommand=function(self)
 			if ThemePrefs.Get("RainbowMode") then self:diffuse(0,0,0,1) end
-			self:xy(_screen.cx, _screen.cy+32):vertalign(top):vertspacing(-3)
+			self:xy(_screen.cx, _screen.cy):vertalign(top):vertspacing(-3):zoom(0.5)
 			unmapped_list = self
 		end,
 		UpdateCommand=function(self)
@@ -92,7 +92,7 @@ else
 		Font="Common Normal",
 		InitCommand=function(self)
 			if ThemePrefs.Get("RainbowMode") then self:diffuse(0,0,0,1) end
-			self:xy(_screen.cx-250, 50):horizalign(left):vertalign(top):vertspacing(0)
+			self:xy(_screen.cx, 50):horizalign(center):vertalign(top):vertspacing(0):zoom(0.7)
 		end
 	}
 end
