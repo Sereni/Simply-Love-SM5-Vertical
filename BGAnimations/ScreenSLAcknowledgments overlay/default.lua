@@ -14,7 +14,7 @@ local page_string = THEME:GetString("ScreenEvaluationSummary","Page")
 af[#af+1] = Def.BitmapText{
 	Name="PageNumber",
 	Font="Common Header",
-	InitCommand=function(self) self:diffusealpha(0):zoom( SL_WideScale(0.5, 0.6) ):xy( _screen.cx, 8 ) end,
+	InitCommand=function(self) self:diffusealpha(0):zoom( 0.3 ):xy( _screen.cx, 7.5 ) end,
 	OnCommand=function(self) self:sleep(0.1):decelerate(0.33):diffusealpha(1):playcommand("Update",{page=1}) end,
 	OffCommand=function(self) self:accelerate(0.33):diffusealpha(0) end,
 	UpdateCommand=function(self, params) self:sleep(0.5):settext( ("%s %d/%d"):format(page_string, params.page, #pages) ) end
