@@ -45,7 +45,7 @@ return Def.ActorFrame {
         InitCommand=function(self)
             self:zoomto(histogramWidth,histogramHeight)
                 :align(0, 0)
-                :diffuse(color("#4D6677"))
+                :diffuse(color("#0a141b"))
         end
     },
 
@@ -71,7 +71,7 @@ return Def.ActorFrame {
     },
 
     Def.BitmapText{
-        Font="_miso",
+        Font="Miso/_miso",
         InitCommand=function(self)
             self:diffuse(color("#ffffff"))
                 :horizalign("left")

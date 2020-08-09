@@ -47,10 +47,6 @@ SelectMusicOrCourse = function()
 	if GAMESTATE:IsCourseMode() then
 		return "ScreenSelectCourse"
 	else
-		if SL.Global.GameMode == "Casual" then
-			return "ScreenSelectMusicCasual"
-		end
-
 		return "ScreenSelectMusic"
 	end
 end
@@ -65,7 +61,6 @@ end
 
 Branch.AllowScreenSelectColor = function()
 	if ThemePrefs.Get("AllowScreenSelectColor") and not ThemePrefs.Get("RainbowMode") then
-		if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectColorThonk" end
 		return "ScreenSelectColor"
 	else
 		return Branch.AfterScreenSelectColor()
@@ -73,45 +68,24 @@ Branch.AllowScreenSelectColor = function()
 end
 
 Branch.AfterScreenSelectColor = function()
-	local preferred_style = ThemePrefs.Get("AutoStyle")
-	
-	if preferred_style ~= "none"
-	-- AutoStyle should not be possible in pay mode
-	-- it's too confusing for machine operators, novice players, and developers alike
-	and GAMESTATE:GetCoinMode() ~= "CoinMode_Pay" then
-
-		-- If "versus" ensure that both players are actually considered joined.
-		if preferred_style == "versus" then
-			GAMESTATE:JoinPlayer(PLAYER_1)
-			GAMESTATE:JoinPlayer(PLAYER_2)
-
-		-- if AutoStyle was "single" but both players are already joined
-		-- (for whatever reason), we're in a bit of a pickle, as there is
-		-- no way to read the player's mind and know which side they really
-		-- want to play on. Unjoin PLAYER_2 for lack of a better solution.
-		elseif preferred_style == "single" and GAMESTATE:GetNumSidesJoined() == 2 then
-			GAMESTATE:UnjoinPlayer(PLAYER_2)
-		end
-
-		-- FIXME: there's probably a more sensible place to set the current style for
-		-- the engine, but I guess we're doing it here, in SL-Branches.lua, for now.
-		GAMESTATE:SetCurrentStyle( preferred_style )
-
-		if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectPlayModeThonk" end
-		return "ScreenSelectPlayMode"
+	-- Single is the only supported style in Vertical
+	local preferred_style = "single"
+	-- if AutoStyle was "single" but both players are already joined
+	-- (for whatever reason), we're in a bit of a pickle, as there is
+	-- no way to read the player's mind and know which side they really
+	-- want to play on. Unjoin PLAYER_2 for lack of a better solution.
+	if GAMESTATE:GetNumSidesJoined() == 2 then
+		GAMESTATE:UnjoinPlayer(PLAYER_2)
 	end
 
-	if ThemePrefs.Get("VisualTheme") == "Thonk" then return "ScreenSelectStyleThonk" end
-	return "ScreenSelectStyle"
+	-- FIXME: there's probably a more sensible place to set the current style for
+	-- the engine, but I guess we're doing it here, in SL-Branches.lua, for now.
+	GAMESTATE:SetCurrentStyle( preferred_style )
+	return "ScreenSelectPlayMode"
 end
 
 Branch.AfterEvaluationStage = function()
-	-- If we're in Casual mode, don't save the profile(s).
-	if SL.Global.GameMode == "Casual" then
-		return Branch.AfterProfileSave()
-	else
-		return "ScreenProfileSave"
-	end
+	return "ScreenProfileSave"
 end
 
 Branch.AfterSelectPlayMode = function()
@@ -172,12 +146,7 @@ end
 
 Branch.AllowScreenNameEntry = function()
 
-	-- If we're in Casual mode, don't allow NameEntry, and don't
-	-- bother saving the profile(s). Skip directly to GameOver.
-	if SL.Global.GameMode == "Casual" then
-		return Branch.AfterProfileSaveSummary()
-
-	elseif ThemePrefs.Get("AllowScreenNameEntry") then
+	if ThemePrefs.Get("AllowScreenNameEntry") then
 		return "ScreenNameEntryTraditional"
 
 	else

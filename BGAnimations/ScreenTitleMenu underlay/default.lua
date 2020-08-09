@@ -83,11 +83,11 @@ local af = Def.ActorFrame{
 		InitCommand=function(self) self:zoom(song_stats_zoom):y(song_stats_y):diffusealpha(0) end,
 		OnCommand=function(self) self:sleep(0.2):linear(0.4):diffusealpha(1) end,
 
-		LoadFont("_miso")..{
+		LoadFont("Miso/_miso")..{
 			Text=sm_version .. "       " .. sl_name .. (sl_version and (" v" .. sl_version) or ""),
 			InitCommand=function(self) self:y(-20):diffuse(TextColor) end,
 		},
-		LoadFont("_miso")..{
+		LoadFont("Miso/_miso")..{
 			Text=SongStats,
 			InitCommand=function(self) self:diffuse(TextColor) end,
 		}

@@ -53,7 +53,7 @@ local t = Def.ActorFrame {
 		screen:RemoveInputCallback(testinput_input)
 		screen:AddInputCallback(sortmenu_input)
 
-		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		for player in ivalues(PlayerNumber) do
 			SCREENMAN:set_input_redirected(player, true)
 		end
 		self:playcommand("ShowSortMenu")
@@ -66,7 +66,7 @@ local t = Def.ActorFrame {
 		screen:RemoveInputCallback(sortmenu_input)
 		screen:AddInputCallback(testinput_input)
 
-		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		for player in ivalues(PlayerNumber) do
 			SCREENMAN:set_input_redirected(player, true)
 		end
 		self:playcommand("HideSortMenu")
@@ -80,7 +80,7 @@ local t = Def.ActorFrame {
 		screen:RemoveInputCallback(sortmenu_input)
 		screen:RemoveInputCallback(testinput_input)
 
-		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		for player in ivalues(PlayerNumber) do
 			SCREENMAN:set_input_redirected(player, false)
 		end
 		self:playcommand("HideSortMenu")
@@ -141,8 +141,6 @@ local t = Def.ActorFrame {
 				if ThemePrefs.Get("AllowDanceSolo") then
 					table.insert(wheel_options, {"ChangeStyle", "Solo"})
 				end
-
-				table.insert(wheel_options, {"ChangeStyle", "Double"})
 
 			elseif style == "double" then
 				table.insert(wheel_options, {"ChangeStyle", "Single"})
@@ -209,7 +207,7 @@ local t = Def.ActorFrame {
 	},
 	-- "Options" text
 	Def.BitmapText{
-		Font="_wendy small",
+		Font="Common Bold",
 		Text=ScreenString("Options"),
 		InitCommand=function(self)
 			self:xy(_screen.cx, _screen.cy-92):zoom(0.4)
@@ -236,7 +234,7 @@ local t = Def.ActorFrame {
 
 	-- "Press SELECT To Cancel" text
 	Def.BitmapText{
-		Font="_wendy small",
+		Font="Common Bold",
 		Text=ScreenString("Cancel"),
 		InitCommand=function(self)
 			if PREFSMAN:GetPreference("ThreeKeyNavigation") then

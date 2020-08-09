@@ -1,11 +1,7 @@
 local player = ...
 local pn = ToEnumShortString(player)
 
-if not SL[pn].ActiveModifiers.NPSGraphAtTop
-or SL.Global.GameMode == "Casual"
-then
-	return
-end
+if not SL[pn].ActiveModifiers.NPSGraphAtTop then return end
 
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 local width = 109
@@ -17,6 +13,8 @@ if styletype == "OnePlayerTwoSides" or styletype == "TwoPlayersSharedSides" then
 end
 
 local song_percent, first_second, last_second
+
+-- -----------------------------------------------------------------------
 
 return Def.ActorFrame{
 	InitCommand=function(self)

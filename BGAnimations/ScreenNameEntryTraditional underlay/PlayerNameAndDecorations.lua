@@ -49,7 +49,7 @@ t[#t+1] = LoadActor("Cursor.png")..{
 	HideCommand=function(self) self:linear(0.25):diffusealpha(0) end
 }
 
-t[#t+1] = LoadFont("_wendy white")..{
+t[#t+1] = LoadFont("Wendy/_wendy white")..{
 	Name="PlayerName",
 	InitCommand=function(self) self:zoom(0.5) end,
 	OnCommand=function(self)
@@ -61,7 +61,7 @@ t[#t+1] = LoadFont("_wendy white")..{
 	end
 }
 
-t[#t+1] = LoadFont("_wendy small")..{
+t[#t+1] = LoadFont("Common Bold")..{
 	Text=ScreenString("OutOfRanking"),
 	OnCommand=function(self) self:zoom(0.5):diffuse(PlayerColor(Player)):y(cursorYOffset):visible(not CanEnterName) end
 }

@@ -12,6 +12,4 @@ if SL.Global.GameMode == "ITG" or SL.Global.GameMode == "FA+" then
 	lifemeter_actor = LoadActor(lifemeter_type .. ".lua", player)
 end
 
--- Casual doesn't have a LifeMeter, so in Casual GameMode,
--- lifemeter_actor will be returned as nil
 return lifemeter_actor

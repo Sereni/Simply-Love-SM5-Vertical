@@ -20,8 +20,12 @@ local Update = function(af, delta)
 		cursor.index = index
 
 		-- queue the appropriate command to the faux playfield, if needed
-		if choices[cursor.index+1] == "Marathon" or choices[cursor.index+1] == "Regular" then
-			af:queuecommand("FirstLoop"..choices[cursor.index+1])
+		if ScreenName=="ScreenSelectPlayMode2" then
+			if choices[cursor.index+1] == "Marathon" then
+				af:queuecommand("FirstLoopMarathon")
+			else
+				af:queuecommand("FirstLoopRegular")
+			end
 		end
 
 		-- queue an "Update" to the AF containing the cursor, description text, score, and lifemeter actors
@@ -141,7 +145,7 @@ local t = Def.ActorFrame{
 	Def.ActorFrame{
 		Name="Cursor",
 		OnCommand=function(self)
-			-- it is possible for players to have something other than "Casual" as the default choice
+			-- it is possible for players to have different default choices
 			-- for ScreenSelectPlayMode (see: Simply Love Options in the Operator Menu)
 			-- account for that here, in the OnCommand of the cursor ActorFrame, by updating cursor.index
 			-- to match the value of ThemePrefs.Get("DefaultGameMode") in the choices table
@@ -159,34 +163,44 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(1,1,1,1):y(1) end,
 			UpdateCommand=function(self) self:zoomtowidth( cursor.w +2 ) end,
-			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
+			-- The quad above is disappearing at 227 / 0.2 = 1135 px per second.
+			-- Make the cursors disappear with the same velocity, so that the movement is synchronized.
+			OffCommand=function(self)
+				-- If at the 2nd choice, wait for the vanishing line to travel the length
+				-- of the first choice before starting the animation.
+				local sleepOffset = cursor.index == 0 and 0 or (choice_widths[1] * iconWidthScale + cursorMargin) / 1135
+				self:sleep(0.6 + sleepOffset)
+				self:linear((cursor.w + 2) / 1135)
+				self:cropleft(1)
+			end
 		},
 		Def.Quad{
 			InitCommand=function(self) self:zoomtoheight(cursor.h):diffuse(0,0,0,1) end,
 			UpdateCommand=function(self) self:zoomtowidth( cursor.w ) end,
-			OffCommand=function(self) self:sleep(0.4):linear(0.2):cropleft(1) end
+			OffCommand=function(self)
+				local sleepOffset = cursor.index == 0 and 0 or (choice_widths[1] * iconWidthScale + cursorMargin) / 1135
+				self:sleep(0.6 + sleepOffset)
+				self:linear(cursor.w / 1135)
+				self:cropleft(1)
+			end
 		}
 	},
 
 	-- Score
 	Def.BitmapText{
-		Font="_wendy monospace numbers",
+		Font="Wendy/_wendy monospace numbers",
 		InitCommand=function(self)
 			self:zoom(0.17):xy(93,-51):diffusealpha(0)
 		end,
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
 			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "Casual" then
-					self:stoptweening():linear(0.25):diffusealpha(0)
+				if choices[cursor.index+1] == "FA+" then
+					self:settext("99.50")
 				else
-					if choices[cursor.index+1] == "FA+" then
-						self:settext("99.50")
-					else
-						self:settext("77.41")
-					end
-					self:stoptweening():linear(0.25):diffusealpha(1)
+					self:settext("77.41")
 				end
+				self:stoptweening():linear(0.25):diffusealpha(1)
 			else
 				self:diffusealpha(1)
 				if SL.Global.GameMode == "FA+" then
@@ -224,7 +238,7 @@ local t = Def.ActorFrame{
 		},
 		-- lifemeter colored quad
 		Def.Quad{
-			InitCommand=function(self) self:zoomto(40,14):x(-9):diffuse( GetCurrentColor() ) end
+			InitCommand=function(self) self:zoomto(40,14):x(-9):diffuse( GetCurrentColor(true) ) end
 		},
 		-- life meter animated swoosh
 		LoadActor(THEME:GetPathB("ScreenGameplay", "underlay/PerPlayer/LifeMeter/swoosh.png"))..{

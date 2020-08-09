@@ -26,7 +26,7 @@ local meter = Def.ActorFrame{
 	-- the Quad that changes width/color depending on current Life
 	Def.Quad{
 		Name="MeterFill",
-		InitCommand=function(self) self:zoomto(0,h):diffuse(PlayerColor(player)):horizalign(left) end,
+		InitCommand=function(self) self:zoomto(0,h):diffuse(PlayerColor(player,true)):horizalign(left) end,
 		OnCommand=function(self) self:x( _x - w/2 ) end,
 
 		-- check whether the player's LifeMeter is "Hot"
@@ -39,7 +39,7 @@ local meter = Def.ActorFrame{
 					self:diffuse(1,1,1,1)
 				else
 					-- ~~man's~~ lifebar's not hot
-					self:diffuse( PlayerColor(player) )
+					self:diffuse( PlayerColor(player,true) )
 				end
 			end
 		end,

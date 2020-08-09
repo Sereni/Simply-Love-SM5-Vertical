@@ -58,7 +58,7 @@ local function input(event)
 				SL.Global.Stages.Remaining = PREFSMAN:GetPreference("SongsPerPlay")
 				SL.Global.ContinuesRemaining = SL.Global.ContinuesRemaining - 1
 
-				SL.Global.ScreenAfter.PlayAgain = (SL.Global.GameMode == "Casual" and "ScreenSelectMusicCasual") or "ScreenSelectMusic"
+				SL.Global.ScreenAfter.PlayAgain = "ScreenSelectMusic"
 			else
 				SL.Global.ScreenAfter.PlayAgain = "ScreenEvaluationSummary"
 			end
@@ -88,7 +88,7 @@ local wheel_item_mt = {
 				end
 			}
 
-			af[#af+1] = LoadFont("_wendy small")..{
+			af[#af+1] = LoadFont("Common Bold")..{
 				InitCommand=function(subself)
 					self.text= subself
 					subself:diffusealpha(0)
@@ -169,7 +169,7 @@ local t = Def.ActorFrame{
 	-- slightly darken the entire screen
 	Def.Quad { InitCommand=function(self) self:FullScreen():diffuse(0,0,0,0.6) end },
 
-	LoadFont("_wendy small")..{
+	LoadFont("Common Bold")..{
 		Text=THEME:GetString("ScreenPlayAgain", "Continue"),
 		InitCommand=function(self) self:xy(_screen.cx, _screen.cy-30) end,
 	},

@@ -1,53 +1,63 @@
-local args = ...
-local af = args.af
-local num_panes = args.num_panes
+local af, num_panes = unpack(...)
 
-if not af then return end
+if not af
+or type(num_panes) ~= "number"
+then
+	return
+end
+
+-- -----------------------------------------------------------------------
 
 local panes, active_pane = {}, {}
 
 local style = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
+local players = GAMESTATE:GetHumanPlayers()
 
-for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-	local pn = ToEnumShortString(player)
-	panes[pn] = {}
+local mpn = GAMESTATE:GetMasterPlayerNumber()
+-- -----------------------------------------------------------------------
+
+for controller=1,2 do
+
+	panes[controller] = {}
 
 	-- Iterate through all potential panes, and only add the non-nil ones to the
 	-- list of panes we want to consider.
 	for i=1,num_panes do
-		if af:GetChild(pn.."_AF_Lower"):GetChild("Pane"..i) ~= nil then
-		 	table.insert(panes[pn], af:GetChild(pn.."_AF_Lower"):GetChild("Pane"..i))
+		local pane_str = ("Pane%i_SideP%i"):format(i, controller)
+		local pane = af:GetChild("Panes"):GetChild(pane_str)
+
+		if pane ~= nil then
+				pane:visible(i == 1)
+				active_pane[controller] = 1
+		 		table.insert(panes[controller], pane)
 		end
 	end
-
-	active_pane[pn] = #panes[pn]
 end
 
+-- -----------------------------------------------------------------------
 return function(event)
+	if not (event and (event.PlayerNumber == mpn) and event.button) then return false end
 
-	if not (event and event.PlayerNumber and event.button) then return false end
+	local  cn = tonumber(ToEnumShortString(event.controller))
 
-	local pn = ToEnumShortString(event.PlayerNumber)
-
-	if event.type == "InputEventType_FirstPress" and panes[pn] then
+	if event.type == "InputEventType_FirstPress" and panes[cn] then
 
 		if event.GameButton == "MenuRight" or event.GameButton == "MenuLeft" then
 			if event.GameButton == "MenuRight" then
-				active_pane[pn] = ((active_pane[pn] + 1) % #panes[pn])
+				active_pane[cn] = ((active_pane[cn]    ) % #panes[cn]) + 1
+
 			elseif event.GameButton == "MenuLeft" then
-				active_pane[pn] = ((active_pane[pn] - 1) % #panes[pn])
+				active_pane[cn] = ((active_pane[cn] - 2) % #panes[cn]) + 1
 			end
 
-			for i=1,#panes[pn] do
-				if style == "OnePlayerTwoSides" and panes[pn][active_pane[pn]+1]:GetCommand("ExpandForDouble") then
-					af:queuecommand("Expand")
-				else
-					af:queuecommand("Shrink")
-				end
-
-				panes[pn][i]:visible(false)
+			-- hide all panes for this side
+			for i=1,#panes[cn] do
+				panes[cn][i]:visible(false)
 			end
-			panes[pn][active_pane[pn]+1]:visible(true)
+			-- show the panes we want on both sides
+			panes[cn][active_pane[cn]]:visible(true)
+
+			af:queuecommand("PaneSwitch")
 		end
 	end
 
