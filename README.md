@@ -11,7 +11,7 @@ Simply Love Vertical is a Stepmania theme designed for single-player setups with
 
 This theme is based on [quietly-turning's Simply-Love-SM5](https://github.com/quietly-turning/Simply-Love-SM5) and the readme assumes you are familiar with it. If not, check out the original repo.
 
-The theme is currently in alpha, and does not have released versions. To install:
+To install:
 1. Download/clone the repository
 1. Add the contents to your Themes/ folder
 1. Switch to the theme in Stepmania options
@@ -25,7 +25,7 @@ The theme is currently in alpha, and does not have released versions. To install
 ## Limitations compared to Simply Love
 
 - Only single player is supported
-- Only ITG/FA+ modes are available
+- Casual mode is not available
 - Edit mode is not functional
 - Data visualizations and target score graph are not available
 - Other features are up to Simply Love 4.9
@@ -38,7 +38,7 @@ The theme is currently in alpha, and does not have released versions. To install
 
 ## Known issues
 
-We are actively developing this very much unfinished theme. Check the Issues tab for known issues. New issue reports and PRs are welcome!
+See the Issues tab. Most things should work. Bug reports and fixes are welcome!
 
 ## Thanks
 - Pluto for "what if we turned it sideways?"
