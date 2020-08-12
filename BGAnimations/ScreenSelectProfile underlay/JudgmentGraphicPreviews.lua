@@ -18,7 +18,7 @@ for profile in ivalues(args.profile_data) do
 					Name="JudgmentGraphic_"..StripSpriteHints(profile.judgment),
 					Texture=path,
 					InitCommand=function(self)
-						self:y(-50):animate(false)
+						self:y(-50):animate(false):zoom(0.8)
 						-- why is the original Love judgment asset so... not aligned?
 						-- it throws the aesthetic off as-is, so fudge a little
 						if dir=="ITG" and profile.judgment == "Love 2x6.png" then self:y(-55) end

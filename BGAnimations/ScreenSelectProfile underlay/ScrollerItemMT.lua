@@ -18,7 +18,7 @@ return {
 			local txt = LoadFont("Common Normal")..{
 				InitCommand=function(subself)
 					self.bmt = subself
-					subself:maxwidth(115):MaskDest():shadowlength(0.5)
+					subself:maxwidth(115):MaskDest():shadowlength(0.5):zoom(0.7)
 				end,
 			}
 
@@ -46,7 +46,7 @@ return {
 				self.bmt:playcommand("LoseFocus")
 			end
 
-			self.container:linear(0.15):y(35 * item_index)
+			self.container:linear(0.15):y(26 * item_index)
 		end,
 		set = function(self, info)
 			if not info then self.bmt:settext(""); return end
