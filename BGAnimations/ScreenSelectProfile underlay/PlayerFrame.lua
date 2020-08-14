@@ -29,7 +29,7 @@ local info = {
 	padding = 4
 }
 
-local avatar_dim = info.w
+local avatar_dim = info.w - (info.padding * 2.25)
 
 -- account for the possibility that there are no local profiles and
 -- we want "[ Guest ]" to start in the middle, with focus
@@ -179,7 +179,7 @@ return Def.ActorFrame{
 				-- --------------------------------------------------------------------------------
 				-- Avatar ActorFrame
 				Def.ActorFrame{
-					InitCommand=function(self) self:xy(0,-80.5) end,
+					InitCommand=function(self) self:xy(info.padding*1.125,-75.2) end,
 
 					---------------------------------------
 					-- fallback avatar
@@ -195,12 +195,12 @@ return Def.ActorFrame{
 
 						Def.Quad{
 							InitCommand=function(self)
-								self:align(0,0):zoomto(avatar_dim,avatar_dim-4):diffuse(color("#283239aa"))
+								self:align(0,0):zoomto(avatar_dim,avatar_dim):diffuse(color("#283239aa"))
 							end
 						},
 						LoadActor(THEME:GetPathG("", "_VisualStyles/".. ThemePrefs.Get("VisualTheme") .."/SelectColor"))..{
 							InitCommand=function(self)
-								self:align(0,0):zoom(0.09):diffusealpha(0.9):xy(7, 8)
+								self:align(0,0):zoom(0.088):diffusealpha(0.9):xy(1.7,5.5)
 							end
 						},
 					},
@@ -209,8 +209,15 @@ return Def.ActorFrame{
 					Def.Sprite{
 						Name="PlayerAvatar",
 						InitCommand=function(self)
-							self:align(0,0):scaletoclipped(avatar_dim-4,avatar_dim-4)
+							self:align(0,0):scaletoclipped(avatar_dim,avatar_dim)
 						end,
+						SetCommand=function(self, params)
+							if params and params.displayname and avatars[params.displayname] then
+								self:SetTexture(avatars[params.displayname]):visible(true)
+							else
+								self:visible(false)
+							end
+						end
 					},
 				},
 				-- --------------------------------------------------------------------------------
