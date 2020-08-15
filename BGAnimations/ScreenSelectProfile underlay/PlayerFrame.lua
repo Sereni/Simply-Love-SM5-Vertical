@@ -205,7 +205,6 @@ return Def.ActorFrame{
 						},
 					},
 					---------------------------------------
--- TODO test with player avatars
 					Def.Sprite{
 						Name="PlayerAvatar",
 						InitCommand=function(self)
