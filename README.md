@@ -6,6 +6,7 @@
 Simply Love Vertical is a Stepmania theme designed for single-player setups with monitors in portrait mode. Turning the monitor sideways increases the arrow scrolling space by 1.7x, meaning that a 23" monitor gains as much vertical play area as a 39" monitor.
 
 ![main-screen](https://user-images.githubusercontent.com/4284741/80278102-83821b80-86eb-11ea-81f6-b64b177926d9.jpg)
+![gameplay screens](https://user-images.githubusercontent.com/4284741/90311356-fe1cb400-def1-11ea-918b-03b21fab77c0.png)
 
 ## Setup
 
