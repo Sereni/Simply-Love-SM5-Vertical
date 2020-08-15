@@ -82,15 +82,6 @@ end
 local t = Def.ActorFrame{
 	InitCommand=function(self)
 		self:xy(_screen.cx, 40):valign(1):zoom(1.33)
-
-		local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
-
-		if (styletype == "OnePlayerTwoSides") or (PREFSMAN:GetPreference("Center1Player") and #GAMESTATE:GetHumanPlayers() == 1) then
-			local mpn = GAMESTATE:GetMasterPlayerNumber()
-			if SL[ToEnumShortString(mpn)].ActiveModifiers.NPSGraphAtTop then
-				self:x(_screen.cx + _screen.w * (mpn==PLAYER_1 and 0.3 or -0.3))
-			end
-		end
 	end,
 
 	LoadFont("Common Normal")..{
