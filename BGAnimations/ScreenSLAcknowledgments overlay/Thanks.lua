@@ -185,6 +185,12 @@ return {
 			Img="pluto.png",
 			About="Pluto has supplied exceptional art for many dance game events such as ECS and Nordic Cup, and has infused each with her signature style.\n\nWhen she collaborated with me on my Distant Towers visual novel project, her artistic output brought life and vitality to my moribund mind, and her feedback as a friend kept my soul on life support and my heart beating while I was otherwise dead.",
 		},
+
+		{
+   		Name="Vertical crew",
+   		Img="vertical.png",
+   		About="A wise Pluto once said:\n — Those monitors we got turn sideways, wouldn't it be cool if Simply Love supported that?\n\nAnd Sereni, Fieoner, and Roujo thought it would be cool indeed.",
+  	},
 	},
 
 	-- page 12
