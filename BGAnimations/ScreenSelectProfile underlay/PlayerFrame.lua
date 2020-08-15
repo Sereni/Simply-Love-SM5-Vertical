@@ -14,13 +14,13 @@ end
 --       as-is, they are half-leftover from editing _fallback's code
 
 local frame = {
-	w = 200,
-	h = 214,
+	w = 150,
+	h = 160.5,
 	border = 2
 }
 
-local row_height = 35
-scroller.x = -47
+local row_height = 26
+scroller.x = -35.5
 scroller.y = row_height * -5
 
 local info = {
@@ -40,7 +40,7 @@ end
 
 local FrameBackground = function(c, player, w)
 	w = w or frame.w
-	scroller.w = w - info.w
+	scroller.w = w - info.w + 0.5
 
 	return Def.ActorFrame {
 		OnCommand=function(self)
@@ -158,7 +158,7 @@ return Def.ActorFrame{
 			Name="DataFrame",
 			InitCommand=function(self)
 				-- FIXME
-				self:x(15.5)
+				self:x(11.5)
 			end,
 			OnCommand=function(self) self:playcommand("Set", profile_data[1]) end,
 
@@ -179,7 +179,7 @@ return Def.ActorFrame{
 				-- --------------------------------------------------------------------------------
 				-- Avatar ActorFrame
 				Def.ActorFrame{
-					InitCommand=function(self) self:xy(info.padding*1.125,-103.5) end,
+					InitCommand=function(self) self:xy(info.padding*1.125,-75.2) end,
 
 					---------------------------------------
 					-- fallback avatar
@@ -200,25 +200,11 @@ return Def.ActorFrame{
 						},
 						LoadActor(THEME:GetPathG("", "_VisualStyles/".. ThemePrefs.Get("VisualTheme") .."/SelectColor"))..{
 							InitCommand=function(self)
-								self:align(0,0):zoom(0.09):diffusealpha(0.9):xy(13, 8)
+								self:align(0,0):zoom(0.088):diffusealpha(0.9):xy(1.7,5.5)
 							end
 						},
-						LoadFont("Common Normal")..{
-							Text=THEME:GetString("ProfileAvatar","NoAvatar"),
-							InitCommand=function(self)
-								self:valign(0):zoom(0.815):diffusealpha(0.9):xy(self:GetWidth()*0.5 + 13, 67)
-							end,
-							SetCommand=function(self, params)
-								if params == nil then
-									self:settext(THEME:GetString("ScreenSelectProfile", "GuestProfile"))
-								else
-									self:settext(THEME:GetString("ProfileAvatar", "NoAvatar"))
-								end
-							end
-						}
 					},
 					---------------------------------------
-
 					Def.Sprite{
 						Name="PlayerAvatar",
 						InitCommand=function(self)
@@ -241,7 +227,7 @@ return Def.ActorFrame{
 				LoadFont("Common Normal")..{
 					Name="TotalSongs",
 					InitCommand=function(self)
-						self:align(0,0):xy(info.padding*1.25,0):zoom(0.65):vertspacing(-2)
+						self:align(0,0):xy(info.padding*1.25,0):zoom(0.55):vertspacing(-2)
 						self:maxwidth((info.w-info.padding*2.5)/self:GetZoom())
 					end,
 					SetCommand=function(self, params)
@@ -297,7 +283,7 @@ return Def.ActorFrame{
 				LoadFont("Common Normal")..{
 					Name="RecentMods",
 					InitCommand=function(self)
-						self:align(0,0):xy(info.padding*1.25,47):zoom(0.625)
+						self:align(0,0):xy(info.padding*1.25,47):zoom(0.5)
 						self:_wrapwidthpixels((info.w-info.padding*2.5)/self:GetZoom())
 						self:ztest(true)     -- ensure mask hides this text if it is too long
 						self:vertspacing(-2) -- less vertical spacing
@@ -335,7 +321,7 @@ return Def.ActorFrame{
 		Name='SelectedProfileText',
 		InitCommand=function(self)
 			self:settext(profile_data[1] and profile_data[1].displayname or "")
-			self:y(160):zoom(1.35):shadowlength(ThemePrefs.Get("RainbowMode") and 0.5 or 0):cropright(1)
+			self:y(110):zoom(1):shadowlength(ThemePrefs.Get("RainbowMode") and 0.5 or 0):cropright(1)
 		end,
 		OnCommand=function(self) self:sleep(0.2):smooth(0.2):cropright(0) end
 	}

@@ -82,7 +82,7 @@ if EarnedMachineRecord or EarnedPersonalRecord then
 	}
 
 	if HighScoreIndex.Machine+1 > 0 then
-		local y_offset = -18
+		local y_offset = -24
 		-- If Personal record isn't displayed, move machine record down
 		if HighScoreIndex.Personal+1 <= 0 then
 			y_offset = 24

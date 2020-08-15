@@ -4,8 +4,8 @@
 -- in the background.
 
 local num_rows
-local row_height  = 28
-local container_w = 240
+local row_height  = 28*0.7
+local container_w = 240*0.7
 
 local underlay = Def.ActorFrame {
 	InitCommand=function(self) self:queuecommand("Capture") end,
@@ -22,7 +22,7 @@ local underlay = Def.ActorFrame {
 -- darken the background behind the modal
 underlay[#underlay+1] = Def.Quad{
 	SizeCommand=function(self)
-		self:x(_screen.cx)
+		-- self:x(_screen.cx)
 		self:zoomto(_screen.w*2, _screen.h*2):diffuse(0,0,0,0.75)
 	end
 }
@@ -32,7 +32,7 @@ underlay[#underlay+1] = Def.Quad{
 -- the MiniMenu choices (set P1, set P2, edit, rename, delete, merge, move, etc.)
 -- are hardcoded by the SM5 engine for now
 underlay[#underlay+1] = Def.ActorFrame{
-	InitCommand=function(self) self:xy(_screen.cx-container_w, -16) end,
+	InitCommand=function(self) self:xy(-container_w/2-4.5,-12) end,
 
 	-- decorative border
 	Def.Quad{
@@ -41,7 +41,7 @@ underlay[#underlay+1] = Def.ActorFrame{
 
 	-- local profile's display name at top of modal
 	LoadFont("Common Normal")..{
-		InitCommand=function(self) self:xy(-99, -118):halign(0):diffuse(Color.Black) end,
+		InitCommand=function(self) self:xy(-20,-85):zoom(0.8):halign(0):diffuse(Color.Black) end,
 		BeginCommand=function(self)
 			local profile = GAMESTATE:GetEditLocalProfile()
 			if profile then
