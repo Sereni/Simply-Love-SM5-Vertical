@@ -9,6 +9,24 @@ local t = Def.ActorFrame{
 	-- time ScreenGameplay loads, it should have a properly animated entrance.
 	InitCommand=function(self) SL.Global.GameplayReloadCheck = false end,
 
+	OnCommand=function(self)
+		-- Protect ring functions differently for ECS, but no reason not to always set fail type appropriately.
+		local player_state = GAMESTATE:GetPlayerState(GAMESTATE:GetMasterPlayerNumber())
+		if player_state then
+			local po = player_state:GetPlayerOptions("ModsLevel_Preferred")
+			if po then
+				if ECS.Mode == "ECS" then
+					po:FailSetting('FailType_Immediate')
+				else
+					po:FailSetting('FailType_ImmediateContinue')
+				end
+			end
+		end
+	end,
+	ChangeStepsMessageCommand=function(self, params)
+		self:playcommand("StepsHaveChanged", params)
+	end,
+
 	PlayerJoinedMessageCommand=function(self, params)
 		UnjoinLateJoinedPlayer(params.Player)
 	end,
@@ -16,6 +34,8 @@ local t = Def.ActorFrame{
 	-- ---------------------------------------------------
 	--  first, load files that contain no visual elements, just code that needs to run
 
+	-- MenuButton code for backing out of SelectMusic when in EventMode
+	LoadActor("./EscapeFromEventMode.lua"),
 	-- MenuTimer code for preserving SSM's timer value
 	LoadActor("./MenuTimer.lua"),
 	-- Apply player modifiers from profile
