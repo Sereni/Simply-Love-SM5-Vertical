@@ -132,35 +132,11 @@ local t = Def.ActorFrame {
 		table.insert(wheel_options, {"SortBy", "Popularity"})
 		table.insert(wheel_options, {"SortBy", "Recent"})
 
-
-		-- Allow players to switch from single to double and from double to single
-		-- but only present these options if Joint Double or Joint Premium is enabled
-		if not (PREFSMAN:GetPreference("Premium") == "Premium_Off" and GAMESTATE:GetCoinMode() == "CoinMode_Pay") then
-
-			if style == "single" then
-				if ThemePrefs.Get("AllowDanceSolo") then
-					table.insert(wheel_options, {"ChangeStyle", "Solo"})
-				end
-
-			elseif style == "double" then
-				table.insert(wheel_options, {"ChangeStyle", "Single"})
-
-			elseif style == "solo" then
-				table.insert(wheel_options, {"ChangeStyle", "Single"})
-
-			-- Routine is not ready for use yet, but it might be soon.
-			-- This can be uncommented at that time to allow switching from versus into routine.
-			-- elseif style == "versus" then
-			--	table.insert(wheel_options, {"ChangeStyle", "Routine"})
-			end
-		end
-
 		-- Allow players to switch out to a different SL GameMode if no stages have been played yet,
 		-- but don't add the current SL GameMode as a choice. If a player is already in FA+, don't
 		-- present a choice that would allow them to switch to FA+.
 		if SL.Global.Stages.PlayedThisGame == 0 then
 			if SL.Global.GameMode ~= "ITG"      then table.insert(wheel_options, {"ChangeMode", "ITG"}) end
-			if SL.Global.GameMode ~= "FA+"      then table.insert(wheel_options, {"ChangeMode", "FA+"}) end
 		end
 
 		-- allow players to switch to a TestInput overlay if the current game has visual assets to support it
