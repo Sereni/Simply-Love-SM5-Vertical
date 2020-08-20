@@ -36,6 +36,7 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 	-- FIXME: refactor PerColumnJudgmentTracking to not be inside this loop
 	--        the Lua input callback logic shouldn't be duplicated for each player
 	af[#af+1] = LoadActor("./PerColumnJudgmentTracking.lua", player)
+	af[#af+1] = LoadActor("./ECS.lua", player)
 
 	-- the SM5 engine causes NoteField columns in pump to overlap one another slightly
 	-- provide a themeside "fix" until it can be investigated in-engine
