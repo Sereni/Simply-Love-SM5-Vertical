@@ -42,6 +42,10 @@ for player in ivalues(Players) do
 	-- the per-player lower half of ScreenEvaluation, including: judgment scatterplot,
 	-- modifier list, disqualified text, and panes 1-6
 	t[#t+1] = LoadActor("./PerPlayer/Lower/default.lua", player)
+
+	-- Accumulate scores for the ECS player. The loop itself doesn't matter for this since this can
+	-- only run in single player mode.
+	t[#t+1] = LoadActor("./ECS.lua", player)
 end
 
 -- -----------------------------------------------------------------------
