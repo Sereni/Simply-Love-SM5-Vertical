@@ -1,4 +1,35 @@
 local af = Def.ActorFrame{ InitCommand=function(self) self:Center() end }
+local quotes = {
+{
+	{"In the race for success,\nspeed is less important\nthan stamina.", -90, -10},
+	{"- B. C. Forbes", 55, 36}
+},
+{
+	{"A stream is music and motion.", -100, -10},
+	{"- Nelson Bryant", 104, 12}
+},
+{
+	{"I honestly wasn't sure if I'd make it through Slam.\nThis is by far the hardest thing I've passed.", -130, -10},
+	{"- Zetorux, ECS1", 120, 25}
+},
+{
+	{"Are you asking about my stamina cap ?", -120, -10},
+	{"- aijbot", 110, 12}
+},
+}
+
+local body, author
+local w = 310
+-- ---------------------------------------
+
+local af = Def.ActorFrame{
+InitCommand=function(self)
+	self:Center()
+	local quote = quotes[math.random(#quotes)]
+	body:settext(quote[1][1]):xy(quote[1][2],quote[1][3]):zoom(0.8)
+	author:settext(quote[2][1]):xy(quote[2][2],quote[2][3]):zoom(0.8)
+end
+}
 
 -- check SM5 version, current game (dance, pump, etc.), and RTT support
 af[#af+1] = LoadActor("./CompatibilityChecks.lua")
@@ -55,11 +86,24 @@ for i=1,7 do
 	af[#af+1] = arrow
 end
 
+-- quote body
 af[#af+1] = LoadFont("Common Normal")..{
-	Text=ScreenString("ThemeDesign"),
-	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0):zoom(0.8) end,
-	OnCommand=function(self) self:sleep(3):linear(0.25):diffusealpha(1) end,
-	OffCommand=function(self) self:linear(0.25):diffusealpha(0) end,
+	InitCommand=function(self)
+		body = self
+		self:diffuse(GetHexColor(slc)):diffusealpha(0):horizalign(left):vertspacing(-4)
+	end,
+	OnCommand=cmd(sleep,3; linear,0.25; diffusealpha,1),
+	OffCommand=cmd(linear,0.25; diffusealpha,0)
+}
+
+-- quote author
+af[#af+1] = LoadFont("Common Normal")..{
+	InitCommand=function(self)
+		author = self
+		self:diffuse(GetHexColor(slc)):diffusealpha(0):horizalign(right)
+	end,
+	OnCommand=cmd(sleep,3; linear,0.25; diffusealpha,1),
+	OffCommand=cmd(linear,0.25; diffusealpha,0)
 }
 
 return af
