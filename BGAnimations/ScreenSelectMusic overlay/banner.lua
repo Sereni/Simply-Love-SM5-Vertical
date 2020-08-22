@@ -63,7 +63,6 @@ t[#t+1] = Def.ActorFrame{
 	}
 }
 
--- TODO(Sereni): layout and maybe move away from the banner, we got space
 local SetSongPointText = function(self)
 	local song = GAMESTATE:GetCurrentSong()
 	if song == nil then
@@ -90,16 +89,16 @@ end
 -- ECS Information
 t[#t+1] = Def.ActorFrame{
 	InitCommand=function(self)
-		self:addx(-170):addy(-60)
+		self:addy(-142)
 		if ECS.Mode ~= "ECS" and ECS.Mode ~= "Marathon" then
 			self:visible(false)
 		end
 	end,
 	Def.Quad{
-		InitCommand=function(self) self:diffuse(color("#000000AA")):zoomto(300, 80):addx(140):addy(20) end
+		InitCommand=function(self) self:diffuse(color("#000000AA")):zoomto(418, 80):addy(20) end
 	},
 	LoadFont("Common Normal")..{
-		InitCommand=function(self) self:shadowlength(1):zoom(2):horizalign(left) end,
+		InitCommand=function(self) self:shadowlength(1):zoom(1.5):addx(-190):horizalign(left) end,
 		OnCommand=function(self)
 			local total_points = 0
 			for i=1,7 do
@@ -112,7 +111,7 @@ t[#t+1] = Def.ActorFrame{
 		end
 	},
 	LoadFont("Common Normal")..{
-		InitCommand=function(self) self:shadowlength(1):zoom(2):addy(30):horizalign(left) end,
+		InitCommand=function(self) self:shadowlength(1):zoom(1.5):addx(-190):addy(33):horizalign(left) end,
 		OnCommand=SetSongPointText,
 		CurrentSongChangedMessageCommand=SetSongPointText,
 	}
