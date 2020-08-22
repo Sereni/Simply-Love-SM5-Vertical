@@ -84,6 +84,31 @@ Branch.AfterScreenSelectColor = function()
 	return "ScreenSelectPlayMode"
 end
 
+Branch.ScreenLimitRelics = function()
+	local mpn = GAMESTATE:GetMasterPlayerNumber()
+	local profile_name = PROFILEMAN:GetPlayerName(mpn)
+	local total_ro_relics = 0
+	if profile_name and ECS.Players[profile_name] and ECS.Players[profile_name].relics then
+		-- First count how many selectable relics there are for RO.
+		for player_relic in ivalues(ECS.Players[profile_name].relics) do
+			for master_relic in ivalues(ECS.Relics) do
+				if master_relic.name == player_relic.name then
+					if not master_relic.is_marathon and (not master_relic.is_consumable or player_relic.quantity > 0) then
+						total_ro_relics = total_ro_relics + 1
+					end
+				end
+			end
+		end
+		if total_ro_relics > 10 then
+			return "ScreenLimitRelics"
+		else
+			return "ScreenProfileLoad"
+		end
+	end
+	-- No valid profile loaded to participate in ECS. Go back to the title menu.
+	return Branch.TitleMenu()
+end
+
 Branch.AfterEvaluationStage = function()
 	return "ScreenProfileSave"
 end
@@ -121,7 +146,7 @@ Branch.AfterHeartEntry = function()
 end
 
 Branch.AfterSelectMusic = function()
-	if SCREENMAN:GetTopScreen():GetGoToOptions() then
+	if SCREENMAN:GetTopScreen() if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen().GetGoToOptions ~= nil and SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenPlayerOptions"
 	else
 		-- routine mode specifically uses ScreenGameplayShared
@@ -131,7 +156,35 @@ Branch.AfterSelectMusic = function()
 		end
 
 		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
-		return "ScreenGameplay"
+		if ECS.Mode == "ECS" or ECS.Mode == "Marathon" then
+			local song = GAMESTATE:GetCurrentSong()
+			if song then
+				local group_name = song:GetGroupName()
+
+				-- Using an unknown profile, just go straight to ScreenGameplay.
+				if PlayerIsUpper() == nil then
+					return "ScreenGameplay"
+				end
+
+				if (PlayerIsUpper() and
+						((ECS.Mode == "ECS" and group_name == "ECS9 - Upper") or
+						(ECS.Mode == "Marathon" and group_name == "ECS9 - Upper Marathon")) or
+					(not PlayerIsUpper() and
+						group_name == "ECS9 - Lower")) then
+					-- Only go to ScreenEquipRelics if it's a valid song for the player.
+					return "ScreenEquipRelics"
+				else
+					-- Otherwise go directly to gameplay.
+					return "ScreenGameplay"
+				end
+			else
+				-- If for some reason we can't determine the song, then try to equip relics just in case.
+				return "ScreenEquipRelics"
+			end
+		else
+			-- No need to select relics in warmup or freeplay.
+			return "ScreenGameplay"
+		end
 	end
 end
 
@@ -165,6 +218,14 @@ end
 Branch.AfterProfileSave = function()
 
 	if PREFSMAN:GetPreference("EventMode") then
+		if ECS.Mode == "Marathon" then
+			for active_relic in ivalues(ECS.Player.Relics) do
+				if active_relic.name == "Arvin's Gambit" then
+					return SelectMusicOrCourse()
+				end
+			end
+			return Branch.AllowScreenEvalSummary()
+		end
 		return SelectMusicOrCourse()
 
 	elseif GAMESTATE:IsCourseMode() then
