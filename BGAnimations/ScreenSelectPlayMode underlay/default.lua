@@ -63,7 +63,11 @@ local t = Def.ActorFrame{
 		if ScreenName=="ScreenSelectPlayMode" or ScreenName=="ScreenSelectPlayModeThonk" then
 			-- set the GameMode now; we'll use it throughout the theme
 			-- to set certain Gameplay settings and determine which screen comes next
-			SL.Global.GameMode = choices[cursor.index+1]
+			ECS.Mode = choices[cursor.index+1]
+
+			-- hardcode this to always be ITG windows for the ECS event
+			SL.Global.GameMode = "ITG"
+
 			-- now that a GameMode has been selected, set related preferences
 			SetGameModePreferences()
 			-- and reload the theme's Metrics
