@@ -42,7 +42,6 @@ local SecondsToMMSS = function(seconds)
 	return minutes..":"..seconds
 end
 
--- TODO(Sereni): Test SessionHasEnded message
 local SessionHasEnded = function()
 	if ECS.Mode == "ECS" and ECS.BreakTimer < 0 then return true end
 
@@ -154,8 +153,6 @@ local af = Def.ActorFrame{
 		end,
 	},
 
-	-- TODO(Sereni): verify layout
-
 	-- Freeplay | Warmup | ECS | Marathon
 	LoadFont("Wendy/_wendy small")..{
 		Name="GameModeText",
@@ -200,7 +197,7 @@ if (ECS.Mode == "ECS" or ECS.Mode == "Warmup" or (ECS.Mode == "Marathon" and Arv
 			Name="SessionTimer",
 			InitCommand=function(self)
 				sessiontimer_actor = self
-				self:diffusealpha(0):zoom(0.2):horizalign(left):xy(10, 4.5)
+				self:diffusealpha(0):zoom(0.3):horizalign(left):xy(10, 7.5)
 			end,
 			OnCommand=function(self)
 				if not PREFSMAN:GetPreference("EventMode") then
@@ -219,7 +216,7 @@ if (ECS.Mode == "ECS" or ECS.Mode == "Warmup" or (ECS.Mode == "Marathon" and Arv
 			Name="BreakTimer",
 			InitCommand=function(self)
 				breaktimer_actor = self
-				self:diffusealpha(0):zoom(0.2):xy(_screen.cx+50, 4.5):halign(0)
+				self:diffusealpha(0):zoom(0.3):xy(_screen.cx+45, 7.5):halign(0)
 			end,
 			OnCommand=function(self)
 				if not PREFSMAN:GetPreference("EventMode") then
@@ -255,7 +252,7 @@ if (ECS.Mode == "ECS" or ECS.Mode == "Warmup" or (ECS.Mode == "Marathon" and Arv
 		},
 
 		LoadFont("Miso/_miso")..{
-			InitCommand=function(self) self:xy(_screen.cx, 200):wrapwidthpixels(380/1.5):zoom(1.5) end,
+			InitCommand=function(self) self:xy(_screen.cx, 200):wrapwidthpixels(380/1.5):zoom(0.8) end,
 			SessionHasEndedCommand=function(self)
 				local s = ""
 				if ECS.Mode == "Marathon" then
