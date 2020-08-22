@@ -4,6 +4,7 @@ local TopScreen = nil
 -- we'll reassign it appropriately below, once the TopScreen is available
 local ScreenName = "ScreenSelectPlayMode"
 
+-- TODO(Sereni): Fit 4 options onto the screen
 local cursor = {
 	h = 30,
 	index = 0,
@@ -93,6 +94,22 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			OnCommand=function(self)
 				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
+		},
+		Def.Quad{
+			OnCommand=function(self)
+				self:x(choice_positions[3]):zoomtowidth(choice_widths[3] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.4):linear(0.1):diffusealpha(0) end
+		},
+		Def.Quad{
+			OnCommand=function(self)
+				self:x(choice_positions[4]):zoomtowidth(choice_widths[4] * iconWidthScale + cursorMargin)
 				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
 			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
