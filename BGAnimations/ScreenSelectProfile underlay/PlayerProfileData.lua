@@ -98,6 +98,24 @@ local TotalSongs = function(numSongs)
 end
 
 -- ----------------------------------------------------
+-- ECS functions
+
+local ECSCountry = function(name)
+	if not ECS.Players[name] then return nil end
+	return ECS.Players[name].country
+end
+
+local ECSLevel = function(name)
+	if not ECS.Players[name] then return nil end
+	return ECS.Players[name].level
+end
+
+local ECSExp = function(name)
+	if not ECS.Players[name] then return nil end
+	return ECS.Players[name].exp
+end
+
+-- ----------------------------------------------------
 -- retrieves profile data from disk without applying it to the SL table
 
 local RetrieveProfileData = function(profile, dir)
@@ -122,6 +140,7 @@ for i=1, PROFILEMAN:GetNumLocalProfiles() do
 
 	-- GetLocalProfileFromIndex() expects indices to start at 0
 	local profile = PROFILEMAN:GetLocalProfileFromIndex(i-1)
+	local profile_name = profile:GetDisplayName()
 	-- GetLocalProfileIDFromIndex() also expects indices to start at 0
 	local id = PROFILEMAN:GetLocalProfileIDFromIndex(i-1)
 	local dir = PROFILEMAN:LocalProfileIDToDir(id)
@@ -131,11 +150,14 @@ for i=1, PROFILEMAN:GetNumLocalProfiles() do
 	local data = {
 		index = i,
 		dir=dir,
-		displayname = profile:GetDisplayName(),
+		displayname = profile_name,
 		totalsongs = TotalSongs(profile:GetNumTotalSongsPlayed()),
 		mods = mods,
 		noteskin = noteskin,
 		judgment = judgment,
+		country = ECSCountry(profile_name),
+		level = ECSLevel(profile_name),
+		exp = ECSExp(profile_name)
 	}
 
 	table.insert(profile_data, data)

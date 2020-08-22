@@ -251,5 +251,6 @@ t[#t+1] = LoadActor("PlayerFrame.lua", {Player=mpn, Scroller=scrollers[mpn], Pro
 
 LoadActor("./JudgmentGraphicPreviews.lua", {af=t, profile_data=profile_data})
 LoadActor("./NoteSkinPreviews.lua", {af=t, profile_data=profile_data})
+LoadActor("./Flags.lua", {af=t})
 
 return t

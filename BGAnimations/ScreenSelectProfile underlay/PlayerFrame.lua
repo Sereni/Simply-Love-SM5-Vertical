@@ -221,6 +221,41 @@ return Def.ActorFrame{
 				},
 				-- --------------------------------------------------------------------------------
 
+				-- Country / Flag
+				Def.ActorProxy{
+					Name="CountryFlag",
+					InitCommand=function(self) self:zoom(0.4):xy(75,-30) end,
+					SetCommand=function(self, params)
+						local underlay = SCREENMAN:GetTopScreen():GetChild("Underlay")
+						if params and params.country then
+							local flag = underlay:GetChild("Flag_"..params.country)
+							if flag then
+								self:visible(true):SetTarget(flag)
+							else
+								self:visible(false)
+							end
+						else
+							self:visible(false)
+						end
+					end
+				},
+
+				LoadFont("Common Normal")..{
+					Name="SRPG4 Level",
+					InitCommand=function(self)
+						self:align(0,0):xy(info.padding*1.25,-97):zoom(0.65):vertspacing(-2)
+						self:maxwidth((info.w-info.padding*2.5)/self:GetZoom())
+					end,
+					SetCommand=function(self, params)
+						if params then
+							self:visible(true):settext(params.level and ("SRPG4 Level: "..params.level) or "")
+						else
+							self:visible(false):settext("")
+						end
+					end
+				},
+
+			  -- ----------------------------------------------
 				-- how many songs this player has completed in gameplay
 				-- failing a song will increment this count, but backing out will not
 
