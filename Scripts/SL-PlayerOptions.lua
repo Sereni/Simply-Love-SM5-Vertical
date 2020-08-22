@@ -11,6 +11,20 @@ local GetModsAndPlayerOptions = function(player)
 	return mods, playeroptions
 end
 
+local BroadcastRelicSelection = function(self, name, list)
+	if self.Choices[1] == "n/a" then
+		MESSAGEMAN:Broadcast(name.."Selected", nil)
+		return
+	end
+
+	for i, item in ipairs(list) do
+		if item then
+			MESSAGEMAN:Broadcast(name.."Selected", ECS.Relics[i])
+			break
+		end
+	end
+end
+
 -- -----------------------------------------------------------------------
 -- For normal gameplay, the engine offers SongUtil.GetPlayableSteps()
 -- but there is not currently any analogous helper function for CourseMode.
@@ -552,7 +566,7 @@ local Overrides = {
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
-			if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.GameplayScreen() end
+			if list[1] then SL.Global.ScreenAfter.PlayerOptions = Branch.AfterSelectMusic() end
 
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions = SelectMusicOrCourse() end
@@ -576,7 +590,7 @@ local Overrides = {
 			return list
 		end,
 		SaveSelections = function(self, list, pn)
-			if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.GameplayScreen() end
+			if list[1] then SL.Global.ScreenAfter.PlayerOptions2 = Branch.AfterSelectMusic() end
 
 			if SL.Global.MenuTimer.ScreenSelectMusic > 1 then
 				if list[2] then SL.Global.ScreenAfter.PlayerOptions2 = SelectMusicOrCourse() end
@@ -587,6 +601,58 @@ local Overrides = {
 		end
 	},
 	-------------------------------------------------------------------------
+  -- TODO(Sereni): Why is this all commented out upstream?
+	-- LimitRelics = {
+	--     -- I don't know whether you want to use Values() or Choices() here
+	--     -- read the inline comments at the top of ./Scripts/SL-PlayerOptions.lua
+	--     -- and ask if you have questions
+	--     Choices = function()
+	--         -- some kind of work that returns a table of the current player's relics as strings
+	--         local mpn = GAMESTATE:GetMasterPlayerNumber()
+	-- 		local profile_name = PROFILEMAN:GetPlayerName(mpn)
+	-- 		local relic_names = {}
+
+	-- 		for i,player_relic in ipairs(ECS.Players[profile_name].relics) do
+	-- 			for master_relic in ivalues(ECS.Relics) do
+	-- 				if master_relic.name == player_relic.name then
+	-- 					if not master_relic.is_consumable or player_relic.quantity > 0 then
+	-- 						if ECS.Mode == "ECS" and not master_relic.is_marathon then
+	-- 							relic_names[#relic_names+1] = master_relic.name
+	-- 						end
+	-- 					end
+	-- 				end
+	-- 			end
+	-- 		end
+	--         return relic_names
+	--     end,
+
+	--     -- "SelectMultiple" allows multiple items in this row to be chosen instead of just one
+	--     SelectType = "SelectMultiple",
+
+	--     -- ExportOnChange means that we call SaveSelections() every time a change is made in this OptionRow
+	--     -- we'll want this true so we can broadcast to ScreenLimitRelics as new relics are selected/de-selected
+	--     ExportOnChange=true,
+
+	--     SaveSelections = function(self, list, pn)
+
+	--         local vals = self.Choices
+	--         local num_active = 0
+	--         -- list will come in as an numerically-indexed table of true/false values
+	--         -- one for each possible value; you should be able to do something like...
+	--         for i=1, #list do
+	--             if list[i] then
+	--                 num_active = num_active+1
+	--                 -- this will broadcast to ScreenLimitRelics so you can listen for
+	--                 -- RelicActivatedMessageCommand=function(self, params) end
+	--                 MESSAGEMAN:Broadcast("RelicActivated", {Index=num_active, RelicIndex=i})
+	--             end
+	--         end
+	--     end,
+
+	--     NotifyOfSelection=function(self, pn, choice)
+	--     	return false
+	-- 	end
+	-- },
 }
 
 
