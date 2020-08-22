@@ -74,7 +74,12 @@ local af = Def.ActorFrame{
 		--see: ./Scripts/SL_Init.lua
 		InitializeSimplyLove()
 
+		-- FIXME: Calling self:Center() after InitializeECS() moves the title off screen
 		self:Center()
+
+		-- see: ./Scripts/ECS.lua
+		InitializeECS()
+
 	end,
 	OffCommand=cmd(linear,0.5; diffusealpha, 0),
 
