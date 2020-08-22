@@ -146,7 +146,7 @@ Branch.AfterHeartEntry = function()
 end
 
 Branch.AfterSelectMusic = function()
-	if SCREENMAN:GetTopScreen() if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen().GetGoToOptions ~= nil and SCREENMAN:GetTopScreen():GetGoToOptions() then
+	if SCREENMAN:GetTopScreen() and SCREENMAN:GetTopScreen().GetGoToOptions ~= nil and SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenPlayerOptions"
 	else
 		-- routine mode specifically uses ScreenGameplayShared
