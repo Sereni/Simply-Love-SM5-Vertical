@@ -70,8 +70,8 @@ local GlobalDefaults = {
 			}
 			self.ScreenAfter = {
 				PlayAgain = "ScreenEvaluationSummary",
-				PlayerOptions  = "ScreenGameplay",
-				PlayerOptions2 = "ScreenGameplay",
+				PlayerOptions  = "ScreenEquipRelics",
+				PlayerOptions2 = "ScreenEquipRelics",
 			}
 			self.ContinuesRemaining = ThemePrefs.Get("NumberOfContinuesAllowed") or 0
 			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"
