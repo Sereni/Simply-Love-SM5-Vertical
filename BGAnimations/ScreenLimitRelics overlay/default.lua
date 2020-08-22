@@ -32,6 +32,8 @@ for i,player_relic in ipairs(ECS.Players[profile_name].relics) do
 	end
 end
 
+-- TODO(Sereni): layout
+
 -- the number of rows that can be vertically stacked on-screen simultaneously
 local NumRowsToDraw = 1
 local header_height = 32
@@ -85,7 +87,7 @@ local InputHandler = function(event)
 
 			local row = OptionRowWheels[pn]:get_info_at_focus_pos()
 			local relic = OptionRowWheels[pn][row]:get_info_at_focus_pos()
-			
+
 			local found_index = -1
 			for i, chosen in ipairs(chosen_relics) do
 				if chosen.name == relic.name then
@@ -146,7 +148,7 @@ local InputHandler = function(event)
 	end
 
 	return false
-end																									
+end
 
 local t = Def.ActorFrame{
 	InitCommand=function(self)

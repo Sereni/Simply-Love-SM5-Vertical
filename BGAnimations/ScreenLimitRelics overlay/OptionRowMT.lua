@@ -4,6 +4,8 @@ local player = args.Player
 local AllItems = args.Items
 local RowHeight = args.RowHeight
 
+-- TODO(Sereni): layout
+
 -- the metatable for a single option in any given OptionRow
 local OptionRow_mt = {
 	__index = {

@@ -3,6 +3,8 @@ local NumRows = args.NumRows
 local player = args.Player
 local Row = args.Row
 
+-- TODO(Sereni): layout
+
 -- the metatable for an optionrow choice
 local optionrow_choice_mt = {
 	__index = {
