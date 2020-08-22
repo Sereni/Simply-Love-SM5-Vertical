@@ -112,6 +112,15 @@ local af = Def.ActorFrame{
 	}
 }
 
+af[#af+1] = Def.ActorFrame {
+	LoadFont("Wendy/_wendy small")..{
+		Text="9",
+		InitCommand=function(self)
+			self:addy(57)
+		end,
+	}
+}
+
 -- the best way to spread holiday cheer is singing loud for all to hear
 if HolidayCheer() then
 	af[#af+1] = Def.Sprite{
