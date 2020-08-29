@@ -25,8 +25,8 @@ local optionrow_choice_mt = {
 					self.bmt = subself
 
 					subself:diffuse(Color.White)
-					subself:y(-3):zoom(0.6)
-					subself:wrapwidthpixels(85)
+					subself:y(-3):zoom(0.5):vertspacing(-6)
+					subself:wrapwidthpixels(105)
 				end,
 			}
 
