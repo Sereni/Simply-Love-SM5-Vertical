@@ -32,13 +32,11 @@ for i,player_relic in ipairs(ECS.Players[profile_name].relics) do
 	end
 end
 
--- TODO(Sereni): layout
-
 -- the number of rows that can be vertically stacked on-screen simultaneously
 local NumRowsToDraw = 1
 local header_height = 32
 local footer_height = 32
-local RowHeight = 70
+local RowHeight = 50
 
 local OptionRowWheels = {}
 
@@ -154,7 +152,7 @@ local t = Def.ActorFrame{
 	InitCommand=function(self)
 		-- queue the next command so that we can actually GetTopScreen()
 		self:queuecommand("Capture")
-
+		self:x(_screen.cx-60)
 		if IsUsingWideScreen() then self:x(110) end
 	end,
 	CaptureCommand=function(self)
@@ -220,14 +218,6 @@ local t = Def.ActorFrame{
 	TransitionBackCommand=function(self)
 		SCREENMAN:GetTopScreen():PostScreenMessage("SM_GoToPrevScreen",0)
 	end,
-	-- fade out when exiting the screen
-	Def.Quad{
-		InitCommand=function(self)
-			self:FullScreen():diffuse(0,0,0,0)
-			if IsUsingWideScreen() then self:Center():addx(-110) end
-		end,
-		OffCommand=function(self) self:sleep(0.3):linear(0.55):diffusealpha(1) end
-	}
 }
 
 -- add an OptionWheel for each available player

@@ -4,8 +4,6 @@ local player = args.Player
 local AllItems = args.Items
 local RowHeight = args.RowHeight
 
--- TODO(Sereni): layout
-
 -- the metatable for a single option in any given OptionRow
 local OptionRow_mt = {
 	__index = {
@@ -39,7 +37,7 @@ local OptionRow_mt = {
 						subself:diffuse(color("#222222"))
 					end
 
-					subself:zoomto(340, RowHeight-2):x(0)
+					subself:zoomto(180, RowHeight-2):x(-30)
 				end,
 
 			}
@@ -48,7 +46,7 @@ local OptionRow_mt = {
 				InitCommand=function(subself)
 					self.TitleQuad = subself
 					subself:diffuse(color("#111111"))
-					subself:zoomto(70, RowHeight-2):x(-135)
+					subself:zoomto(50, RowHeight-2):x(-145)
 				end,
 				GainFocusCommand=function(subself) subself:diffuse( GetCurrentColor() ) end,
 				LoseFocusCommand=function(subself) subself:diffuse( color("#111111") ) end
@@ -59,14 +57,14 @@ local OptionRow_mt = {
 				Font="Common normal",
 				InitCommand=function(subself)
 					self.bmt = subself
-					subself:x(-135)
+					subself:x(-145):zoom(0.8)
 				end,
 			}
 
 			-- cursor underline thing
 			af[#af+1] = Def.Quad{
 				InitCommand=function(subself)
-					subself:zoomto(60,4):visible(true):xy(19, 25)
+				  subself:zoomto(50,3):visible(true):xy(-27, -5)
 						:diffuse( GetCurrentColor() )
 					self.underline = subself
 				end,
@@ -97,6 +95,7 @@ local OptionRow_mt = {
 			self.optionrow = optionrow
 			self.index = FindInTable( optionrow, AllItems ) or 1
 			local text = THEME:GetString( "OptionTitles", optionrow )
+			if text == "Relics" then text = "" end
 			self.bmt:settext(text)
 		end
 	}
