@@ -142,17 +142,20 @@ local InputHandler = function(event)
 			local relic = OptionRowWheels[pn][row]:get_info_at_focus_pos()
 			SCREENMAN:GetTopScreen():GetChild("Overlay"):playcommand( row.."Selected", relic )
 
-		elseif event.button == "MenuLeft" or event.button == "MenuRight" then
+		elseif event.button == "Left"
+					 or event.button == "MenuLeft"
+					 or event.button == "Right"
+					 or event.button == "MenuRight" then
 
 			local row = OptionRowWheels[pn]:get_info_at_focus_pos()
 
 			-- if not the exit row
 			if row ~= Rows[#Rows] then
 
-				-- handle menuleft and menu right
-				if event.button == "MenuLeft" then
+				-- handle left and right
+				if event.button == "MenuLeft" or event.button == "Left" then
 					OptionRowWheels[pn][row]:scroll_by_amount(-1)
-				elseif event.button == "MenuRight" then
+				elseif event.button == "MenuRight" or event.button == "Right" then
 					OptionRowWheels[pn][row]:scroll_by_amount(1)
 				end
 
