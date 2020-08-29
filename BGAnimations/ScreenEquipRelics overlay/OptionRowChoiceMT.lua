@@ -25,22 +25,22 @@ local optionrow_choice_mt = {
 					self.bmt = subself
 
 					subself:diffuse(Color.White)
-					subself:y(10):zoom(0.8)
+					subself:y(-3):zoom(0.6)
 					subself:wrapwidthpixels(85)
 				end,
 			}
 
 			return af
 		end,
-		
--- TODO(Sereni): layout
+
 		transform = function(self, item_index, num_items, has_focus)
 			self.container:finishtweening()
 			self.container:linear(0.2)
 			self.index=item_index
 
-			local OffsetFromCenter = (item_index - math.floor(num_items/2))-1
-			local x_padding = 80
+			local OffsetFromCenter = (item_index - math.floor(num_items/2))-1.79
+
+			local x_padding = 60
 			local x = x_padding * OffsetFromCenter
 
 			if item_index <= 1 or item_index >= num_items then

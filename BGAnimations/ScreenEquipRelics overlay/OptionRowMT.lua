@@ -9,7 +9,6 @@ local OptionRow_mt = {
 	__index = {
 		create_actors = function(self, name)
 			self.name=name
--- TODO(Sereni): layout
 			local af = Def.ActorFrame{
 				Name=self.name,
 				InitCommand=function(subself)
@@ -36,7 +35,7 @@ local OptionRow_mt = {
 					if ThemePrefs.Get("RainbowMode") then
 						subself:diffuse(color("#222222"))
 					end
-					subself:zoomto(340, RowHeight-2):x(0)
+					subself:zoomto(180, RowHeight-2):x(-30)
 				end,
 
 			}
@@ -45,7 +44,7 @@ local OptionRow_mt = {
 				InitCommand=function(subself)
 					self.TitleQuad = subself
 					subself:diffuse(color("#111111"))
-					subself:zoomto(70, RowHeight-2):x(-135)
+					subself:zoomto(50, RowHeight-2):x(-145)
 				end,
 				GainFocusCommand=function(subself) subself:diffuse( GetCurrentColor() ) end,
 				LoseFocusCommand=function(subself) subself:diffuse( color("#111111") ) end
@@ -56,14 +55,14 @@ local OptionRow_mt = {
 				Font="Common normal",
 				InitCommand=function(subself)
 					self.bmt = subself
-					subself:x(-135)
+					subself:xy(-160, -12):zoom(0.6)
 				end,
 			}
 
 			-- cursor underline thing
 			af[#af+1] = Def.Quad{
 				InitCommand=function(subself)
-					subself:zoomto(60,4):visible(true):xy(19, 25)
+					subself:zoomto(50,3):visible(true):xy(-27, -5)
 						:diffuse( GetCurrentColor() )
 					self.underline = subself
 				end,
