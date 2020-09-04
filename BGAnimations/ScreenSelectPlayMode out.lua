@@ -22,10 +22,9 @@ return Def.Actor{
 				end
 			end
 		elseif ECS.Mode == "Marathon" then
-			-- TODO(teejusb)
-			local masochisma = SONGMAN:FindSong("ECS9 - Upper Marathon/Masochisma Mk 0")
-			if masochisma then
-				GAMESTATE:SetPreferredSong(masochisma)
+			local stratospheric = SONGMAN:FindSong("ECS9 - Upper Marathon/Stratospheric Intricacy")
+			if stratospheric then
+				GAMESTATE:SetPreferredSong(stratospheric)
 			end
 		end
 	end
