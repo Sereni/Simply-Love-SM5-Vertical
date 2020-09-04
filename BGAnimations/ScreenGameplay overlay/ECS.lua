@@ -23,7 +23,7 @@ local CreateScoreFile = function(day, month_string, year, seconds, hour, minute,
 
 	-- ----------------------------------------------------------
 
-	local path = "Themes/ECS9/ECSData/"..day..month_string..year.."-"..seconds.."-"..profile_name.."-".."SCORE"..".txt"
+	local path = THEME:GetCurrentThemeDirectory().."ECSData/"..day..month_string..year.."-"..seconds.."-"..profile_name.."-".."SCORE"..".txt"
 
 	local data = ""
 	data = data..GetECSID()
@@ -61,7 +61,7 @@ local CreateRelicFile = function(day, month_string, year, seconds)
 		if group_name ~= "ECS9 - Lower" then return end
 	end
 
-	local path = "Themes/ECS9/ECSData/"..day..month_string..year.."-"..seconds.."-"..profile_name.."-".."RELIC"..".txt"
+	local path = THEME:GetCurrentThemeDirectory().."ECSData/"..day..month_string..year.."-"..seconds.."-"..profile_name.."-".."RELIC"..".txt"
 	local data = ""
 
 	for i=1, 5 do
