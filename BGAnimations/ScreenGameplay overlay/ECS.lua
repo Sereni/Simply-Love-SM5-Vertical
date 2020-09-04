@@ -205,7 +205,6 @@ local SecondsToMMSS = function(s)
 end
 
 local FaustsScalpelIsActive = function()
-	if true then return true end
 	for active_relic in ivalues(ECS.Player.Relics) do
 		if active_relic.name == "Faust's Scalpel" then
 			return true
