@@ -102,10 +102,9 @@ t[#t+1] = Def.ActorFrame{
 		OnCommand=function(self)
 			local total_points = 0
 			for i=1,7 do
-				if ECS.Player.SongsPlayed[i] == nil then
-					break
+				if ECS.Player.SongsPlayed[i] ~= nil then
+					total_points = total_points + ECS.Player.SongsPlayed[i].points
 				end
-				total_points = total_points + ECS.Player.SongsPlayed[i].points
 			end
 			self:settext("Total Set Points: " .. tostring(total_points))
 		end

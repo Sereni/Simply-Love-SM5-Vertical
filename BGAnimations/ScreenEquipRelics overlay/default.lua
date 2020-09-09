@@ -50,7 +50,8 @@ for i,player_relic in ipairs(ECS.Players[profile_name].relics) do
 						is_consumable=master_relic.is_consumable,
 						desc=master_relic.desc,
 						effect=master_relic.effect,
-						action=master_relic.action
+						action=master_relic.action,
+						score=master_relic.score
 					}
 				end
 			end
@@ -194,6 +195,9 @@ local InputHandler = function(event)
 					active_relics[i] = OptionRowWheels[pn]["Relic"..i]:get_info_at_focus_pos()
 				end
 			end
+			local song_name = GAMESTATE:GetCurrentSong():GetDisplayFullTitle()
+			local score, _ = CalculateScoreForSong(ECS.Players[PROFILEMAN:GetPlayerName(GAMESTATE:GetMasterPlayerNumber())], song_name, 0, active_relics, false)
+			MESSAGEMAN:Broadcast("UpdateECSScore", {score})
 
 		end
 	end
@@ -306,6 +310,29 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 end
 
 t[#t+1] = LoadActor("./pane.lua")
+
+t[#t+1] = LoadFont("Common Normal")..{
+	InitCommand=function(self)
+		self:zoom(1):xy(_screen.cx+50, 25):horizalign(right):settext("Min Song Points: ")
+	end,
+}
+
+t[#t+1] = LoadFont("Common Normal")..{
+	Name="Points",
+	InitCommand=function(self)
+		self:zoom(1):xy(_screen.cx+50, 25):horizalign(left):settext("0")
+	end,
+	OnCommand=function(self)
+		local song = GAMESTATE:GetCurrentSong()
+		local song_info = PlayerIsUpper() and ECS.SongInfo.Upper or ECS.SongInfo.Lower
+		local song_name = song:GetDisplayFullTitle()
+		local song_data = FindEcsSong(song_name, song_info)
+		self:settext(tostring(song_data.dp + song_data.ep + song_data.rp))
+	end,
+	UpdateECSScoreMessageCommand=function(self, t)
+		self:settext(tostring(t[1]))
+	end,
+}
 
 ---------------------------------------------------------------------
 return t
