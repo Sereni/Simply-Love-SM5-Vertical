@@ -19,11 +19,8 @@ end
 
 local endgame_warning_has_been_issued = false
 
-local breaktimer_at_screen_start
-local seconds_at_screen_start
-
-local deduct_from_breaktimer = false
-local add_to_sessiontimer = false
+local breaktimer_at_screen_start = 0
+local seconds_at_screen_start = 0
 
 local sessiontimer_actor
 local breaktimer_actor
@@ -42,12 +39,14 @@ local SecondsToMMSS = function(seconds)
 	return minutes..":"..seconds
 end
 
-local SessionHasEnded = function()
+local SessionHasEnded = function(session_seconds)
 	if ECS.Mode == "ECS" and ECS.BreakTimer < 0 then return true end
 
 	if SL.Global.TimeAtSessionStart
-	and (GetTimeSinceStart() - SL.Global.TimeAtSessionStart > settimer_seconds)
-	and (ECS.Mode == "Warmup" or (ECS.Mode == "ECS" and SL.Global.Stages.PlayedThisGame >= 7) or ArvinsGambitIsActive())
+		and (session_seconds > settimer_seconds)
+		and (ECS.Mode == "Warmup" or
+			 (ECS.Mode == "ECS" and SL.Global.Stages.PlayedThisGame >= 7) or
+			 ArvinsGambitIsActive())
 	then
 		return true
 	end
@@ -65,9 +64,26 @@ local InputHandler = function(event)
 	return false
 end
 
+local DeductFromBreakTimer = function()
+	if ECS.Mode == "Warmup" then return false end
+
+	local screen_name = SCREENMAN:GetTopScreen():GetName()
+
+	if screen_name == "ScreenSelectMusic"
+	or screen_name == "ScreenPlayerOptions"
+	or screen_name == "ScreenPlayerOptions2"
+	or screen_name == "ScreenEquipRelics"
+	or screen_name == "ScreenEvaluationStage" then
+		return true
+	end
+
+	return false
+end
+
 local Update = function(af, dt)
 	if SL.Global.TimeAtSessionStart ~= nil then
-		local session_seconds = GetTimeSinceStart() - SL.Global.TimeAtSessionStart
+		local cur_time = GetTimeSinceStart()
+		local session_seconds = cur_time - SL.Global.TimeAtSessionStart
 
 		-- if this game session is less than 1 hour in duration so far
 		if session_seconds < settimer_seconds then
@@ -76,8 +92,8 @@ local Update = function(af, dt)
 			sessiontimer_actor:settext( SecondsToHHMMSS(session_seconds) ):diffuse(1,0,0,1)
 		end
 
-		if deduct_from_breaktimer then
-			ECS.BreakTimer = breaktimer_at_screen_start - (GetTimeSinceStart() - seconds_at_screen_start)
+		if DeductFromBreakTimer() then
+			ECS.BreakTimer = breaktimer_at_screen_start - (cur_time - seconds_at_screen_start)
 		end
 
 		if breaktimer_actor then
@@ -89,7 +105,7 @@ local Update = function(af, dt)
 			end
 		end
 
-		if SessionHasEnded() and (not endgame_warning_has_been_issued) then
+		if SessionHasEnded(session_seconds) and (not endgame_warning_has_been_issued) then
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenGameplay" then
 				if ECS.Mode == "Warmup" then
 					-- Force users out of screen gameplay if their set timer has ended.
@@ -103,21 +119,6 @@ local Update = function(af, dt)
 	end
 end
 
-local DeductFromBreakTimer = function()
-	if ECS.Mode == "Warmup" then return false end
-
-	local screen_name = SCREENMAN:GetTopScreen():GetName()
-
-	if screen_name == "ScreenSelectMusic"
-	or screen_name == "ScreenPlayerOptions"
-	or screen_name == "ScreenPlayerOptions2"
-	or screen_name == "ScreenEvaluationStage" then
-		return true
-	end
-
-	return false
-end
-
 local af = Def.ActorFrame{
 	Name="Header",
 	InitCommand=function(self) self:queuecommand("PostInit") end,
@@ -127,18 +128,17 @@ local af = Def.ActorFrame{
 			-- TimeAtSessionStart will be reset to nil between game sessions
 			-- thus, if it's currently nil, we're loading ScreenSelectMusic
 			-- for the first time this particular game session
+			local start_time = GetTimeSinceStart()
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenSelectMusic" and SL.Global.TimeAtSessionStart == nil then
-				SL.Global.TimeAtSessionStart = GetTimeSinceStart()
+				SL.Global.TimeAtSessionStart = start_time
 			end
 
 			breaktimer_at_screen_start = ECS.BreakTimer
-			seconds_at_screen_start = GetTimeSinceStart()
+			seconds_at_screen_start = start_time
 
 			if SL.Global.TimeAtSessionStart ~= nil then
 				self:SetUpdateFunction( Update )
 			end
-
-			deduct_from_breaktimer = DeductFromBreakTimer()
 		end
 	end,
 

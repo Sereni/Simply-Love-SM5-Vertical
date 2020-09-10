@@ -3,7 +3,7 @@ ECS = {}
 -- call this to (re)initialize per-player settings
 InitializeECS = function()
 	ECS.Mode = "Warmup"
-	ECS.BreakTimer=(13 * 60)
+	ECS.BreakTimer=(15 * 60)
 
 	ECS.Player = {
 		Profile=nil,
