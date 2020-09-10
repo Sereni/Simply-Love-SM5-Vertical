@@ -26,7 +26,7 @@ local CreateScoreFile = function(day, month_string, year, seconds, hour, minute,
 	local path = THEME:GetCurrentThemeDirectory().."ECSData/"..day..month_string..year.."-"..seconds.."-"..profile_name.."-".."SCORE"..".txt"
 
 	local data = ""
-	data = data..GetECSID()
+	data = data..ECS.Players[profile_name].id .."\n"
 	data = data..percent_score .."\n"
 	data = data..passed_song.."\n"
 	data = data..group_name.."\n"

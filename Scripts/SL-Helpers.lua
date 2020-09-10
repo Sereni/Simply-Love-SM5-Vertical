@@ -612,19 +612,6 @@ GetThemeVersion = function()
 end
 
 -- -----------------------------------------------------------------------
--- read the theme version from ThemeInfo.ini to get the ECSID for this machine
--- this allows players to more easily identify what specific machine for ECS7 they are playing on
-GetECSID = function()
-	local file = IniFile.ReadFile( THEME:GetCurrentThemeDirectory() .. "ThemeInfo.ini" )
-	if file then
-		if file.ThemeInfo and file.ThemeInfo.ECSID then
-			return file.ThemeInfo.ECSID
-		end
-	end
-	return -1
-end
-
--- -----------------------------------------------------------------------
 -- functions handle custom judgment graphic detection/loading
 
 local function FilenameIsMultiFrameSprite(filename)
