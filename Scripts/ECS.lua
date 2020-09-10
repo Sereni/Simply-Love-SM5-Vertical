@@ -259,8 +259,8 @@ ECS.Relics = {
 		action=function()
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
 				SL.Global.ActiveModifiers.TimingWindows = {true,true,true,false,false}
-				PREFSMAN:SetPreference("TimingWindowSecondsW4", SL.Preferences.Competitive.TimingWindowSecondsW3)
-				PREFSMAN:SetPreference("TimingWindowSecondsW5", SL.Preferences.Competitive.TimingWindowSecondsW3)
+				PREFSMAN:SetPreference("TimingWindowSecondsW4", SL.Preferences.ITG.TimingWindowSecondsW3)
+				PREFSMAN:SetPreference("TimingWindowSecondsW5", SL.Preferences.ITG.TimingWindowSecondsW3)
 			end
 		end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap) return 0 end
@@ -1744,8 +1744,8 @@ ECS.Relics = {
 		action=function()
 			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
 				SL.Global.ActiveModifiers.TimingWindows = {true,true,true,false,false}
-				PREFSMAN:SetPreference("TimingWindowSecondsW4", SL.Preferences.Competitive.TimingWindowSecondsW3)
-				PREFSMAN:SetPreference("TimingWindowSecondsW5", SL.Preferences.Competitive.TimingWindowSecondsW3)
+				PREFSMAN:SetPreference("TimingWindowSecondsW4", SL.Preferences.ITG.TimingWindowSecondsW3)
+				PREFSMAN:SetPreference("TimingWindowSecondsW5", SL.Preferences.ITG.TimingWindowSecondsW3)
 			end
 		end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap) return 0 end

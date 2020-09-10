@@ -37,61 +37,62 @@ if isECS then
 		OnCommand=function(self)
 			self:decelerate(0.5):croptop(0):fadetop(0):glow(1,1,1,1):decelerate(1):glow(1,1,1,1)
 
-			-- NOTE(teejusb): The code below also works for marathons. The SongsPlayed table would only
-			-- contain the marathon, and any MP giving relics are alread accounted for. The End-of-set
-			-- relics won't be active as they're not selectable during the marathon.
+			if ECS.Mode == "ECS" then
 
-			-- First add best 7 scores
-			local total_points = 0
-			for i=1,7 do
-				if ECS.Player.SongsPlayed[i] ~= nil then
-					total_points = total_points + ECS.Player.SongsPlayed[i].points
+				-- First add best 7 scores
+				local total_points = 0
+				for i=1,7 do
+					if ECS.Player.SongsPlayed[i] ~= nil then
+						total_points = total_points + ECS.Player.SongsPlayed[i].points
+					end
 				end
-			end
 
-			-- Then handle end of set relics
-			-- First check which end of set relics were active.
-			local slime_badge, agility_potion, stamina_potion = false, false, false
-			for song_played in ivalues(ECS.Player.SongsPlayed) do
-				if not song_played.failed then
-					for relic in ivalues(song_played.relics_used) do
-						if relic.name == "Slime Badge" then
-							slime_badge = true
-						end
-						if relic.name == "Agility Potion" then
-							agility_potion = true
-						end
-						if relic.name == "Stamina Potion" then
-							stamina_potion = true
+				-- Then handle end of set relics
+				-- First check which end of set relics were active.
+				local slime_badge, agility_potion, stamina_potion = false, false, false
+				for song_played in ivalues(ECS.Player.SongsPlayed) do
+					if not song_played.failed then
+						for relic in ivalues(song_played.relics_used) do
+							if relic.name == "Slime Badge" then
+								slime_badge = true
+							end
+							if relic.name == "Agility Potion" then
+								agility_potion = true
+							end
+							if relic.name == "Stamina Potion" then
+								stamina_potion = true
+							end
 						end
 					end
 				end
-			end
 
-			-- Then add in the additional BPM from them
-			local songs_passed = 0
-			local total_bpm = 0
-			local tiers = {}
-			local total_steps = 0
-			for song_played in ivalues(ECS.Player.SongsPlayed) do
-				if not song_played.failed then
-					total_bpm = total_bpm + song_played.bpm
-					if tiers[song_played.bpm_tier] == nil then
-						tiers[song_played.bpm_tier] = 0
+				-- Then add in the additional BPM from them
+				local songs_passed = 0
+				local total_bpm = 0
+				local tiers = {}
+				local total_steps = 0
+				for song_played in ivalues(ECS.Player.SongsPlayed) do
+					if not song_played.failed then
+						total_bpm = total_bpm + song_played.bpm
+						if tiers[song_played.bpm_tier] == nil then
+							tiers[song_played.bpm_tier] = 0
+						end
+						tiers[song_played.bpm_tier] = tiers[song_played.bpm_tier] + 1
+						total_steps = total_steps + song_played.steps
+						songs_passed = songs_passed + 1
 					end
-					tiers[song_played.bpm_tier] = tiers[song_played.bpm_tier] + 1
-					total_steps = total_steps + song_played.steps
-					songs_passed = songs_passed + 1
 				end
+				local total_tiers = 0
+				for _ in pairs(tiers) do total_tiers = total_tiers + 1 end
+
+				if slime_badge then total_points = total_points + 100 * total_tiers end
+				if agility_potion then total_points = total_points + math.floor(((total_bpm / songs_passed) - 120)^1.3) end
+				if stamina_potion then total_points = total_points + math.floor(total_steps / 75) end
+
+				self:settext(tostring(total_points))
+			elseif ECS.Mode == "Marathon" then
+					self:settext(tostring(ECS.Player.TotalMarathonPoints))
 			end
-			local total_tiers = 0
-			for _ in pairs(tiers) do total_tiers = total_tiers + 1 end
-
-			if slime_badge then total_points = total_points + 100 * total_tiers end
-			if agility_potion then total_points = total_points + math.floor(((total_bpm / songs_passed) - 120)^1.3) end
-			if stamina_potion then total_points = total_points + math.floor(total_steps / 75) end
-
-			self:settext(tostring(total_points))
 		end,
 		OffCommand=function(self) self:accelerate(0.5):fadeleft(1):cropleft(1) end
 	}

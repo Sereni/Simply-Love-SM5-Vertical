@@ -94,6 +94,20 @@ t[#t+1] = Def.ActorFrame{
 			self:visible(false)
 		end
 	end,
+	CurrentSongChangedMessageCommand=function(self)
+		local song = GAMESTATE:GetCurrentSong()
+		if song == nil then
+			self:visible(false)
+			return
+		end
+		local group_name = song:GetGroupName()
+		if ((group_name == "ECS9 - Upper" and PlayerIsUpper()) or
+			(group_name == "ECS9 - Lower" and not PlayerIsUpper())) then
+			self:visible(true)
+		else
+			self:visible(false)
+		end
+	end,
 	Def.Quad{
 		InitCommand=function(self) self:diffuse(color("#000000AA")):zoomto(418, 80):addy(20) end
 	},

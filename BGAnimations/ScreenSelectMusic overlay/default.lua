@@ -15,7 +15,7 @@ local t = Def.ActorFrame{
 		if player_state then
 			local po = player_state:GetPlayerOptions("ModsLevel_Preferred")
 			if po then
-				if ECS.Mode == "ECS" then
+				if ECS.Mode == "ECS" or ECS.Mode == "Marathon" then
 					po:FailSetting('FailType_Immediate')
 				else
 					po:FailSetting('FailType_ImmediateContinue')
