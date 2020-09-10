@@ -39,34 +39,32 @@ if isECS then
 
 			if ECS.Mode == "ECS" then
 
-				-- First add best 7 scores
+				-- Add best 7 scores and also check which end of set relics were active.
 				local total_points = 0
-				for i=1,7 do
-					if ECS.Player.SongsPlayed[i] ~= nil then
-						total_points = total_points + ECS.Player.SongsPlayed[i].points
-					end
-				end
-
-				-- Then handle end of set relics
-				-- First check which end of set relics were active.
 				local slime_badge, agility_potion, stamina_potion = false, false, false
-				for song_played in ivalues(ECS.Player.SongsPlayed) do
-					if not song_played.failed then
-						for relic in ivalues(song_played.relics_used) do
-							if relic.name == "Slime Badge" then
-								slime_badge = true
-							end
-							if relic.name == "Agility Potion" then
-								agility_potion = true
-							end
-							if relic.name == "Stamina Potion" then
-								stamina_potion = true
+
+				for i=1,7 do
+					local song_played = ECS.Player.SongsPlayed[i]
+					if song_played ~= nil then
+						total_points = total_points + song_played.points
+						-- Relics are only active if you passed the song you used them on.
+						if not song_played.failed then
+							for relic in ivalues(song_played.relics_used) do
+								if relic.name == "Slime Badge" then
+									slime_badge = true
+								end
+								if relic.name == "Agility Potion" then
+									agility_potion = true
+								end
+								if relic.name == "Stamina Potion" then
+									stamina_potion = true
+								end
 							end
 						end
 					end
 				end
 
-				-- Then add in the additional BPM from them
+				-- Add additional BP from the end of set relics
 				local songs_passed = 0
 				local total_bpm = 0
 				local tiers = {}
@@ -91,7 +89,7 @@ if isECS then
 
 				self:settext(tostring(total_points))
 			elseif ECS.Mode == "Marathon" then
-					self:settext(tostring(ECS.Player.TotalMarathonPoints))
+				self:settext(tostring(ECS.Player.TotalMarathonPoints))
 			end
 		end,
 		OffCommand=function(self) self:accelerate(0.5):fadeleft(1):cropleft(1) end
