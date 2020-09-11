@@ -98,26 +98,10 @@ local af = Def.ActorFrame{
 		}
 	},
 
-	-- Arrows between SIMPLY and LOVE
-	LoadActor(THEME:GetPathG("", "_logos/" .. game))..{
-		InitCommand=function(self)
-			self:xy(logos_x,logos_y):zoom( game=="pump" and logos_zoom_itg or logos_zoom_pump )
-		end
-	},
-
-	-- Large SIMPLY LOVE title
-	LoadActor(THEME:GetPathG("", "_VisualStyles/"..style.."/"..image.." (doubleres).png"))..{
-		InitCommand=function(self) self:x(2):zoom(title_zoom):shadowlength(0.75) end,
+	-- East Coast Stamina logo
+	LoadActor(THEME:GetPathG("", "_logos/ecs (doubleres).png"))..{
+		InitCommand=function(self) self:xy(2,10):zoom(0.25):shadowlength(0.75) end,
 		OffCommand=function(self) self:linear(0.5):shadowlength(0) end
-	}
-}
-
-af[#af+1] = Def.ActorFrame {
-	LoadFont("Wendy/_wendy small")..{
-		Text="9",
-		InitCommand=function(self)
-			self:addy(57)
-		end,
 	}
 }
 
@@ -125,8 +109,8 @@ af[#af+1] = Def.ActorFrame {
 if HolidayCheer() then
 	af[#af+1] = Def.Sprite{
 		Texture=THEME:GetPathB("ScreenTitleMenu", "underlay/hat.png"),
-		InitCommand=function(self) self:zoom(0.15):xy( hat_x, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,
-		DropCommand=function(self) self:decelerate(hat_decelerate_rate):y(hat_decelerate_y) end,
+		InitCommand=function(self) self:zoom(0.1):xy( hat_x+48, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,
+		DropCommand=function(self) self:decelerate(hat_decelerate_rate):y(hat_decelerate_y+48) end,
 	}
 end
 
