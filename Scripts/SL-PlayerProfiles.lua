@@ -139,10 +139,10 @@ SaveProfileCustom = function(profile, dir)
 
 	if FILEMAN:DoesFileExist(relic_file_path) then
 		local relic_data = LoadActor(relic_file_path)
-		if relic_data then
+		if relic_data and GAMESTATE:GetMasterPlayerNumber() ~= nil then	
 			ECS.Players[PROFILEMAN:GetPlayerName(GAMESTATE:GetMasterPlayerNumber())].relics = relic_data
 		end
-	end	
+	end
 
 	return true
 end

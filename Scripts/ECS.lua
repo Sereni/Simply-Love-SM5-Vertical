@@ -344,7 +344,7 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 gold by checking every player
 			local all_gold_amounts = {}
-			for name, player in ipairs(ECS.Players) do
+			for name, player in pairs(ECS.Players) do
 				all_gold_amounts[#all_gold_amounts + 1] = player.lifetime_song_gold
 			end
 			table.sort(all_gold_amounts)
@@ -489,7 +489,7 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 JP by checking every player
 			local all_jp_amounts = {}
-			for name, player in ipairs(ECS.Players) do
+			for name, player in pairs(ECS.Players) do
 				all_jp_amounts[#all_jp_amounts + 1] = player.lifetime_jp
 			end
 			table.sort(all_jp_amounts)
@@ -1891,7 +1891,7 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 EXP by checking every player
 			local max_exp = 0
-			for name, player in ipairs(ECS.Players) do
+			for name, player in pairs(ECS.Players) do
 				max_exp = math.max(player.exp, max_exp)
 			end
 
