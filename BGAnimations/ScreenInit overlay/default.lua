@@ -18,16 +18,27 @@ local quotes = {
 },
 }
 
-local body, author
+local body, author, picture
 local w = 310
+local quote_pics = 4
+local rand_quote
 -- ---------------------------------------
 
 local af = Def.ActorFrame{
 InitCommand=function(self)
 	self:Center()
-	local quote = quotes[math.random(#quotes)]
-	body:settext(quote[1][1]):xy(quote[1][2],quote[1][3]):zoom(0.8)
-	author:settext(quote[2][1]):xy(quote[2][2],quote[2][3]):zoom(0.8)
+	rand_quote = math.random(#quotes + quote_pics)
+		if rand_quote <= quote_pics then
+			picture:Load(THEME:GetPathG("", "_VisualStyles/Mario/Quotes/" .. tostring(rand_quote)))
+			body:settext("")
+			author:settext("")
+		else
+			rand_quote = rand_quote - quote_pics
+			local quote = quotes[rand_quote]
+			body:settext(quote[1][1]):xy(quote[1][2],quote[1][3]):zoom(0.8)
+			author:settext(quote[2][1]):xy(quote[2][2],quote[2][3]):zoom(0.8)
+			picture:Load(nil)
+		end
 end
 }
 
@@ -104,6 +115,23 @@ af[#af+1] = LoadFont("Common Normal")..{
 	end,
 	OnCommand=cmd(sleep,3; linear,0.25; diffusealpha,1),
 	OffCommand=cmd(linear,0.25; diffusealpha,0)
+}
+
+af[#af+1] = Def.Sprite{
+	InitCommand=function(self)
+		self:diffusealpha(0)
+		picture = self
+	end,
+	OnCommand=function(self)
+		local zoom_value = math.min(80/self:GetHeight(), 240/self:GetWidth())
+		self:zoom(zoom_value):sleep(3):linear(0.25):diffusealpha(1):queuecommand("MaybePlaySound")
+	end,
+	MaybePlaySoundCommand=function(self)
+		if rand_quote == 4 then
+			SOUND:PlayOnce(THEME:GetPathS("", "mario_hey_stinky.ogg"))
+		end
+	end,
+	OffCommand=cmd(linear,0.25; zoomtoheight, 0; diffusealpha,0)
 }
 
 return af
