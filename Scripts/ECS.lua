@@ -1635,7 +1635,7 @@ ECS.Relics = {
 		img="anduril.png",
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			return math.floor(rp * 0.6)
+			return math.floor(ap * 0.6)
 		end
 	},
 	{
