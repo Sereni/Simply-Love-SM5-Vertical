@@ -87,9 +87,9 @@ local Update = function(af, dt)
 
 		-- if this game session is less than 1 hour in duration so far
 		if session_seconds < settimer_seconds then
-			sessiontimer_actor:settext( SecondsToMMSS(session_seconds) )
+			sessiontimer_actor:settext("SET  " .. SecondsToMMSS(session_seconds) )
 		else
-			sessiontimer_actor:settext( SecondsToHHMMSS(session_seconds) ):diffuse(1,0,0,1)
+			sessiontimer_actor:settext("SET  " .. SecondsToHHMMSS(session_seconds) ):diffuse(1,0,0,1)
 		end
 
 		if DeductFromBreakTimer() then
@@ -97,7 +97,7 @@ local Update = function(af, dt)
 		end
 
 		if breaktimer_actor then
-			breaktimer_actor:settext( SecondsToMMSS(ECS.BreakTimer) )
+			breaktimer_actor:settext("BREAK  " ..  SecondsToMMSS(ECS.BreakTimer) )
 
 			-- BREAK'S OVER
 			if ECS.BreakTimer < 0 then
@@ -159,7 +159,7 @@ local af = Def.ActorFrame{
 		InitCommand=function(self)
 			self:diffusealpha(0):zoom(0.3):xy(_screen.w-60, 7.5):halign(1)
 			if not PREFSMAN:GetPreference("MenuTimer") then
-				self:x(_screen.w-20)
+				self:x(_screen.w-10)
 			end
 		end,
 		OnCommand=function(self)
@@ -216,7 +216,7 @@ if (ECS.Mode == "ECS" or ECS.Mode == "Warmup" or (ECS.Mode == "Marathon" and Arv
 			Name="BreakTimer",
 			InitCommand=function(self)
 				breaktimer_actor = self
-				self:diffusealpha(0):zoom(0.3):xy(_screen.cx+45, 7.5):halign(0)
+				self:diffusealpha(0):zoom(0.3):xy(_screen.cx, 7.5):halign(0)
 			end,
 			OnCommand=function(self)
 				if not PREFSMAN:GetPreference("EventMode") then

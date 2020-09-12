@@ -20,7 +20,7 @@ local af = Def.ActorFrame{
 af[#af+1] = LoadFont("Wendy/_wendy small")..{
 	Name="CustomGlobalOffset",
 	InitCommand=function(self)
-		self:diffusealpha(0):zoom(0.3):xy(_screen.cx+10, 8)
+		self:diffusealpha(0):zoom(0.3):xy(_screen.cx-30, 7.5)
 	end,
 	OnCommand=function(self)
 		self:settext(GetDeltaString())
