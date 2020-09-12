@@ -6,6 +6,15 @@ if ThemePrefs.Get("RainbowMode") then
 	}
 end
 
-t[#t+1] = LoadActor( THEME:GetPathB("", "_shared background"))
+if ThemePrefs.Get("VisualTheme") == "Mario" then
+	t[#t+1] = Def.Sprite {
+			Texture=THEME:GetPathG("", "_VisualStyles/Mario/bg.png"),
+			InitCommand=function(self)
+				self:xy(SCREEN_CENTER_X, SCREEN_CENTER_Y):zoom(SCREEN_HEIGHT/	self:GetHeight())
+			end,
+		}
+else
+	t[#t+1] = LoadActor( THEME:GetPathB("", "_shared background"))
+end
 
 return t

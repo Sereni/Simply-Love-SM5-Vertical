@@ -60,18 +60,17 @@ SL_CustomPrefs.Get = function()
 		},
 		VisualTheme =
 		{
-			Default = "Hearts",
+			Default = "Mario",
 			 -- emojis are our lingua franca for the 21st century
-			Choices = { "♡", "↖", "🐻", "🦆", "😺", "🎃", "🌈", "⭐", "🤔" },
-			Values  = { "Hearts", "Arrows", "Bears", "Ducks", "Cats", "Spooky", "Gay", "Stars", "Thonk" },
+			Choices = { "Ⓜ️", },
+			Values  = { "Mario" },
 		},
 		RainbowMode = {
 			Default = false,
 			Choices = {
-				THEME:GetString("ThemePrefs", "On"),
 				THEME:GetString("ThemePrefs", "Off")
 			},
-			Values 	= { true , false }
+			Values 	= { false }
 		},
 		-- - - - - - - - - - - - - - - - - - - -
 		-- SimplyLoveColor saves the theme color for the next time
@@ -121,15 +120,15 @@ SL_CustomPrefs.Get = function()
 		-- Enable/Disable Certain Screens
 		AllowScreenSelectProfile =
 		{
-			Default = false,
-			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Default = true,
+			Choices = { THEME:GetString("ThemePrefs","Yes") },
+			Values 	= { true }
 		},
 		AllowScreenSelectColor =
 		{
-			Default = true,
-			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Default = false,
+			Choices = { THEME:GetString("ThemePrefs", "No") },
+			Values 	= { false }
 		},
 		AllowScreenEvalSummary =
 		{

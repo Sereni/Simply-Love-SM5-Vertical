@@ -1,4 +1,4 @@
-local bg = LoadActor(THEME:GetPathB("","_shared background"))
+local bg = LoadActor(THEME:GetPathB("ScreenWithMenuElements","background"))
 
 -- SupportsRenderToTexture() is defined in ./Scripts/SL-Helpers.lua; read more details there.
 if SupportsRenderToTexture() then
