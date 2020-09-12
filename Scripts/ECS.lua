@@ -67,7 +67,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_bow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Long Bow" or name == "Eurytus Bow" or
 				    name == "Artemis Bow" or name == "Twisted Bow") then
@@ -131,7 +131,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_bow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Long Bow" or name == "Eurytus Bow" or
 				    name == "Artemis Bow" or name == "Twisted Bow") then
@@ -195,7 +195,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_bow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Long Bow" or name == "Eurytus Bow" or
 				    name == "Artemis Bow" or name == "Twisted Bow") then
@@ -308,7 +308,7 @@ ECS.Relics = {
 			end
 		end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Scythe of Vitur" then
 					return 300
@@ -395,7 +395,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_bow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Long Bow" or name == "Eurytus Bow" or
 				    name == "Artemis Bow" or name == "Twisted Bow") then
@@ -446,7 +446,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_arrow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Stone Arrow" or name == "Bronze Arrow" or name == "Mythril Arrow") then
 					has_arrow = true
@@ -611,7 +611,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_arrow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Stone Arrow" or name == "Bronze Arrow" or name == "Mythril Arrow") then
 					has_arrow = true
@@ -775,7 +775,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_laevitas = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Laevitas" then
 					has_laevitas = true
@@ -906,7 +906,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_arrow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Stone Arrow" or name == "Bronze Arrow" or name == "Mythril Arrow") then
 					has_arrow = true
@@ -1046,7 +1046,7 @@ ECS.Relics = {
 				bp = bp + 100
 			end
 			bp = bp + math.floor(song_data.ep * 0.5)
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Gae Derg" then
 					bp = bp + math.floor(ap * 0.1)
@@ -1084,7 +1084,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_leavitas = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Leavitas" then
 					has_leavitas = true
@@ -1201,7 +1201,7 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			local has_arrow = false
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if (name == "Stone Arrow" or name == "Bronze Arrow" or name == "Mythril Arrow") then
 					has_arrow = true
@@ -1341,7 +1341,7 @@ ECS.Relics = {
 				bp = bp + 200
 			end
 			bp = bp + math.floor(song_data.ep * 0.5)
-			for _, relic in relics_used do
+			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Gae Buide" then
 					bp = bp + math.floor(song_data.rp * 0.1)
