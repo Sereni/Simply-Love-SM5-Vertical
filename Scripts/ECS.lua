@@ -1603,13 +1603,16 @@ ECS.Relics = {
 				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
 				local failed = pss:GetFailed()
 				if not failed then
-					-- BreakTimer is in seconds.
-					ECS.BreakTimer = ECS.BreakTimer + (song_data.length * 60 * 0.18)
+					local length = GAMESTATE:GetCurrentSong():MusicLengthSeconds()
+					if length then
+						-- BreakTimer is in seconds.
+						ECS.BreakTimer = ECS.BreakTimer + (length * 0.18)
+					end
 				end
 			end
 		end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			return 50 * math.floor(song_data.length)
+			return math.floor(song_data.length * 50)
 		end
 	},
 	{
