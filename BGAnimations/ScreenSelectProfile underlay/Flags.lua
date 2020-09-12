@@ -9,7 +9,7 @@ for file in ivalues(files) do
 	if file:sub(1,1) ~= "." then
 		af[#af+1] = LoadActor(THEME:GetPathG("","_flags/"..StripSpriteHints(file)..".png"))..{
 			Name="Flag_"..StripSpriteHints(file),
-			InitCommand=function(self) self:xy(-100, -210):zoom(0.35) end
+			InitCommand=function(self) self:xy(-100, -210):zoom(0.7) end
 		}
 	end
 end
