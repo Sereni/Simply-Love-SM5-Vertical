@@ -13,7 +13,7 @@ local InputHandler = function(event)
 			af:queuecommand("ChangeChoice")
 
 		-- cancel out of this prompt overlay and return to selecting a song
-		elseif event.GameButton == "Back" or event.GameButton == "Select" or (event.GameButton == "Start" and active_index == 0) then
+		elseif event.GameButton == "Select" or (event.GameButton == "Start" and active_index == 0) then
 			af:queuecommand("Cancel")
 
 		-- back out of ScreenSelectMusic and head to either EvaluationSummary (if stages were played) or TitleMenu
@@ -29,7 +29,7 @@ local af = Def.ActorFrame{
 
 	-- the SM5 engine has broadcast that the player input a Metrics-based button code
 	CodeMessageCommand=function(self, params)
-		if params.Name == "EscapeFromEventMode" then
+		if params.Name == "EscapeFromEventMode" or params.Name == "EscapeUsingBackButton" then
 			self:queuecommand("Show")
 		end
 	end,
