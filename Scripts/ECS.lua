@@ -16807,7 +16807,7 @@ AddPlayedSong = function(ecs_player, song_name, score, relics_used, failed)
 	local index = #ECS.Player.SongsPlayed + 1
 	for i=1,#ECS.Player.SongsPlayed do
 		if ECS.Player.SongsPlayed[i].name == song_name then
-			if score > ECS.Player.SongsPlayed[i].score then
+			if points > ECS.Player.SongsPlayed[i].points then
 				index = i
 			end
 		end

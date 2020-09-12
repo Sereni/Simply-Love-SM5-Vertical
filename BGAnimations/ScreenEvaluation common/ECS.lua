@@ -20,10 +20,18 @@ local af = Def.ActorFrame{
 
 		if ECS.Mode == "ECS" then
 			AddPlayedSong(ecs_player, song_name, score, ECS.Player.Relics, failed)
+			if failed then
+				SOUND:PlayOnce(THEME:GetPathS("", "mario_oof.ogg"))
+			else
+				SOUND:PlayOnce(THEME:GetPathS("", "mario_1up.ogg"))
+			end
 		elseif ECS.Mode == "Marathon" and group_name == "ECS9 - Upper Marathon" and song_name == "Stratospheric Intricacy" then
 			ECS.Player.TotalMarathonPoints = 55000 * score
-			if not failed then
+			if failed then
+				SOUND:PlayOnce(THEME:GetPathS("", "mario_oof.ogg"))
+			else
 				ECS.Player.TotalMarathonPoints = ECS.Player.TotalMarathonPoints + 10000
+				SOUND:PlayOnce(THEME:GetPathS("", "mario_1up.ogg"))
 			end
 			for relic in ivalues(ECS.Player.Relics) do
 				if relic.name ~= "(nothing)" then
