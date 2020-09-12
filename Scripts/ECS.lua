@@ -1132,7 +1132,7 @@ ECS.Relics = {
 			if song_data.bpm_tier == 140 then
 				bp = bp + 150
 			end
-			bp = bp + math.floor(song_data.ep * 0.4)
+			bp = bp + math.floor(song_data.ep * 0.1)
 			return bp
 		end
 	},
