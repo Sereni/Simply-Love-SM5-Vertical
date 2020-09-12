@@ -1890,30 +1890,15 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 EXP by checking every player
-			local all_exp_amounts = {}
+			local max_exp = 0
 			for name, player in ipairs(ECS.Players) do
-				all_exp_amounts[#all_exp_amounts + 1] = player.exp
-			end
-			table.sort(all_exp_amounts)
-
-			local max_exp = all_exp_amounts[#all_exp_amounts]
-			if max_exp == nil then return 0 end
-
-			-- We need the 2nd highest as well for those that weren't rank 1
-			local second_highest = nil
-			for i = #all_exp_amounts, 1, -1 do
-				if all_exp_amounts[i] < max_exp then
-					second_highest = all_exp_amounts[i]
-					break
-				end
+				max_exp = math.max(player.exp, max_exp)
 			end
 
 			if max_exp == ecs_player.exp then
 				return 600
 			else
-				local second_highest = all_exp_amounts[#all_exp_amounts-1]
-				if second_highest == nil then return 0 end
-				return math.floor(400*(ecs_player.exp / second_highest))
+				return math.floor(400*(ecs_player.level / 100))
 			end
 		end
 	},
