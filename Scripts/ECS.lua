@@ -16805,7 +16805,6 @@ AddPlayedSong = function(ecs_player, song_name, score, relics_used, failed)
 			end
 		end
 	end
-
 	ECS.Player.SongsPlayed[index] = {
 		name=song_data.name,
 		points=points,
@@ -16813,6 +16812,7 @@ AddPlayedSong = function(ecs_player, song_name, score, relics_used, failed)
 		bpm=song_data.bpm,
 		bpm_tier=song_data.bpm_tier,
 		failed=failed,
+		relics_used=DeepCopy(relics_used)
 	}
 	local SortByPointsDesc = function(a, b)
 		return a.points > b.points
