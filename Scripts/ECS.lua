@@ -344,8 +344,8 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 gold by checking every player
 			local all_gold_amounts = {}
-			for name, player in ECS.Players do
-				all_gold_amounts[#all_gold_amounts + 1] = ecs_player.lifetime_song_gold
+			for name, player in ipairs(ECS.Players) do
+				all_gold_amounts[#all_gold_amounts + 1] = player.lifetime_song_gold
 			end
 			table.sort(all_gold_amounts)
 
@@ -489,8 +489,8 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 JP by checking every player
 			local all_jp_amounts = {}
-			for name, player in ECS.Players do
-				all_jp_amounts[#all_jp_amounts + 1] = ecs_player.lifetime_jp
+			for name, player in ipairs(ECS.Players) do
+				all_jp_amounts[#all_jp_amounts + 1] = player.lifetime_jp
 			end
 			table.sort(all_jp_amounts)
 
@@ -1344,7 +1344,8 @@ ECS.Relics = {
 			for relic in ivalues(relics_used) do
 				local name = relic.name
 				if name == "Gae Buide" then
-					bp = bp + math.floor(song_data.rp * 0.1)
+					local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+					bp = bp + math.floor(song_data.rp/(max_division_rp/1000)*0.1)
 				end
 			end
 			return bp
@@ -1399,7 +1400,8 @@ ECS.Relics = {
 			end
 		end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			return 200 + math.floor(song_data.rp * 0.4)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return 200 + math.floor(song_data.rp/(max_division_rp/1000)*0.4)
 		end
 	},
 	{
@@ -1413,7 +1415,8 @@ ECS.Relics = {
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			if song_data.pack:lower():find("baguettestreamz") ~= nil or song_data.pack:lower():find("french coast stamina") then
-				return math.floor(song_data.rp * 0.4)
+				local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+				return math.floor(song_data.rp/(max_division_rp/1000)*0.4)
 			else
 				return 0
 			end
@@ -1495,7 +1498,8 @@ ECS.Relics = {
 		img="fursuit.png",
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			return math.floor(song_data.ep * 0.1) + math.floor(song_data.dp * 0.1) + math.floor(song_data.rp * 0.1) + math.floor(ap * 0.1)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return math.floor(song_data.ep * 0.1) + math.floor(song_data.dp * 0.1) + math.floor(ap * 0.1) + math.floor(song_data.rp/(max_division_rp/1000)*0.1)
 		end
 	},
 	{
@@ -1887,8 +1891,8 @@ ECS.Relics = {
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
 			-- Determine Rank 1 EXP by checking every player
 			local all_exp_amounts = {}
-			for name, player in ECS.Players do
-				all_exp_amounts[#all_exp_amounts + 1] = ecs_player.exp
+			for name, player in ipairs(ECS.Players) do
+				all_exp_amounts[#all_exp_amounts + 1] = player.exp
 			end
 			table.sort(all_exp_amounts)
 
@@ -1936,7 +1940,8 @@ ECS.Relics = {
 		img="reid.png",
 		action=function() end,
 		score=function(ecs_player, song_info, song_data, relics_used, ap)
-			return math.floor(rp * 0.6)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return math.floor(song_data.rp/(max_division_rp/1000)*0.6)
 		end
 	},
 	{

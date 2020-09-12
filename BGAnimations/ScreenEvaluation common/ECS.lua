@@ -40,6 +40,7 @@ local af = Def.ActorFrame{
 						relic.score(--[[ecs_player=]]nil, --[[song_info=]]nil, --[[song_data=]]nil, --[[relics_used]]nil, --[[ap=]]nil))
 				end
 			end
+			ECS.Player.TotalMarathonPoints = math.floor(ECS.Player.TotalMarathonPoints)
 		end
 	end,
 
