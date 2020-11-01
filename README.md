@@ -32,6 +32,7 @@ The theme is currently in alpha, and does not have released versions. To install
 
 ## Additional features
 
+- Custom Score support for intergration with Simply Training, from the Simply Love beta branch
 - NPS graph is always displayed during music selection
 - Ability to change global offset for the duration of a single set (via player options)
 - Do Not Judge Me: a mode where most result-related things are hidden (via player options)
