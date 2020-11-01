@@ -36,6 +36,7 @@ To install:
 - NPS graph is always displayed during music selection
 - Ability to change global offset for the duration of a single set (via player options)
 - Do Not Judge Me: a mode where most result-related things are hidden (via player options)
+- Song Search: Use Down + Start on the song wheel to search for a song by name
 
 ## Known issues
 
