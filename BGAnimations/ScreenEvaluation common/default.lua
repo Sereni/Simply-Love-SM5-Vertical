@@ -1,6 +1,10 @@
 local Players = GAMESTATE:GetHumanPlayers()
 local NumPanes = 6
 
+if ThemePrefs.Get("WriteCustomScores") then
+	WriteScores()
+end
+
 local t = Def.ActorFrame{}
 
 -- add a lua-based InputCalllback to this screen so that we can navigate
