@@ -24,6 +24,14 @@ if SL.Global.GameMode == "FA+" then
 	colors.FullComboW4 = {color("#C9FFC9"), color("#94FEC1")} -- green combo
 end
 
+-- combo colors used in ECFA
+if SL.Global.GameMode == "ECFA" then
+	colors.FullComboW1 = {color("#FF0080"), color("#FF0080")} -- pink combo
+	colors.FullComboW2 = {color("#FFFF00"), color("#FFFF00")} -- gold combo
+	colors.FullComboW3 = {color("#00c800"), color("#00c800")} -- green combo
+	colors.FullComboW4 = {color("#0080FF"), color("#0080FF")} -- blue combo
+end
+
 
 local ShowComboAt = THEME:GetMetric("Combo", "ShowComboAt")
 

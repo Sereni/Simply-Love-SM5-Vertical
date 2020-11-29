@@ -6,7 +6,7 @@ local lifemeter_actor
 -- in ITG and FA+, we have the choice a "Standard" LifeMeter (at the top of the screen)
 -- a "Surround" LifeMeter, which occupies the space behind the arrows,
 -- or a "Vertical" LifeMeter, which mimics the sizing and positioning used in ITG2.
-if SL.Global.GameMode == "ITG" or SL.Global.GameMode == "FA+" then
+if SL.Global.GameMode == "ITG" or SL.Global.GameMode == "FA+" or SL.Global.GameMode == "ECFA" then --TODO: probably remove this if (?)
 
 	local lifemeter_type = SL[ToEnumShortString(player)].ActiveModifiers.LifeMeterType or CustomOptionRow("LifeMeterType").Choices[1]
 	lifemeter_actor = LoadActor(lifemeter_type .. ".lua", player)
