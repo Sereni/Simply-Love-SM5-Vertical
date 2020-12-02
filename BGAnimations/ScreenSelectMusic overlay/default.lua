@@ -41,6 +41,8 @@ local t = Def.ActorFrame{
 	LoadActor("./SongDescription.lua"),
 	-- Density Graph
 	LoadActor("./DensityGraph.lua"),
+	-- ECFA 2021 tech radar jawn
+	LoadActor("./TechRadar.lua"),
 
 	-- ---------------------------------------------------
 	-- finally, load the overlay used for sorting the MusicWheel (and more), hidden by default
