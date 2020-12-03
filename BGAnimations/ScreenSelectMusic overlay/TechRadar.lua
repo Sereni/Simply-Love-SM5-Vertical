@@ -1,30 +1,24 @@
 -- Conditional "tech radar" for ECFA 2021
 
--- only need to draw one, since both players will be viewing the same chart
+if SL.Global.GameMode ~= "ECFA" then return end
+
 local player = GAMESTATE:GetMasterPlayerNumber()
 
 local rowh = 12
-local colw = 114
-local columns = 1
 
 local width = 125
-local height = 105
-
-local headerh = 12
+local height = 112
 
 local xpos = width / 2
-local ypos = _screen.cy + 165
-
-local barw = colw - 50
-local barxadd = 38
+local ypos = _screen.cy + 168
 
 local zoom = .6
 
 local radarOffsetX = 30
-local radarOffsetY = 25
+local radarOffsetY = 29
 
-local labelOffsetX = -15
-local labelOffsetY = -5
+local labelOffsetX = -10
+local labelOffsetY = -3
 
 local elements = {
 	{key = "speed", label = "Speed"},
@@ -36,13 +30,15 @@ local elements = {
 }
 
 local gimmicks = {[-1] = "N/A", [0] = "None", [1] = "Light", [2] = "Medium", [3] = "Heavy"}
-local gmkcolors = {Color.Green, Color.Yellow, {1,0.2,0.2,1}}
 
-local rcolors = { {3, Color.Green}, {6, Color.Yellow}, {9, Color.Orange}, {10, {1,0.1,0.1,1}}}
-local radarBlue = Color.Blue
-local radarTeal = color("#80c9f0")
-radarTeal[4] = .7
+local scaleColor = color("#28353f")
+-- index+1 will match the color of the background
+local primaryColor = ThemePrefs.Get("RainbowMode") and color("#7fb9e3") or GetHexColor(SL.Global.ActiveColorIndex + 1, true)
+local radarBorder = primaryColor
+local radarFill = primaryColor
+radarFill[4] = .5 -- alpha
 
+-- values are set in af's SetCommand
 local radar = {
 	speed = 0,
 	stamina = 0,
@@ -50,10 +46,10 @@ local radar = {
 	movement = 0,
 	rhythms = 0,
 	gimmick = 0,
-}-- this gets set in af's SetCommand
+}
 
-	-- we use these to initializate the groove radar
-local zeroVert = {{radarOffsetX,radarOffsetY,0},radarTeal}
+	-- use these to initializate the groove radar
+local zeroVert = {{radarOffsetX,radarOffsetY,0},radarFill}
 local zeroVerts = {}
 for i = 1, 12 do
 	zeroVerts[#zeroVerts+1] = zeroVert
@@ -63,9 +59,9 @@ local getRadarVert = function(index, value)
 	local x = 0
 	local y = 0
 	if index and value then
-		angle = 1.25664 * index 
-		x = radarOffsetX + 5 * value * math.sin(angle)
-		y = radarOffsetY + 5 * value * -math.cos(angle)
+		angle = 1.25664 * index
+		x = radarOffsetX + 5.5 * value * math.sin(angle)
+		y = radarOffsetY + 5.5 * value * -math.cos(angle)
 	end
 	return {x, y, 0}
 end
@@ -74,16 +70,16 @@ local getPentagon = function(size)
 	local verts = {}
 	for i = 1, 6 do
 		angle = 1.25664 * i
-		x = radarOffsetX + 10 * size * math.sin(angle)
-		y = radarOffsetY + 10 * size * -math.cos(angle)
-		verts[#verts+1] = {{x,y,0},radarBlue}
+		x = radarOffsetX + 11 * size * math.sin(angle)
+		y = radarOffsetY + 11 * size * -math.cos(angle)
+		verts[#verts+1] = {{x,y,0},scaleColor}
 	end
 	return verts
 end
 
 local getGrooveRadarBg = function()
 	t = Def.ActorFrame{}
-	for i = 1, 3 do
+	for i = 1, 4 do
 		t[#t+1] = Def.ActorMultiVertex{
 			Name = "GrooveRadarBg"..i,
 			InitCommand = function(self)
@@ -123,7 +119,7 @@ local af = Def.ActorFrame{
 	end,
 	HideCommand = function(self)
 		self:stoptweening()
-		self:decelerate(0.2)
+		self:decelerate(0.1)
 		self:x(-xpos)
 	end,
 
@@ -150,7 +146,7 @@ local af = Def.ActorFrame{
 				for i, t in ipairs(elements) do
 					if t.key ~= "gimmick" then
 						local pos = getRadarVert(i,radar[t.key])
-						local color = radarTeal
+						local color = radarFill
 						verts[#verts+1] = {pos,color}
 						verts[#verts+1] = zeroVert
 					end
@@ -191,7 +187,7 @@ local af = Def.ActorFrame{
 				for i, t in ipairs(elements) do
 					if t.key ~= "gimmick" then
 						local pos = getRadarVert(i,radar[t.key])
-						local color = radarBlue
+						local color = radarBorder
 						verts[#verts+1] = {pos,color}
 					end
 				end
@@ -215,80 +211,35 @@ local af = Def.ActorFrame{
 	},
 }
 
-local startx = -width/2 + 6
-local starty = -height/2 + headerh*1.5 + 2
-
--- add "grid" elements
+-- Add groove radar labels
 for i, t in ipairs(elements) do
 	-- label
 	if t.key ~= "gimmick" then
-		local angle = 1.25664 * i 
-		local labelx = labelOffsetX + 40 * math.sin(angle)
-		local labely = labelOffsetY + 40 * -math.cos(angle)
-		local col = (i-1) % columns
-		local row = math.floor((i-1)/columns)
+		local angle = 1.25664 * i
+		local labelx = labelOffsetX + 52 * math.sin(angle)
+		local labely = labelOffsetY + 45 * -math.cos(angle)
 		af[#af+1] = LoadFont("Common Normal")..{
 			Text = t.label,
 			InitCommand = function(self) self:xy(labelx, labely)
-				:horizalign("left"):zoom(zoom)
-				if t.key ~= "gimmick" then self:maxwidth(42/0.8) end
+				:horizalign("left"):zoom(zoom * 0.8)
+				self:diffuse(color("#b5bdc5"))
+				if t.key ~= "gimmick" then self:maxwidth(42/0.7) end
 			end
 		}
 	end
---GRID	-- bars for visual effect
---GRID	if t.key ~= "gimmick" then
---GRID		af[#af+1] = Def.Quad{
---GRID			InitCommand = function(self) self:xy(startx + (col * (colw + 10)) + barxadd, starty + row*rowh)
---GRID				:horizalign("left"):diffuse(Color.Black):zoomto(barw, rowh-4) end
---GRID		}
---GRID		af[#af+1] = Def.Quad{
---GRID			InitCommand = function(self) self:xy(startx + (col * (colw + 10)) + barxadd, starty + row*rowh)
---GRID				:horizalign("left"):zoomto(0, rowh-4) end,
---GRID			SetCommand = function(self)
---GRID				if radar and radar[t.key] then
---GRID					self:stoptweening()
---GRID					local color = Color.White
---GRID					for c in ivalues(rcolors) do
---GRID						if radar[t.key] <= c[1] then color = c[2] break end
---GRID					end
---GRID					self:decelerate(0.1)
---GRID					self:diffuse(color)
---GRID					self:zoomx((radar[t.key]/10) * barw)
---GRID				end
---GRID			end
---GRID		}
---GRID	end
---GRID	-- values
---GRID	af[#af+1] = LoadFont("Common Normal")..{
---GRID		Text = "",
---GRID		InitCommand = function(self) self:xy(startx + (col * (colw + 10) + colw), starty + row*rowh)
---GRID			:horizalign("right"):zoom(zoom) end,
---GRID		SetCommand = function(self)
---GRID			if radar then
---GRID				local text
---GRID				if t.key == "gimmick" then
---GRID					text = gimmicks[radar.gimmick] or "None"
---GRID					self:diffuse(gmkcolors[radar.gimmick] or Color.White)
---GRID				else
---GRID					text = tostring(radar[t.key])
---GRID				end
---GRID				self:settext(text)
---GRID			end
---GRID		end
---GRID	}
 end
 
 -- max dp
 af[#af+1] = LoadFont("Common Normal")..{
 	Text = "Max DP:",
 	InitCommand = function(self)
-		self:xy(startx, starty + 6*rowh + 3):horizalign("left"):zoom(zoom*1.2)
+		self:xy(0, height/2 - 8):horizalign("center"):zoom(zoom * 0.9)
 	end,
 	SetCommand = function(self)
 		local steps = GAMESTATE:GetCurrentSteps(player)
 		if radar and steps then
 			local dp = CalculateMaxDPByTechRadar(radar)
-			if dp then self:settext("Max ECFA Points: "..ECFAPointString(dp)) end
+			if dp then self:settext("Max points: "..ECFAPointString(dp)) end
 		end
 	end
 }
@@ -296,8 +247,8 @@ af[#af+1] = LoadFont("Common Normal")..{
 -- cmod ok/no good
 af[#af+1] = LoadFont("Common Normal")..{
 	Text = "",
-	InitCommand = function(self) self:xy(200, -165)
-		:horizalign("right"):zoom(zoom) end,
+	InitCommand = function(self) self:xy(-width/2 + 5, -height/2 + 8)
+		:horizalign("left"):zoom(zoom * 0.7) end,
 	SetCommand = function(self)
 		if radar then
 			local cmod = ((not radar.gimmick) or radar.gimmick < 1)
@@ -308,5 +259,26 @@ af[#af+1] = LoadFont("Common Normal")..{
 	self:visible(active)
 	end
 }
+
+-- Gimmick indicator
+af[#af+1] = LoadFont("Common Normal")..{
+	Text = "",
+	InitCommand = function(self) self:xy(-width/2 + 5, -height/2 + 16)
+		:horizalign("left"):zoom(zoom * 0.7) end,
+	SetCommand = function(self)
+		if radar then
+			if radar.gimmick > 0 then
+				text = gimmicks[radar.gimmick]
+			else
+				text = ""
+			end
+			self:settext(text)
+			self:diffuse(Color.Orange)
+		end
+		local active = IsECFA2021Song()
+	self:visible(active)
+	end
+}
+
 
 return af
