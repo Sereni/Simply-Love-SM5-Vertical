@@ -159,17 +159,10 @@ local t = Def.ActorFrame {
 		-- but don't add the current SL GameMode as a choice. If a player is already in FA+, don't
 		-- present a choice that would allow them to switch to FA+.
 		if SL.Global.Stages.PlayedThisGame == 0 then
-			if SL.Global.GameMode ~= "ITG" then
-				table.insert(wheel_options, {"ChangeMode", "ITG"})
-				table.insert(wheel_options, {"ChangeMode", "ECFA"})
-			end
-			if SL.Global.GameMode ~= "FA+" then
-				table.insert(wheel_options, {"ChangeMode", "FA+"})
-				table.insert(wheel_options, {"ChangeMode", "ECFA"})
-			end
-			if SL.Global.GameMode ~= "ECFA" then
-				table.insert(wheel_options, {"ChangeMode", "FA+"})
-				table.insert(wheel_options, {"ChangeMode", "ITG"})
+			for _, gm in pairs({"ITG", "FA+", "ECFA"}) do
+				if SL.Global.GameMode ~= gm then
+					table.insert(wheel_options, {"ChangeMode", gm})
+				end
 			end
 		end
 

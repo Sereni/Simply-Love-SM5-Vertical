@@ -47,6 +47,7 @@
 -- use StepManiaVersionIsSupported() to check if Simply Love supports the version of SM5 in use
 
 StepManiaVersionIsSupported = function()
+	if true then return true end
 
 	-- ensure that we're using StepMania
 	if type(ProductFamily) ~= "function" or ProductFamily():lower() ~= "stepmania" then return false end

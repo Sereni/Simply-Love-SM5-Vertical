@@ -484,7 +484,7 @@ SetGameModePreferences = function()
 	local prefix = {
 		ITG = "",
 		["FA+"] = "ECFA-",
-		["ECFA"] = "ECFA-",
+		["ECFA"] = "ECFA2021-",
 	}
 
 	if PROFILEMAN:GetStatsPrefix() ~= prefix[SL.Global.GameMode] then

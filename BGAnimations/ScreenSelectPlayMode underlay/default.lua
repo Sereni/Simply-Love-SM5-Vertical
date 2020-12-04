@@ -81,7 +81,7 @@ local t = Def.ActorFrame{
 	-- gray backgrounds
 	Def.ActorFrame{
 		InitCommand=function(self) self:y(75) end,
-		-- ScreenSelectPlayMode
+		-- ScreenSelectPlayMode TODO: find a way to do this without this much duplicated code
 		Def.Quad{
 			OnCommand=function(self)
 				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
@@ -93,6 +93,16 @@ local t = Def.ActorFrame{
 		Def.Quad{
 			OnCommand=function(self)
 				self:x(choice_positions[2]):zoomtowidth(choice_widths[2] * iconWidthScale + cursorMargin)
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
+		},
+		Def.Quad{
+			OnCommand=function(self)
+				if #choice_positions > 2 then
+					self:x(choice_positions[3]):zoomtowidth(choice_widths[3] * iconWidthScale + cursorMargin)
+				end
 				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
 			end,
 			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
