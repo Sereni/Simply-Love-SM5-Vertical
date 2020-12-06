@@ -26,16 +26,6 @@ local TNSFrames = {
 	TapNoteScore_W5 = 4,
 	TapNoteScore_Miss = 5
 }
-if mode == "ECFA" then
-	TNSFrames = {
-		TapNoteScore_W1 = 0,
-		TapNoteScore_W2 = 2,
-		TapNoteScore_W3 = 3,
-		TapNoteScore_W4 = 4,
-		TapNoteScore_W5 = 5,
-		TapNoteScore_Miss = 6
-	}
-end
 
 return Def.ActorFrame{
 	Name="Player Judgment",
