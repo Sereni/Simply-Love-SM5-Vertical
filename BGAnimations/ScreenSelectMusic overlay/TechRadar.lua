@@ -4,8 +4,6 @@ if SL.Global.GameMode ~= "ECFA" then return end
 
 local player = GAMESTATE:GetMasterPlayerNumber()
 
-local rowh = 12
-
 local width = 125
 local height = 112
 
