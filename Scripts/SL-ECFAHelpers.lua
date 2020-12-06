@@ -262,9 +262,9 @@ end
 
 function ECFA2021ScoreSL(player)
 		-- similar to the above, but something more tuned to simplay love variants
-		-- note that this will still require that either "Experimental" or "Waterfall" game mode is used
+		-- note that this will still require that either "Experimental" or "ECFA" game mode is used
 		if not IsECFA2021Song() then return nil end
-		if not (SL.Global.GameMode == "Experimental" or SL.Global.GameMode == "Waterfall") then return nil end
+		if not (SL.Global.GameMode == "Experimental" or SL.Global.GameMode == "ECFA") then return nil end
 		local steps = GAMESTATE:GetCurrentSteps(player)
 		local radar = TechRadarFromSteps(steps)
 		if not radar then return nil end
