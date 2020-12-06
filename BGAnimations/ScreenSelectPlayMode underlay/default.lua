@@ -81,7 +81,7 @@ local t = Def.ActorFrame{
 	-- gray backgrounds
 	Def.ActorFrame{
 		InitCommand=function(self) self:y(75) end,
-		-- ScreenSelectPlayMode TODO: find a way to do this without this much duplicated code
+		-- ScreenSelectPlayMode
 		Def.Quad{
 			OnCommand=function(self)
 				self:x(choice_positions[1]):zoomtowidth(choice_widths[1] * iconWidthScale + cursorMargin)
@@ -233,7 +233,7 @@ local t = Def.ActorFrame{
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
 			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "ITG" or choices[cursor.index+1] == "ECFA" or choices[cursor.index+1] == "FA+" then --TODO: this is ugly
+				if choices[cursor.index+1] == "ITG" or choices[cursor.index+1] == "ECFA" or choices[cursor.index+1] == "FA+" then
 					self:stoptweening():linear(0.25):diffusealpha(1)
 				else
 					self:stoptweening():linear(0.25):diffusealpha(0)
