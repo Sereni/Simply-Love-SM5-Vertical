@@ -55,8 +55,9 @@ SL_CustomPrefs.Get = function()
 			Choices = {
 				THEME:GetString("ScreenSelectPlayMode", "ITG"),
 				THEME:GetString("ScreenSelectPlayMode", "FA+"),
+				THEME:GetString("ScreenSelectPlayMode", "ECFA"),
 			},
-			Values 	= {"ITG", "FA+" }
+			Values 	= {"ITG", "FA+", "ECFA" }
 		},
 		VisualTheme =
 		{
