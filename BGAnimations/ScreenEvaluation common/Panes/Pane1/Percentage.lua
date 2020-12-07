@@ -40,7 +40,8 @@ return Def.ActorFrame{
                 InitCommand = function(self)
                         if not ecfa2021score then return end
                         self:vertalign(middle):horizalign(right):zoom(0.38):x(40)
-                        self:settext(ECFAPointString(ecfa2021score))
+			score = ECFAPointString(ecfa2021score)
+			if score ~= "0" then self:settext(score) end
                 end
         },
         -- "Insufficient FA" message
@@ -53,8 +54,11 @@ return Def.ActorFrame{
                                 local diff = GAMESTATE:GetCurrentSteps(player):GetMeter()
                                 local dpscore = math.floor(10000*rawdp)/100
                                 local fapass = math.round(100*ECFA_FAPass[diff])
-                                self:xy(ptext:GetX() + 80, -30):zoom(0.8):diffuseshift():effectcolor1(Color.Red)
-                                        :effectcolor2(Color.White):settext(string.format("%.2f/%d%% FA Pass", dpscore, fapass))
+				local text = string.format("Insufficient FA\n%.2f/%d%%", dpscore, fapass)
+                                self:x(ptext:GetX())
+					:zoom(0.8)
+					:diffuse({1,.4,.4,1})
+					:settext(text)
                         end
                 end
         }
