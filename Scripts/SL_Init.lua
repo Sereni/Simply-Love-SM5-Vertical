@@ -309,7 +309,6 @@ SL = {
                         GradeWeightHeld=6,
                         GradeWeightHitMine=-3,
 
-                        -- lifebar values are defined in WF-LifeBars.lua
                         LifePercentChangeW1=0.010,
                         LifePercentChangeW2=0.010,
                         LifePercentChangeW3=0.010,

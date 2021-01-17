@@ -177,14 +177,17 @@ SongNameDuringSet = function(self, item)
 				end
 			end
 		end
-		
+
 		-- Get the block rating / tech max associated with that chart
 		-- and append it to the title.
 		if highestRegularChart then
 			local blockRating = tonumber(highestRegularChart:GetMeter())
-			techRadar = ParseTechRadar(highestRegularChart:GetChartStyle())
-			techRadar.rating = blockRating
-			local techMaxDP = math.floor(CalculateMaxDPByTechRadar(techRadar))
+      techRadar = ParseTechRadar(highestRegularChart:GetChartStyle())
+      if not techRadar then return end
+      techRadar.rating = blockRating
+      local rawmaxdp = CalculateMaxDPByTechRadar(techRadar)
+      if not rawmaxdp then return end
+			local techMaxDP = math.floor(rawmaxdp)
 
 			-- Title gets a prepended block rating
 			-- Subtitle gets either a Cmod directive, a max DP calculation, or
@@ -221,6 +224,7 @@ end
 -- functions for calculating the player performance score
 
 ECFA_FAPass = {
+    [0]  = 0, --dummy value for handling cases that shouldn't, but could, occur
     [7]  = 0.60,
     [8]  = 0.65,
     [9]  = 0.70,
@@ -244,6 +248,7 @@ function ECFA2021ScoreWF(player)
     end
 
     local maxscore = CalculateMaxDPByTechRadar(radar)
+    if not maxscore then return nil end
     local rating = steps:GetMeter()
     local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
     local perf = pss:GetTapNoteScores("TapNoteScore_W1")
@@ -261,7 +266,7 @@ function ECFA2021ScoreWF(player)
 end
 
 function ECFA2021ScoreSL(player)
-    -- similar to the above, but something more tuned to simplay love variants
+    -- similar to the above, but something more tuned to Simply love variants
     -- note that this will still require "ECFA" game mode is used
     if not IsECFA2021Song() then return nil end
     if not SL.Global.GameMode == "ECFA" then return nil end
@@ -294,6 +299,7 @@ end
 function ECFAPointString(val)
     -- previously this was returning a string in the form of %.2f, but we've decided to only display
     -- integers for aesthetic purposes
+    if tostring(val) == tostring(0/0) then val = 0 end
     return tostring(math.floor(val))
 end
 

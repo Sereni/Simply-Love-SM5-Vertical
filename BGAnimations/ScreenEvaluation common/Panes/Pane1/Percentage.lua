@@ -32,7 +32,7 @@ return Def.ActorFrame{
 			self:x(45)
 		end
 	},
-	
+
 	-- ECFA 2021 score
         LoadFont("Wendy/_wendy white")..{
                 Name="ECFA2021",
@@ -54,7 +54,7 @@ return Def.ActorFrame{
                                 local diff = GAMESTATE:GetCurrentSteps(player):GetMeter()
                                 local dpscore = math.floor(10000*rawdp)/100
                                 local fapass = math.round(100*ECFA_FAPass[diff])
-				local text = string.format("Insufficient FA\n%.2f/%d%%", dpscore, fapass)
+				local text = string.format("Insufficient FA\n%.2f/%d", dpscore, fapass)
                                 self:x(ptext:GetX())
 					:zoom(0.8)
 					:diffuse({1,.4,.4,1})
