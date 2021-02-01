@@ -153,6 +153,14 @@ SL = {
 			color("#b45cff"),	-- purple (greatly lightened)
 			color("#ff3030")	-- red (slightly lightened)
 		},
+		ECFA = {
+                        color("#FF00BE"),       -- fuschia
+                        color("#FFFF00"),       -- yellow
+                        color("#00c800"),       -- green
+                        color("#0080FF"),       -- blue
+                        color("#808080"),       -- gray
+                        color("#ff3030")        -- red (slightly lightened)
+                },
 	},
 	Preferences = {
 		ITG = {
@@ -195,6 +203,27 @@ SL = {
 			TimingWindowSecondsMine=0.065000,
 			TimingWindowSecondsRoll=0.350000,
 		},
+		ECFA = {
+                        TimingWindowAdd=0.0000,
+                        TimingWindowScale=1,
+                        RegenComboAfterMiss=5,
+                        MaxRegenComboAfterMiss=5,
+                        MinTNSToHideNotes="TapNoteScore_W4",
+                        HarshHotLifePenalty=0,
+
+                        PercentageScoring=1,
+                        AllowW1="AllowW1_Everywhere",
+                        SubSortByNumSteps=1,
+
+                        TimingWindowSecondsW1=0.015000,
+                        TimingWindowSecondsW2=0.03000,
+                        TimingWindowSecondsW3=0.050000,
+                        TimingWindowSecondsW4=0.100000,
+                        TimingWindowSecondsW5=0.160000,
+                        TimingWindowSecondsHold=0.300000,
+                        TimingWindowSecondsMine=0.050000,
+                        TimingWindowSecondsRoll=0.350000,
+                }
 	},
 	Metrics = {
 		ITG = {
@@ -259,6 +288,37 @@ SL = {
 			LifePercentChangeHeld=0.008,
 			LifePercentChangeHitMine=-0.05,
 		},
+		ECFA = {
+                        PercentScoreWeightW1=10,
+                        PercentScoreWeightW2=9,
+                        PercentScoreWeightW3=6,
+                        PercentScoreWeightW4=3,
+                        PercentScoreWeightW5=0,
+                        PercentScoreWeightMiss=0,
+                        PercentScoreWeightLetGo=0,
+                        PercentScoreWeightHeld=6,
+                        PercentScoreWeightHitMine=-3,
+
+                        GradeWeightW1=10,
+                        GradeWeightW2=9,
+                        GradeWeightW3=6,
+                        GradeWeightW4=3,
+                        GradeWeightW5=0,
+                        GradeWeightMiss=0,
+                        GradeWeightLetGo=0,
+                        GradeWeightHeld=6,
+                        GradeWeightHitMine=-3,
+
+                        LifePercentChangeW1=0.010,
+                        LifePercentChangeW2=0.010,
+                        LifePercentChangeW3=0.010,
+                        LifePercentChangeW4=0.005,
+                        LifePercentChangeW5=-0.050,
+                        LifePercentChangeMiss=-0.1,
+                        LifePercentChangeLetGo=-0.1,
+                        LifePercentChangeHeld=0.010,
+                        LifePercentChangeHitMine=-0.05,
+                },
 	}
 }
 

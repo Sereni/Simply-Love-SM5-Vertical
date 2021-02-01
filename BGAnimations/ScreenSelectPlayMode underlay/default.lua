@@ -98,6 +98,16 @@ local t = Def.ActorFrame{
 			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
 			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
 		},
+		Def.Quad{
+			OnCommand=function(self)
+				if #choice_positions > 2 then
+					self:x(choice_positions[3]):zoomtowidth(choice_widths[3] * iconWidthScale + cursorMargin)
+				end
+				if ScreenName ~= "ScreenSelectPlayMode" then self:visible(false) end
+			end,
+			InitCommand=function(self) self:diffuse(0.2,0.2,0.2,1):zoomtoheight(cursor.h) end,
+			OffCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(0) end
+		},
 		-- ScreenSelectPlayMode2
 		Def.Quad{
 			OnCommand=function(self)
@@ -197,6 +207,8 @@ local t = Def.ActorFrame{
 			if ScreenName == "ScreenSelectPlayMode" then
 				if choices[cursor.index+1] == "FA+" then
 					self:settext("99.50")
+				elseif choices[cursor.index+1] == "ECFA" then
+					self:settext("69.69")
 				else
 					self:settext("77.41")
 				end
@@ -205,6 +217,8 @@ local t = Def.ActorFrame{
 				self:diffusealpha(1)
 				if SL.Global.GameMode == "FA+" then
 					self:settext("99.50")
+				elseif SL.Global.GameMode == "ECFA" then
+					self:settext("69.69")
 				else
 					self:settext("77.41")
 				end
@@ -219,7 +233,7 @@ local t = Def.ActorFrame{
 		OffCommand=function(self) self:sleep(0.4):linear(0.2):diffusealpha(0) end,
 		UpdateCommand=function(self)
 			if ScreenName == "ScreenSelectPlayMode" then
-				if choices[cursor.index+1] == "ITG" or choices[cursor.index+1] == "FA+" then
+				if choices[cursor.index+1] == "ITG" or choices[cursor.index+1] == "ECFA" or choices[cursor.index+1] == "FA+" then
 					self:stoptweening():linear(0.25):diffusealpha(1)
 				else
 					self:stoptweening():linear(0.25):diffusealpha(0)

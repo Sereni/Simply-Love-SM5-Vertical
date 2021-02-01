@@ -55,8 +55,9 @@ SL_CustomPrefs.Get = function()
 			Choices = {
 				THEME:GetString("ScreenSelectPlayMode", "ITG"),
 				THEME:GetString("ScreenSelectPlayMode", "FA+"),
+				THEME:GetString("ScreenSelectPlayMode", "ECFA"),
 			},
-			Values 	= {"ITG", "FA+" }
+			Values 	= {"ITG", "FA+", "ECFA" }
 		},
 		VisualTheme =
 		{
@@ -72,6 +73,11 @@ SL_CustomPrefs.Get = function()
 				THEME:GetString("ThemePrefs", "Off")
 			},
 			Values 	= { true , false }
+		},
+		WriteCustomScores = {
+			Default = false,
+			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
+			Values	= { true, false }
 		},
 		-- - - - - - - - - - - - - - - - - - - -
 		-- SimplyLoveColor saves the theme color for the next time
