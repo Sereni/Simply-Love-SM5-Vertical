@@ -80,17 +80,18 @@ local ECFA_ScoreModifiers = {
     mscale = {
         speed = 1,   --unused
         stamina = 1, --unused
-        tech = 4,
+        tech = 3,
         movement = 4,
-        rhythms = 5
+        rhythms = 6
     },
-    gimmick = {1.04, 1.08, 1.12},
+    gimmick = {1.02, 1.04, 1.06},
     bigscale = 10000,
     exp = 1.75,
-    maxs = 416
+    maxs = 404
 }
 CalculateMaxDP = function(radar)
     local mods = ECFA_ScoreModifiers
+    radar.rating = math.min(radar.rating, 14)
     local bmin = math.min(radar.rating/10, 1)
 
     local S = (mods.scorebase*(radar.rating-7) +
@@ -126,17 +127,19 @@ CalculateMaxDPByTechRadar = function(techRadarTable)
     -- e.g., {speed = 5, stamina = 6, tech = 7, movement = 10, timing = 9, gimmick = 0}
 	
 	if not techRadarTable then return nil end
-
+	
+	local tmpradar = {}
 	-- Scan for all required parameters.
 	local requiredParams = {'speed', 'stamina', 'tech', 'movement', 'rhythms', 'gimmick', 'rating'}
 	for _, v in ipairs(requiredParams) do
 		if techRadarTable[v] == nil then
 			return nil
 		end
+		tmpradar[v] = (v ~= "rating") and math.min(techRadarTable[v], 10) or techRadarTable[v]
 	end
 
     -- Calculate the max DP.
-    return CalculateMaxDP(techRadarTable)
+    return CalculateMaxDP(tmpradar)
 end
 
 SongNameDuringSet = function(self, item)
