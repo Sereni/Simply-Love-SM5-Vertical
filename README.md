@@ -1,6 +1,6 @@
 # Note: ECFA 2021
 
-ECFA2021 support is coming in February! Early version available now in the `dev` branch. Check back for an update shortly before the event, the score system will change.
+This theme supports ECFA 2021 as of Feb 1! Use ECFA mode to enter the event. For any bugs or discrepancies with the official score spreadsheet, please open an issue in this repo or ping Sereni.
 
 # Simply Love Vertical (StepMania 5)
 
