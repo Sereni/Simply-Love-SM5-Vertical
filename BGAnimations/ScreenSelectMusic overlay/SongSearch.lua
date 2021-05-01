@@ -17,7 +17,7 @@ t = Def.ActorFrame{
 	SearchSongCommand=function(self)
                 SCREENMAN:AddNewScreenToTop("ScreenTextEntry");
                 local songSearch = {
-                        Question = "Song name",
+                        Question = "Song search",
                         MaxInputLength = 255,
                         OnOK = function(answer)
 				-- A song is a match if either the whole search query is a substring of
