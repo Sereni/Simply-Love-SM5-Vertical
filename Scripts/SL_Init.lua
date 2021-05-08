@@ -48,6 +48,8 @@ local PlayerDefaults = {
 				Stats = {}
 			}
 			self.PlayerOptionsString = nil
+			-- The Groovestats API key loaded for this player
+			self.ApiKey = ""
 		end
 	}
 }
@@ -319,6 +321,27 @@ SL = {
                         LifePercentChangeHeld=0.010,
                         LifePercentChangeHitMine=-0.05,
                 },
+	},
+
+	-- Fields used to determine the existence of the launcher and the
+	-- available GrooveStats services.
+	GrooveStats = {
+		-- Whether we're launching StepMania with a launcher.
+		-- Determined once on boot in ScreenSystemLayer.
+		Launcher = false,
+
+		-- Available GrooveStats services. Subject to change while
+		-- StepMania is running.
+		GetScores = false,
+		Leaderboard = false,
+		AutoSubmit = false,
+
+		-- ************* CURRENT QR VERSION *************
+		-- * Update whenever we change relevant QR code *
+		-- *  and when GrooveStats backend is also      *
+		-- *   updated to properly consume this value.  *
+		-- **********************************************
+		ChartHashVersion = 3
 	}
 }
 
