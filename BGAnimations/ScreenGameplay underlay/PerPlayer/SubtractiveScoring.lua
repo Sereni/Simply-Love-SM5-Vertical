@@ -1,4 +1,4 @@
-local player = ...
+local player, layout = ...
 local pn = ToEnumShortString(player)
 local mods = SL[pn].ActiveModifiers
 
@@ -24,11 +24,13 @@ local tns, hns
 
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
+-- -----------------------------------------------------------------------
 -- which font should we use for the BitmapText actor?
 local font = mods.ComboFont
 
 -- most ComboFonts have their own dedicated sprite sheets in ./Simply Love/Fonts/_Combo Fonts/
--- "Wendy" and "Wendy (Cursed)" are exceptions for the time being; reroute both to use "./Fonts/Wendy/_wendy small"
+-- "Wendy" and "Wendy (Cursed)" are exceptions for the time being
+-- reroute both to use "./Fonts/Wendy/_wendy small"
 if font == "Wendy" or font == "Wendy (Cursed)" then
 	font = "Wendy/_wendy small"
 else
@@ -47,6 +49,7 @@ bmt.InitCommand=function(self)
 	local width = GetNotefieldWidth()
 	local NumColumns = GAMESTATE:GetCurrentStyle():ColumnsPerPlayer()
 	-- mirror image of MeasureCounter.lua
+	-- TODO: This might be misaligned, we'll have to check. ~Roujo
 	self:xy( GetNotefieldX(player) + (width/NumColumns), _screen.cy-29 )
 
 	-- Fix overlap issues when MeasureCounter is centered

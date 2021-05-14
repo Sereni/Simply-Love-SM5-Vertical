@@ -1,6 +1,6 @@
 -- Pane3 displays a list of HighScores for the stepchart that was played.
 
-local player, side = unpack(...)
+local player = unpack(...)
 
 local mods = SL[ToEnumShortString(player)].ActiveModifiers
 -- No records in DoNotJudgeMe mode.
@@ -8,6 +8,7 @@ if mods.DoNotJudgeMe then return end
 
 local pane = Def.ActorFrame{
 	InitCommand=function(self)
+		-- TODO: Not sure if this is aligned, might have to remove it ~Roujo
 		self:y(_screen.cy - 53):zoom(0.65)
 	end
 }

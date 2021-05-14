@@ -18,7 +18,18 @@ return Def.ActorFrame{
 			self:x(x_offset_name)
 			self:horizalign(left):zoom(text_size)
 			-- darken the text for RainbowMode to make it more legible
-			if (ThemePrefs.Get("RainbowMode") and not HolidayCheer()) then self:diffuse(Color.Black) end
+			local textColor = Color.White
+			local shadowLength = 0
+			if ThemePrefs.Get("RainbowMode") and not HolidayCheer() then
+				textColor = Color.Black
+			end
+			if ThemePrefs.Get("VisualStyle") == "SRPG5" then
+				textColor = color(SL.SRPG5.TextColor)
+				shadowLength = 0.4
+			end
+
+			self:diffuse(textColor)
+			self:shadowlength(shadowLength)
 
 			local style = GAMESTATE:GetCurrentStyle():GetName()
 			if style == "versus" then style = "single" end

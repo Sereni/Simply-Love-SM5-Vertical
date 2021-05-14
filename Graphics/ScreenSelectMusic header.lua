@@ -1,5 +1,4 @@
 local bmt_actor
-local DrawNinePanelPad = LoadActor( THEME:GetPathB("ScreenSelectStyle", "underlay/pad.lua") )
 
 -- -----------------------------------------------------------------------
 
@@ -116,7 +115,8 @@ af[#af+1] = LoadFont("Common Header")..{
 }
 
 -- Pad image
-af[#af+1] = DrawNinePanelPad()..{
+-- TODO: We might want to keep DrawNinePanelPad() here instead? ~Roujo
+af[#af+1] = LoadActor( THEME:GetPathB("ScreenSelectStyle", "underlay/pad.lua"), {nil, nil, 1, nil} )..{
 	InitCommand=function(self)
 		local x = _screen.w - 10
 

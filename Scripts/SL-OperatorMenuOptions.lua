@@ -1,5 +1,54 @@
 OperatorMenuOptionRows = {}
 
+-- -----------------------------------------------------------------------
+-- System Options
+
+OperatorMenuOptionRows.Theme = function()
+	return {
+		Name = "Theme",
+		Choices = THEME:GetSelectableThemeNames(),
+		LayoutType = "ShowAllInRow",
+		SelectType = "SelectOne",
+		OneChoiceForAllPlayers = true,
+		ExportOnChange = false,
+		LoadSelections = function(self, list, pn)
+			local theme = THEME:GetCurThemeName()
+			if not theme then return end
+
+			local i = FindInTable(theme, self.Choices) or 1
+			list[i] = true
+		end,
+		SaveSelections = function(self, list, pn)
+			for i=1, #list do
+				if list[i] then
+					if self.Choices[i] ~= THEME:GetCurThemeName() then
+						-- if the user is switching to some other version of SL they have installed
+						-- don't bother them with the ResetPreferences prompt; just switch to that theme
+						-- try a simple check first
+						if self.Choices[i]:match("Simply Love")	then
+							THEME:SetTheme( self.Choices[i] )
+							return
+						end
+
+						-- if not, attempt a more roundabout check by peeking into the new theme's ThemeInfo.ini
+						if FILEMAN:DoesFileExist("/Themes/"..self.Choices[i].."/ThemeInfo.ini") then
+							local info = IniFile.ReadFile("/Themes/"..self.Choices[i].."/ThemeInfo.ini")
+							if info and info.ThemeInfo and info.ThemeInfo.DisplayName and info.ThemeInfo.DisplayName:match("Simply Love") then
+								THEME:SetTheme( self.Choices[i] )
+								return
+							end
+						end
+
+						-- if not, we'll assume the new theme is different enough to warrant prompting the user
+						SL.NextTheme = self.Choices[i]
+						SCREENMAN:GetTopScreen():SetNextScreenName("ScreenPromptToResetPreferencesToStock")
+					end
+				end
+			end
+		end,
+	}
+end
+
 OperatorMenuOptionRows.EditorNoteskin = function()
 	local skins = NOTESKIN:GetNoteSkinNames()
 	return {
@@ -30,12 +79,22 @@ OperatorMenuOptionRows.EditorNoteskin = function()
 	}
 end
 
+-- -----------------------------------------------------------------------
+-- Advanced Options
+
 OperatorMenuOptionRows.LongAndMarathonTime = function( str )
+	-- define a range of reasonable choices first
+	-- 150 seconds is 2.5 minutes
+	-- 300 seconds is 5   minutes
+	-- 600 seconds is 10  minutes
 	local choices = {
-		Long={Choices=SecondsToMMSS_range(150, 300, 15), Values=range(150, 300, 15)},
-		Marathon={Choices=SecondsToMMSS_range(300, 600, 15), Values=range(300, 600, 15)}
+		Long=    {Choices=map(SecondsToMSS, range(150, 300, 15)), Values=range(150, 300, 15)},
+		Marathon={Choices=map(SecondsToMSS, range(300, 600, 15)), Values=range(300, 600, 15)}
 	}
 
+	-- 999999 seconds ≅ 11 days, 13 hours
+	-- it's an arbitrarily large numerical value to stand-in for "no song should count as multiple rounds"
+	-- it will be presented to the user as the last choice in the OptionRows as a localized "Off"
 	choices.Long.Choices[#choices.Long.Choices+1] = THEME:GetString("ThemePrefs", "Off")
 	choices.Long.Values[#choices.Long.Values+1] = 999999
 	choices.Marathon.Choices[#choices.Marathon.Choices+1] = THEME:GetString("ThemePrefs", "Off")
@@ -108,52 +167,6 @@ OperatorMenuOptionRows.MusicWheelSpeed = function()
 	}
 end
 
-OperatorMenuOptionRows.Theme = function()
-	return {
-		Name = "Theme",
-		Choices = THEME:GetSelectableThemeNames(),
-		LayoutType = "ShowAllInRow",
-		SelectType = "SelectOne",
-		OneChoiceForAllPlayers = true,
-		ExportOnChange = false,
-		LoadSelections = function(self, list, pn)
-			local theme = THEME:GetCurThemeName()
-			if not theme then return end
-
-			local i = FindInTable(theme, self.Choices) or 1
-			list[i] = true
-		end,
-		SaveSelections = function(self, list, pn)
-			for i=1, #list do
-				if list[i] then
-					if self.Choices[i] ~= THEME:GetCurThemeName() then
-						-- if the user is switching to some other version of SL they have installed
-						-- don't bother them with the ResetPreferences prompt; just switch to that theme
-						-- try a simple check first
-						if self.Choices[i]:match("Simply Love")	then
-							THEME:SetTheme( self.Choices[i] )
-							return
-						end
-
-						-- if not, attempt a more roundabout check by peeking into the new theme's ThemeInfo.ini
-						if FILEMAN:DoesFileExist("/Themes/"..self.Choices[i].."/ThemeInfo.ini") then
-							local info = IniFile.ReadFile("/Themes/"..self.Choices[i].."/ThemeInfo.ini")
-							if info and info.ThemeInfo and info.ThemeInfo.DisplayName and info.ThemeInfo.DisplayName:match("Simply Love") then
-								THEME:SetTheme( self.Choices[i] )
-								return
-							end
-						end
-
-						-- if not, we'll assume the new theme is different enough to warrant prompting the user
-						SL.NextTheme = self.Choices[i]
-						SCREENMAN:GetTopScreen():SetNextScreenName("ScreenPromptToResetPreferencesToStock")
-					end
-				end
-			end
-		end,
-	}
-end
-
 ------------------------------------------------------------
 -- Graphics/Sound Options
 
@@ -166,16 +179,21 @@ OperatorMenuOptionRows.VideoRenderer = function()
 	local choices = { "opengl" }
 	local values  = { "opengl" }
 
-	-- Windows also has d3d as a VideoRenderer, and the convention(?)
-	-- there is to list both in Preferences.ini, but only use the first
+	-- Windows also has d3d as a VideoRenderer on SM 5.1, and SM 5.3
+	-- features a modern OpenGL based backend (glad) on all supported
+	-- platforms. The convention(?) there is to list both available
+	-- backends in Preferences.ini, but only use the first
 	local architecture = HOOKS:GetArchName():lower()
-	if architecture:match("windows") then
+	if IsSMVersion(5, 3) then
+		table.insert(choices, "glad")
+		values = { "opengl,glad", "glad,opengl" }
+	elseif architecture:match("windows") then
 		table.insert(choices, "d3d")
 		values = { "opengl,d3d", "d3d,opengl" }
 	end
 
 	return {
-		Name = "VideoRenderer",
+		Name = IsSMVersion(5, 3) and "VideoRendererSM5.3" or "VideoRenderer",
 		Choices = choices,
 		LayoutType = "ShowAllInRow",
 		SelectType = "SelectOne",
@@ -209,41 +227,35 @@ OperatorMenuOptionRows.VideoRenderer = function()
 	}
 end
 
-OperatorMenuOptionRows.VisualDelaySeconds = function()
+function offsetMS(pref, low, high)
+	local val = PREFSMAN:GetPreference(pref)
+	local ms = round(val * 1000)	-- convert seconds to milliseconds
 
-	-- visual delay seconds
-	local vds = PREFSMAN:GetPreference("VisualDelaySeconds")
-	-- visual delay milliseconds, rounded to nearest int
-	local vdms = round(vds * 1000)
-
-	-- it's hopefully safe to assume that the player does not have a VisualDelaySeconds value
-	-- smaller than -1 or larger than 1, but accommodate if they do by using their value as
-	-- the largest or smallest available choice in this OptionRow
-	local low  = round(math.min(-1000, vdms))
-	local high = round(math.max( 1000, vdms))
+	-- If the player has a value set outside of the specified range
+	-- accommodate by extending the range.
+	low = math.min(low, ms)
+	high = math.max(high, ms)
 
 	-- _values as a temp table of values * 1000 as an intermediate step, not presented to players
-	-- _choices as millisecond integers, used for comparison, not presented to players
 	--  choices as millisecond integers with "ms" appended, presented to players
 	local _values  = range(low, high)
-	local _choices = stringify(_values, "%i")
 	local choices  = stringify(_values, "%ims")
 
 	return {
-		Name="VisualDelaySeconds",
+		Name=pref,
 		Choices=choices,
 		LayoutType = "ShowOneInRow",
 		SelectType = "SelectOne",
 		OneChoiceForAllPlayers = true,
 		ExportOnChange = false,
 		LoadSelections = function(self, list, pn)
-			local i = FindInTable(("%i"):format(vdms), _choices) or math.ceil(#choices/2)
+			local i = ms - low + 1
 			list[i] = true
 		end,
 		SaveSelections = function(self, list, pn)
 			for i=1, #choices do
 				if list[i] then
-					PREFSMAN:SetPreference("VisualDelaySeconds", tonumber(_choices[i])/1000)
+					PREFSMAN:SetPreference(pref, (low + i - 1) / 1000)
 					break
 				end
 			end
@@ -251,7 +263,17 @@ OperatorMenuOptionRows.VisualDelaySeconds = function()
 	}
 end
 
-------------------------------------------------------------
+OperatorMenuOptionRows.GlobalOffsetSeconds = function()
+	-- 100ms should be sufficient to accomodate for audio delay
+	return offsetMS("GlobalOffsetSeconds", -100, 100)
+end
+
+OperatorMenuOptionRows.VisualDelaySeconds = function()
+	-- up to 1s of visual delay, because some TVs are really slow
+	return offsetMS("VisualDelaySeconds", -1000, 1000)
+end
+
+-- -----------------------------------------------------------------------
 -- USB profiles
 
 -- the engine doesn't seem to have a conf definition
@@ -282,7 +304,7 @@ end
 
 OperatorMenuOptionRows.CustomSongsMaxSeconds = function()
 	-- first, define a reasonable range of 1:45 to 15:00
-	local choices = SecondsToMMSS_range(105,900,15)
+	local choices = map(SecondsToMSS, range(105,900,15))
 	local values  = range(105,900,15)
 	-- top it off by including 2 hours as a choice
 	table.insert(choices, "2:00:00")

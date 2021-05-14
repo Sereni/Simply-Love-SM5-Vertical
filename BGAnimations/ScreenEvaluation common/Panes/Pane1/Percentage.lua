@@ -1,4 +1,4 @@
-local player, side = unpack(...)
+local player, controller = unpack(...)
 
 local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local PercentDP = stats:GetPercentDancePoints()
@@ -27,7 +27,7 @@ return Def.ActorFrame{
 		Name="Percent",
 		Text=percent,
 		InitCommand=function(self)
-                        if ecfa2021score then self:visible(false) return end
+			if ecfa2021score then self:visible(false) return end
 			self:vertalign(middle):horizalign(right):zoom(0.38)
 			self:x(45)
 		end

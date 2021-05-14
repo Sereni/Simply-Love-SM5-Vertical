@@ -8,7 +8,7 @@ local pane_height  = 130
 local af = Def.ActorFrame{
 	Name=ToEnumShortString(player).."_AF_Lower",
 	InitCommand=function(self)
-	self:x(_screen.cx)
+		self:x(_screen.cx)
 	end
 }
 

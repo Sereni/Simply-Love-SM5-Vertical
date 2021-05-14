@@ -4,12 +4,16 @@ local w = (IsVerticalScreen() and 102 or 136)
 local h = 14
 local _x = Positions.ScreenGameplay.LifeMeterStandardX(player) + 2
 
+-- get SongPosition specific to this player so that
+-- split BPMs are handled if there are any
+local songposition = GAMESTATE:GetPlayerState(player):GetSongPosition()
 local swoosh, velocity
 
 local Update = function(self)
-	velocity = -GAMESTATE:GetSongBPS()/2
-	if GAMESTATE:GetSongFreeze() then velocity = 0 end
-	if swoosh then swoosh:texcoordvelocity(velocity,0) end
+	if not swoosh then return end
+	velocity = -(songposition:GetCurBPS() * 0.5)
+	if songposition:GetFreeze() or songposition:GetDelay() then velocity = 0 end
+	swoosh:texcoordvelocity(velocity,0)
 end
 
 local meter = Def.ActorFrame{

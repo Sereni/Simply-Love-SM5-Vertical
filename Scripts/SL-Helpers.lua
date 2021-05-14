@@ -1,163 +1,4 @@
 -- -----------------------------------------------------------------------
--- NOTE: This is the preferred way to check for RTT support, but we cannot rely on it to
---   accurately tell us whether the current system atually supports RTT!
---   Some players on Linux and [some version of] SM5.1-beta reported that DISPLAY:SupportsRenderToTexture()
---   returned false, when render to texture was definitely working for them.
---   I'm leaving this check here, but commented out, both as "inline instruction" for current SM5 themers
---   and so that it can be easily uncommented and used ~~when we are trees again~~ at a future date.
-
--- SupportsRenderToTexture = function()
--- 	-- ensure the method exists and, if so, ensure that it returns true
--- 	return DISPLAY.SupportsRenderToTexture and DISPLAY:SupportsRenderToTexture()
--- end
-
-
--- -----------------------------------------------------------------------
--- SM5's d3d implementation does not support render to texture. The DISPLAY
--- singleton has a method to check this but it doesn't seem to be implemented
--- in RageDisplay_D3D which is, ironically, where it's most needed.  So, this.
-
-SupportsRenderToTexture = function()
-	-- This is not a sensible way to assess this; it is a hack and should be removed at a future date.
-	if HOOKS:GetArchName():lower():match("windows")
-	and PREFSMAN:GetPreference("VideoRenderers"):sub(1,3):lower() == "d3d" then
-		return false
-	end
-
-	return true
-end
-
-
--- -----------------------------------------------------------------------
--- There's surely a better way to do this.  I need to research this more.
-
-local is8bit = function(text)
-	return text:len() == text:utf8len()
-end
-
-
--- Here's what inline comments in BitmapText.cpp currently have to say about wrapwidthpixels
-------
--- // Break sText into lines that don't exceed iWrapWidthPixels. (if only
--- // one word fits on the line, it may be larger than iWrapWidthPixels).
---
--- // This does not work in all languages:
--- /* "...I can add Japanese wrapping, at least. We could handle hyphens
--- * and soft hyphens and pretty easily, too." -glenn */
-------
---
--- So, wrapwidthpixels does not have great support for East Asian Languages.
--- Without whitespace characters to break on, the text just... never wraps.  Neat.
---
--- Here are glenn's thoughts on the topic as of June 2019:
-------
--- For Japanese specifically I'd convert the string to WString (so each character is one character),
--- then make it split "words" (potential word wrap points) based on each character type.  If you
--- were splitting "text あああ", it would split into "text " (including the space), "あ", "あ", "あ",
--- using a mapping to know which language each character is.  Then just follow the same line fitting
--- and recombine without reinserting spaces (since they're included in the array).
---
--- It wouldn't be great, you could end up with things like periods being wrapped onto a line by
--- themselves, ugly single-character lines, etc.  There are more involved language-specific word
--- wrapping algorithms that'll do a better job:
--- ( https://en.wikipedia.org/wiki/Line_breaking_rules_in_East_Asian_languages ),
--- or a line balancing algorithm that tries to generate lines of roughly even width instead of just
--- filling line by line, but those are more involved.
---
--- A simpler thing to do is implement zero-width spaces (&zwsp), which is a character that just
--- explicitly marks a place where word wrap is allowed, and then you can insert them strategically
--- to manually word-wrap text.  Takes more work to insert them, but if there isn't a ton of text
--- being wrapped, it might be simpler.
-------
---
--- I have neither the native intelligence nor the brute-force-self-taught-CS-experience to achieve
--- any of the above, so here is some laughably bad code that is just barely good enough to meet the
--- needs of JP text in Simply Love.  Feel free to copy+paste this method to /r/shittyprogramming,
--- private Discord servers, etc., for didactic and comedic purposes alike.
-
-BitmapText._wrapwidthpixels = function(bmt, w)
-	local text = bmt:GetText()
-
-	if not is8bit(text) then
-		-- a range of bytes I'm considering to indicate JP characters,
-		-- mostly derived from empirical observation and guesswork
-		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso in SL, so don't include those
-		-- FIXME: If you know more about how this actually works, please submit a pull request.
-		local lower = 200
-		local upper = 240
-		bmt:settext("")
-
-		for i=1, text:utf8len() do
-			local c = text:utf8sub(i,i)
-			local b = c:byte()
-
-			-- if adding this character causes the displayed string to be wider than allowed
-			if bmt:settext( bmt:GetText()..c ):GetWidth() > w then
-				-- and if that character just added was in the jp range (...maybe)
-				if b < upper and b >= lower then
-					-- then insert a newline between the previous character and the current
-					-- character that caused us to go over
-					bmt:settext( bmt:GetText():utf8sub(1,-2).."\n"..c )
-				else
-					-- otherwise it's trickier, as romance languages only really allow newlines
-					-- to be inserted between words, not in the middle of single words
-					-- we'll have to "peel back" a character at a time until we hit whitespace
-					-- or something in the jp range
-					local _text = bmt:GetText()
-
-					for j=i,1,-1 do
-						local _c = _text:utf8sub(j,j)
-						local _b = _c:byte()
-
-						if _c:match("%s") or (_b < upper and _b >= lower) then
-							bmt:settext( _text:utf8sub(1,j) .. "\n" .. _text:utf8sub(j+1) )
-							break
-						end
-					end
-				end
-			end
-		end
-	else
-		bmt:wrapwidthpixels(w)
-	end
-
-	-- return the BitmapText actor in case the theme is chaining actor commands
-	return bmt
-end
-
-BitmapText.Truncate = function(bmt, m)
-	local text = bmt:GetText()
-	local l = text:len()
-
-	-- With SL's Miso and JP fonts, english characters (Miso) tend to render 2-3x less wide
-	-- than JP characters. If the text includes JP characters, it is (probably) desired to
-	-- truncate the string earlier to achieve the same effect.
-	-- Here, we are arbitrarily "weighting" JP characters to count 4x as much as one Miso
-	-- character and then scaling the point at which we truncate accordingly.
-	-- This is, of course, a VERY broad over-generalization, but It Works For Now™.
-	if not is8bit(text) then
-		l = 0
-
-		local lower = 200
-		local upper = 240
-
-		for i=1, text:utf8len() do
-			local b = text:utf8sub(i,i):byte()
-			l = l + ((b < upper and b >= lower) and 4 or 1)
-		end
-		m = math.floor(m * (m/l))
-	end
-
-	-- if the length of the string is less than the specified truncate point, don't do anything
-	if l <= m then return end
-	-- otherwise, replace everything after the truncate point with an ellipsis
-	bmt:settext( text:utf8sub(1, m) .. "…" )
-
-	-- return the BitmapText actor in case the theme is chaining actor commands
-	return bmt
-end
-
--- -----------------------------------------------------------------------
 -- call this to draw a Quad with a border
 -- arguments are: width of quad, height of quad, and border width, in pixels
 
@@ -195,16 +36,33 @@ SL_WideScale = function(AR4_3, AR16_9)
 	return clamp(scale( SCREEN_WIDTH, 640, 854, AR4_3, AR16_9 ), AR4_3, AR16_9)
 end
 
+
+-- -----------------------------------------------------------------------
+-- get timing window in milliseconds
+
+GetTimingWindow = function(n)
+	local prefs = SL.Preferences[SL.Global.GameMode]
+	local scale = PREFSMAN:GetPreference("TimingWindowScale")
+	return prefs["TimingWindowSecondsW"..n] * scale + prefs.TimingWindowAdd
+end
+
 -- -----------------------------------------------------------------------
 -- determines which timing_window an offset value (number) belongs to
 -- used by the judgment scatter plot and offset histogram in ScreenEvaluation
 
 DetermineTimingWindow = function(offset)
-	for i=1,5 do
-		if math.abs(offset) < SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..i] * PREFSMAN:GetPreference("TimingWindowScale") + SL.Preferences[SL.Global.GameMode]["TimingWindowAdd"] then
+	for i=1,NumJudgmentsAvailable() do
+		if math.abs(offset) < GetTimingWindow(i) then
 			return i
 		end
 	end
+	return 5
+end
+
+-- -----------------------------------------------------------------------
+-- return number of available judgments
+
+NumJudgmentsAvailable = function()
 	return 5
 end
 
@@ -225,6 +83,7 @@ end
 -- return the x value for the center of a player's notefield
 --   this is used to position various elements in ScreenGameplay
 --   but it is not used to position the notefields themselves
+--   (that's handled in Metrics.ini under [ScreenGameplay])
 
 GetNotefieldX = function( player )
 	if not player then return end
@@ -265,15 +124,12 @@ local NoteFieldWidth = {
 		-- couple = 256,
 		-- threepanel = 192
 	},
-	-- the SM5 engine causes NoteField columns in pump to overlap one another slightly
-	-- SL provides a hack to "fix" that overlap in ./BGA/ScreenGameplay overlay/PumpColumnSpacingFix.lua
-	-- the NoteFieldWidth values specified here were chosen by trying different values
-	-- and eventually saying, "yeah, that looks good enough." :(
+	-- pump's values are very similar to those used in dance, but curiously smaller
 	pump = {
-		single  = 278,
-		versus  = 278,
-		double  = 563,
-		routine = 563,
+		single  = 250,
+		versus  = 250,
+		double  = 500,
+		routine = 500,
 	},
 	-- These values for techno, para, and kb7 are the result of empirical observation
 	-- of the SM5 engine and should not be regarded as any kind of Truth.
@@ -313,35 +169,37 @@ end
 --
 -- We reference this function in Metrics.ini under the [Gameplay] section.
 GetComboThreshold = function( MaintainOrContinue )
-	local CurrentGame = GAMESTATE:GetCurrentGame():GetName()
 
-	local ComboThresholdTable = {
-		dance	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-		pump	=	{ Maintain = "TapNoteScore_W4", Continue = "TapNoteScore_W4" },
-		techno	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-		kb7		=	{ Maintain = "TapNoteScore_W4", Continue = "TapNoteScore_W4" },
-		-- these values are chosen to match Deluxe's PARASTAR
-		para	=	{ Maintain = "TapNoteScore_W5", Continue = "TapNoteScore_W3" },
+	local Combo = {}
+	Combo.dance = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+	Combo.pump  = { Maintain = "TapNoteScore_W4", Continue = "TapNoteScore_W4" }
+	Combo.techno= { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+	Combo.kb7   = { Maintain = "TapNoteScore_W4", Continue = "TapNoteScore_W4" }
 
-		-- I don't know what these values are supposed to actually be...
-		popn	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-		beat	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-		kickbox	=	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
+	-- values for para were inherited from freem's Moonlight theme which had an inline comment stating:
+	-- "these are chosen to match Deluxe's PARASTAR"
+	Combo.para = { Maintain = "TapNoteScore_W5", Continue = "TapNoteScore_W3" }
 
-		-- lights is not a playable game mode, but it is, oddly, a selectable one within the operator menu
-		-- include dummy values here to prevent Lua errors in case players accidentally switch to lights
-		lights =	{ Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" },
-	}
+	-- I don't know what these values are supposed to be.
+	Combo.popn    = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+	Combo.beat    = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+	Combo.kickbox = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
+
+	-- lights is not a playable game mode, but it is, oddly, a selectable one within the operator menu
+	-- include dummy values here to prevent Lua errors in case players accidentally switch to lights
+	Combo.lights  = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
 
 
-	if CurrentGame ~= "para" then
-		if SL.Global.GameMode=="FA+" then
-			ComboThresholdTable.dance.Maintain = "TapNoteScore_W4"
-			ComboThresholdTable.dance.Continue = "TapNoteScore_W4"
-		end
+	-- handle FA+ for Dance
+	-- should these values change for Pump?  I guess that's up to me.
+	if SL.Global.GameMode=="FA+" then
+		Combo.dance.Maintain = "TapNoteScore_W4"
+		Combo.dance.Continue = "TapNoteScore_W4"
 	end
 
-	return ComboThresholdTable[CurrentGame][MaintainOrContinue]
+
+	local game = GAMESTATE:GetCurrentGame():GetName() or "dance"
+	return Combo[game][MaintainOrContinue]
 end
 
 -- -----------------------------------------------------------------------
@@ -448,12 +306,13 @@ end
 -- -----------------------------------------------------------------------
 
 SetGameModePreferences = function()
-	-- apply the preferences associated with this GameMode
+	-- apply the preferences associated with this SL GameMode (Casual, ITG, FA+)
 	for key,val in pairs(SL.Preferences[SL.Global.GameMode]) do
 		PREFSMAN:SetPreference(key, val)
 	end
  	SL.Global.ActiveModifiers.TimingWindows = {true,true,true,true,true}
 
+	--------------------------------------------
 	-- loop through human players and apply whatever mods need to be set now
 	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 		-- Now that we've set the SL table for TimingWindows appropriately,
@@ -476,16 +335,22 @@ SetGameModePreferences = function()
 		player_modslevel:FailSetting( GetDefaultFailType() )
 	end
 
+	--------------------------------------------
+	-- finally, load the Stats.xml file appropriate for this SL GameMode
+
 	-- these are the prefixes that are prepended to each custom Stats.xml, resulting in
-	-- Stats.xml, ECFA-Stats.xml
+	-- Stats.xml, ECFA-Stats.xml, Casual-Stats.xml
+	local prefix = {}
+
+	-- ITG has no prefix and scores go directly into the main Stats.xml
+	-- this was probably a Bad Decision™ on my part in hindsight  -quietly
+	prefix["ITG"] = ""
+
 	-- "FA+" mode is prefixed with "ECFA-" because the mode was previously known as "ECFA Mode"
 	-- and I don't want to deal with renaming relatively critical files from the theme.
 	-- Thus, scores from FA+ mode will continue to go into ECFA-Stats.xml.
-	local prefix = {
-		ITG = "",
-		["FA+"] = "ECFA-",
-		["ECFA"] = "ECFA2021-",
-	}
+	prefix["FA+"] = "ECFA-"
+	prefix["ECFA"] = "ECFA2021-"
 
 	if PROFILEMAN:GetStatsPrefix() ~= prefix[SL.Global.GameMode] then
 		PROFILEMAN:SetStatsPrefix(prefix[SL.Global.GameMode])
@@ -574,60 +439,30 @@ DarkUI = function()
 end
 
 -- -----------------------------------------------------------------------
--- Check a string for emojis.  If any are found, force specifically
--- those characters to be diffused to an rgba of 1,1,1,1
--- that is, no color - native emoji colors will be maintained.
---
--- This allows us to have a string like "hello world 🌊 i am here" displayed
--- in a single BitmapText actor, with diffuse() only applied to the text.
---
--- If you have string that might have emojis in it, do your normal diffuse() first,
--- then use DiffuseEmojis() to remove that diffuse property from emoji characters.
-
-DiffuseEmojis = function(bmt, text)
-	text = text or bmt:GetText()
-
-	-- loop through each char in the string, checking for emojis; if any are found
-	-- don't diffuse that char to be any specific color by selectively diffusing it to be {1,1,1,1}
-	for i=1, text:utf8len() do
-		-- FIXME: Similar to _wrapwidthpixels(), if you can implement a proper utf8-friendly fix,
-		--        please submit a pull request because I certainly don't know what I'm doing.
-		if text:utf8sub(i,i):byte() >= 240 then
-			bmt:AddAttribute(i-1, { Length=1, Diffuse={1,1,1,1} } )
-		end
-	end
+-- "The chills, I have them down my spine."
+IsSpooky = function()
+	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==9 and ThemePrefs.Get("VisualStyle")=="Spooky")
 end
 
 -- -----------------------------------------------------------------------
--- read the theme version from ThemeInfo.ini to display on ScreenTitleMenu underlay
--- this allows players to more easily identify what version of the theme they are currently using
+-- functions that handle custom judgment graphic detection/loading
 
-GetThemeVersion = function()
-	local file = IniFile.ReadFile( THEME:GetCurrentThemeDirectory() .. "ThemeInfo.ini" )
-	if file then
-		if file.ThemeInfo and file.ThemeInfo.Version then
-			return file.ThemeInfo.Version
-		end
-	end
-	return false
-end
-
--- -----------------------------------------------------------------------
--- functions handle custom judgment graphic detection/loading
-
-local function FilenameIsMultiFrameSprite(filename)
-	-- look for the "[frames wide] x [frames tall]"
-	-- and some sort of all-letters file extension
-	-- Lua doesn't support an end-of-string regex marker...
+-- look for the "[frames wide] x [frames tall]" and some sort of all-letters file extension
+-- return true if both are found in the filename
+-- (note: Lua doesn't natively support an end-of-string regex marker.)
+local FilenameIsMultiFrameSprite = function(filename)
 	return string.match(filename, " %d+x%d+") and string.match(filename, "%.[A-Za-z]+")
 end
 
-function StripSpriteHints(filename)
+-- remove "[frames wide] x [frames tall]"
+-- remove "(doublres)"
+-- remove ".png"
+StripSpriteHints = function(filename)
 	-- handle common cases here, gory details in /src/RageBitmapTexture.cpp
 	return filename:gsub(" %d+x%d+", ""):gsub(" %(doubleres%)", ""):gsub(".png", "")
 end
 
-function GetJudgmentGraphics(mode)
+GetJudgmentGraphics = function(mode)
 	local path = THEME:GetPathG('', '_judgments/' .. mode)
 	local files = FILEMAN:GetDirListing(path .. '/')
 	local judgment_graphics = {}
@@ -724,215 +559,8 @@ GetComboFonts = function()
 	return fonts
 end
 
--- -----------------------------------------------------------------------
--- Returns an actor that can write a request, wait for its response, and then
--- perform some action. This actor will only wait for one response at a time.
--- If we make a new request while we are already waiting on a response, we
--- will ignore the response received from the previous request and wait for the
--- new response.
---
--- Usage:
--- af[#af+1] = RequestResponseActor("GetScores", 10)
---
--- Which can then be triggered by:
---
--- af[#af+1] = Def.Actor{
---   OnCommand=function(self)
---     MESSAGEMAN:Broadcast("GetScores", {
---       data={..},
---       args={..},
---       callback=function(data, args)
---         SCREENMAN:SystemMessage(tostring(data)..tostring(args))
---       end
---     })
---   end
---  }
--- (The OnCommand can be concatenated to the returned actor itself.)
-
--- The params in the MESSAGEMAN:Broadcast() call must have the following:
--- data: A table that can be converted to JSON that will contains the
---       information for the request
--- args: Arguments that will be made accesible to the callback function. This
---       can of any type as long as the callback knows what to do with it.
--- callback: A function that processes the response. It must take at least two
---           parameters:
---              data: The JSON response which has been converted back to a lua table
---              args: The same args as listed above above.
-
--- name: A name that will trigger the request for this actor.
---       It should generally be unique for each actor of this type.
--- timeout: A positive number in seconds between [1.0, 59.0] inclusive. It must
---          be less than 60 seconds as responses are expected to be cleaned up
---          by the launcher by then.
-RequestResponseActor = function(name, timeout)
-	-- Sanitize the timeout value.
-	local timeout = clamp(timeout, 1.0, 59.0)
-	local path_prefix = "/Save/GrooveStats/"
-
-	return Def.Actor{
-		InitCommand=function(self)
-			self.request_id = nil
-			self.request_time = nil
-			self.args = nil
-			self.callback = nil
-		end,
-		WaitCommand=function(self)
-			local Reset = function(self)
-				self.request_id = nil
-				self.request_time = nil
-				self.args = nil
-				self.callback = nil
-			end
-			-- We're waiting on a response.
-			if self.request_id ~= nil then
-				local now = GetTimeSinceStart()
-
-				local f = RageFileUtil.CreateRageFile()
-				-- Check to see if the response file was written.
-				if f:Open(path_prefix.."responses/"..self.request_id..".json", 1) then
-					local data = json.decode(f:Read())
-					self.callback(data, self.args)
-					f:Close()
-					Reset(self)
-				-- Have we timed out?
-				elseif now - self.request_time > timeout then
-					Reset(self)
-				end
-				f:destroy()
-			end
-
-			-- If the id wasn't reset, then we're still waiting. Loop again.
-			if self.request_id ~= nil then
-				self:sleep(0.5):queuecommand('Wait')
-			end
-		end,
-		[name .. "MessageCommand"]=function(self, params)
-			if not SL.GrooveStats.Launcher and params.data["action"] ~= "ping" then return end
-			local id = nil
-			-- We don't want to generate a bunch of files if they will never get processed.
-			-- Specifically for the ping action, we will use a predetermined id.
-			if params.data["action"] == "ping" then
-				id = "ping"
-			else
-				id = CRYPTMAN:GenerateRandomUUID()
-			end
-
-			local f = RageFileUtil:CreateRageFile()
-			if f:Open(path_prefix .. "requests/".. id .. ".json", 2) then
-				f:Write(json.encode(params.data))
-				self.request_id = id
-				self.request_time = GetTimeSinceStart()
-				self.args = params.args
-				self.callback = params.callback
-				f:Close()
-			end
-			f:destroy()
-
-			if self.request_id ~= nil then
-				self:queuecommand('Wait')
-			end
-		end
-	}
-end
 
 -- -----------------------------------------------------------------------
--- Returns the API key for a player if it's found in their profile.
--- Returns the empty string if it was not found or of it was invalid (not 64 characters).
-
-GetApiKeyForPlayer = function(player)
-	if not player then return "" end
-
-	local profile_slot = {
-		[PLAYER_1] = "ProfileSlot_Player1",
-		[PLAYER_2] = "ProfileSlot_Player2"
-	}
-
-	if not profile_slot[player] then return "" end
-
-	local dir = PROFILEMAN:GetProfileDir(profile_slot[player])
-	-- We require an explicit profile to be loaded.
-	if not dir or #dir == 0 then return "" end
-
-	local path = dir.. "GrooveStats.ini"
-
-	if not FILEMAN:DoesFileExist(path) then
-		-- The file doesn't exist. We will create it for this profile, and then just return.
-		IniFile.WriteFile(path, {
-			["GrooveStats"]={
-				["ApiKey"]=""
-			}
-		})
-
-		return ""
-	else
-		local contents = IniFile.ReadFile(path)["GrooveStats"]
-		for k,v in pairs(contents) do
-			if k == "ApiKey" then
-				if #v ~= 64 then
-					SM(ToEnumShortString(player).." has invalid ApiKey length!")
-					return ""
-				else
-					return v
-				end
-			end
-		end
-	end
-
-	return ""
-end
-
--- -----------------------------------------------------------------------
--- The common conditions required to use the GrooveStats services.
--- Currently the conditions are:
---  - We must be in the "dance" game mode (not "pump", etc)
---  - At least one Api Key must be available
---  - We must not be in course mode.
-IsServiceAllowed = function(condition)
-	return (condition and
-		GAMESTATE:GetCurrentGame():GetName()=="dance" and
-		(SL.P1.ApiKey ~= "" or SL.P2.ApiKey ~= "") and
-		not GAMESTATE:IsCourseMode())
-end
-
--- -----------------------------------------------------------------------
--- Store the current global offset
-StoreCurrentGlobalOffset = function()
-	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = PREFSMAN:GetPreference("GlobalOffsetSeconds")
-end
-
--- -----------------------------------------------------------------------
--- Update the default global offset in ThemePrefs.ini and the SL table with the current
--- global offset if it was changed since the last time StoreCurrentGlobalOffset was called
--- Also set the GlobalOffsetDelta modifier to 0
--- Since there's no straightforward way to run this consistently after ScreenGameplay and ScreenSaveSync
--- it has to be placed before Evaluation screen in Scripts/SL-Branches.lua and in ScreenSelectMusic
-UpdateDefaultGlobalOffset = function()
-	if not GAMESTATE:Env()["GlobalOffsetAtSongStart"] then return end
-	offsetAtSongStart = GAMESTATE:Env()["GlobalOffsetAtSongStart"]
-	currentOffset = PREFSMAN:GetPreference("GlobalOffsetSeconds")
-	if currentOffset ~= offsetAtSongStart then
-		ThemePrefs.Set("DefaultGlobalOffsetSeconds", currentOffset)
-		ThemePrefs.Save()
-		SL.Global.DefaultGlobalOffsetSeconds = currentOffset
-		notes = offsetAtSongStart < currentOffset and " (notes earlier)" or " (notes later)"
-		offsetChange = string.format("Default global offset changed from %.3f to %.3f %s",
-			offsetAtSongStart, currentOffset, notes)
-		SM(offsetChange)
-		SL.Global.ActiveModifiers.GlobalOffsetDelta = 0
-	end
-	GAMESTATE:Env()["GlobalOffsetAtSongStart"] = nil
-end
-
--- -----------------------------------------------------------------------
--- Unjoins the specified player and displays an error message.
-UnjoinLateJoinedPlayer = function(player)
-	GAMESTATE:UnjoinPlayer(player)
-	-- TODO localize this error message.
-	-- Better yet, find a way to prevent joining altogether, instead of canceling it.
-	-- Known issues with this solution:
-	-- - The wheel scrolls to the first pack/course on join+unjoin
-  -- - The other player's controls remain active (but enter is blocked)
-	-- - Second player name overlaps in the bottom bar
-	-- - On game over screen, both players' stats can sometimes shown
-	SM("Cannot join 2nd player in vertical mode.")
+IsAutoplay = function(player)
+	return GAMESTATE:GetPlayerState(player):GetPlayerController() ~= "PlayerController_Human"
 end

@@ -35,7 +35,8 @@ local MachineHighScoreIndexInEventMode = function()
 	local index = -1
 
 	for i, highscore in ipairs(MachineHighScores) do
-		local name
+		local name = pss:GetHighScore():GetName()
+
 	 	if  pss:GetHighScore():GetScore() == highscore:GetScore()
 		and pss:GetHighScore():GetDate()  == highscore:GetDate()
 		and
@@ -67,38 +68,40 @@ local EarnedPersonalRecord = ( HighScoreIndex.Personal ~= -1 ) and pss:GetPercen
 
 -- ---------------------------------------------
 
+-- this player earned some record and the ability to enter a high score name
+-- we'll check for this flag later in ./BGAnimations/ScreenNameEntryTradtional underlay/default.lua
 if EarnedMachineRecord or EarnedPersonalRecord then
-
-	-- this player earned some record and the ability to enter a high score name
-	-- we'll check for this flag later in ./BGAnimations/ScreenNameEntryTradtional underlay/default.lua
 	SL[pn].HighScores.EnteringName = true
-
-	local t = Def.ActorFrame{
-		InitCommand=function(self) self:zoom(0.225) end,
-		OnCommand=function(self)
-			self:x( _screen.cx -30 )
-			self:y( _screen.cy -70 )
-		end
-	}
-
-	if HighScoreIndex.Machine+1 > 0 then
-		local y_offset = -24
-		-- If Personal record isn't displayed, move machine record down
-		if HighScoreIndex.Personal+1 <= 0 then
-			y_offset = 24
-		end
-		t[#t+1] = LoadFont("Common Bold")..{
-			Text=(ScreenString("MachineRecord")):format(HighScoreIndex.Machine+1),
-			InitCommand=function(self) self:y(y_offset):horizalign(right):diffuse(PlayerColor(player)) end,
-		}
-	end
-
-	if HighScoreIndex.Personal+1 > 0 then
-		t[#t+1] = LoadFont("Common Bold")..{
-			Text=(ScreenString("PersonalRecord")):format(HighScoreIndex.Personal+1),
-			InitCommand=function(self) self:y(24):horizalign(right):diffuse(PlayerColor(player)) end,
-		}
-	end
-
-	return t
 end
+
+-- We always want to return this actor frame in case we need to "hijack" it for GrooveStats functionality.
+local t = Def.ActorFrame{
+	Name="RecordTexts",
+	InitCommand=function(self) self:zoom(0.225) end,
+	OnCommand=function(self)
+		self:x( _screen.cx -30 )
+		self:y( _screen.cy -70 )
+	end
+}
+
+t[#t+1] = LoadFont("Common Bold")..{
+	Name="MachineRecord",
+	InitCommand=function(self) self:y(-24):horizalign(right):diffuse(PlayerColor(player)) end,
+	OnCommand=function(self)
+		if EarnedMachineRecord and HighScoreIndex.Machine+1 > 0 then
+			self:settext(ScreenString("MachineRecord"):format(HighScoreIndex.Machine+1))
+		end
+	end,
+}
+
+t[#t+1] = LoadFont("Common Bold")..{
+	Name="PersonalRecord",
+	InitCommand=function(self) self:y(24):horizalign(right):diffuse(PlayerColor(player)) end,
+	OnCommand=function(self)
+		if EarnedPersonalRecord and HighScoreIndex.Personal+1 > 0 then
+			self:settext(ScreenString("PersonalRecord"):format(HighScoreIndex.Personal+1))
+		end
+	end,
+}
+
+return t

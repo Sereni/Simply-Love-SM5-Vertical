@@ -1,31 +1,25 @@
 -- Pane6 displays QR codes for uploading scores to groovestats.com
 
-local player, side = unpack(...)
+local player, _, ComputedData = unpack(...)
 
--- ------------------------------------------
--- ValidForGrooveStats.lua contains various checks requested by Archi
--- to determine whether the score should be permitted on GrooveStats
--- and returns a table of booleans, one per check.
---
--- Obviously, this is trivial to circumvent and not meant to keep
--- malicious users out of GrooveStats. It is intended to prevent
--- well-intentioned-but-unaware players from accidentally submitting
--- invalid scores to GrooveStats.
-
-local checks = LoadActor("./ValidForGrooveStats.lua", player)
-
--- reduce the table of booleans to single value; the score is valid or it isn't
-local ValidForGrooveStats = true
-for _, passed_check in ipairs(checks) do
-	if not passed_check then ValidForGrooveStats = false; break end
-end
+local checks, allChecksPassed = ValidForGrooveStats(player)
 
 local url, text = nil, ""
 local X_HasBeenBlinked = false
 
 -- GrooveStatsURL.lua returns a formatted URL with some parameters in the query string
-if ValidForGrooveStats then
-	url = LoadActor("./GrooveStatsURL.lua", player)
+if allChecksPassed then
+
+	-- don't generate the GrooveStats URL twice if only one player is joined
+	-- and we've already generated it for a previous controller's pane
+	-- it involves expensive hash computations
+	if ComputedData and ComputedData.GrooveStatsURL then
+		url = ComputedData.GrooveStatsURL
+	else
+		url = LoadActor("./GrooveStatsURL.lua", player)
+		if ComputedData then ComputedData.GrooveStatsURL = url end
+	end
+
 	text = ScreenString("QRInstructions")
 
 else
@@ -55,7 +49,7 @@ local qrcode_size = 122
 
 local pane = Def.ActorFrame{
 	PaneSwitchCommand=function(self)
-		if self:GetVisible() and not ValidForGrooveStats and not X_HasBeenBlinked then
+		if self:GetVisible() and not allChecksPassed and not X_HasBeenBlinked then
 			self:queuecommand("BlinkX")
 		end
 	end
@@ -75,7 +69,7 @@ pane[#pane+1] = qrcode_amv( url, qrcode_size )..{
 }
 
 -- red X to visually cover the QR code if the score was invalid
-if not ValidForGrooveStats then
+if not allChecksPassed then
 	pane[#pane+1] = LoadActor("x.png")..{
 		InitCommand=function(self)
 			self:zoom(0.77):align(0,0):xy(code_x_offset,code_y_offset)
@@ -99,9 +93,20 @@ pane[#pane+1] = Def.Quad{
 	InitCommand=function(self) self:xy(text_x_offset, text_y_offset+20):zoomto(text_width-3,1):align(0,0):diffuse(1,1,1,0.33) end
 }
 
+-- if there are multiple reasons the score was invalid for GrooveStats ranking
+-- the help text might spill outside the vertical bounds of the pane
+-- hide any such spillover with a mask
+if not allChecksPassed then
+	pane[#pane+1] = Def.Quad{
+		-- TODO: Not sure if this is aligned, might have to change it ~Roujo
+		InitCommand=function(self) self:xy(-10, 142):zoomto(121,140):align(0,0):MaskSource() end
+	}
+end
+
 -- localized help text, either "use your phone to scan" or "here's why your score was invalid"
 pane[#pane+1] = LoadFont("Common Normal")..{
 	Text=text,
+	Name="HelpText",
 	InitCommand=function(self)
 		self:zoom(text_body_size):xy(text_x_offset,text_y_offset+27):align(0,0):vertspacing(-4):wrapwidthpixels(text_width/text_body_size):MaskDest()
 

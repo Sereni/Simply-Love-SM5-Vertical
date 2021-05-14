@@ -6,9 +6,9 @@ local PlayerDefaults = {
 			self.ActiveModifiers = {
 				SpeedModType = "X",
 				SpeedMod = 1.00,
-				JudgmentGraphic = "Love 2x6.png",
+				JudgmentGraphic = "Love 2x6 (doubleres).png",
 				ComboFont = "Wendy",
-				HoldJudgment = "Love 1x2.png",
+				HoldJudgment = "Love 1x2 (doubleres).png",
 				NoteSkin = nil,
 				Mini = "0%",
 				BackgroundFilter = "Off",
@@ -33,12 +33,32 @@ local PlayerDefaults = {
 				MissBecauseHeld = false,
 				NPSGraphAtTop = false,
 				DoNotJudgeMe = false,
+				ErrorBar = "None",
+				ErrorBarUp = false,
+				ErrorBarMultiTick = false,
 			}
 			self.Streams = {
-				SongDir = nil,
-				StepsType = nil,
-				Difficulty = nil,
-				Measures = nil,
+				-- Chart identifiers for caching purposes.
+				Filename = "",
+				StepsType = "",
+				Difficulty = "",
+				Description = "",
+
+				-- Information parsed out from the chart.
+				NotesPerMeasure = {},
+				PeakNPS = 0,
+				NPSperMeasure = {},
+				Hash = '',
+
+				Crossovers = 0,
+				Footswitches = 0,
+				Sideswitches = 0,
+				Jacks = 0,
+				Brackets = 0,
+
+				-- Data for measure counter. Populated in ./ScreenGameplay in/MeasureCounterAndMods.lua.
+				-- Uses the notesThreshold option.
+				Measures = {},
 			}
 			self.HighScores = {
 				EnteringName = false,
@@ -48,8 +68,17 @@ local PlayerDefaults = {
 				Stats = {}
 			}
 			self.PlayerOptionsString = nil
+
+			-- default panes to intialize ScreenEvaluation to
+			-- when only a single player is joined (single, double)
+			-- in versus (2 players joined) only EvalPanePrimary will be used
+			self.EvalPanePrimary   = 1 -- large score and judgment counts
+			self.EvalPaneSecondary = 4 -- offset histogram
+
 			-- The Groovestats API key loaded for this player
 			self.ApiKey = ""
+			-- Whether or not the player is playing on pad.
+			self.IsPadPlayer = false
 		end
 	}
 }
@@ -196,13 +225,21 @@ SL = {
 			AllowW1="AllowW1_Everywhere",
 			SubSortByNumSteps=true,
 
-			TimingWindowSecondsW1=0.011000,
+			TimingWindowSecondsW1=0.013500,
 			TimingWindowSecondsW2=0.021500,
 			TimingWindowSecondsW3=0.043000,
 			TimingWindowSecondsW4=0.102000,
 			TimingWindowSecondsW5=0.135000,
 			TimingWindowSecondsHold=0.320000,
-			TimingWindowSecondsMine=0.065000,
+			-- NOTE(teejusb): FA+ mode previously had mines set to
+			-- 65ms instead of the actual window size of 70ms. This
+			-- was to account for "SM5 Mines" but now with the patch here:
+			-- https://gist.github.com/DinsFire64/4a3f763cd3033afd55a176980b32a3b5
+			-- and the development in the thread here:
+			-- https://github.com/stepmania/stepmania/issues/1896
+			-- it's as good as "fixed" for the very very large majority of
+			-- cases so we can set this back to 70ms now.
+			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
 		ECFA = {
@@ -228,6 +265,16 @@ SL = {
                 }
 	},
 	Metrics = {
+		-- The PercentScoreWeightCheckpointHit and
+		-- GradeWeightCheckpointHit metrics are only used in pump game
+		-- mode. We have to set them to 0 for two reasons:
+		-- 1. Due to an inconsistency in the game engine the score for
+		--    perfect play adds up to less than 100% when
+		--    PercentScoreWeightCheckpointHit is > 0.
+		-- 2. It brings the scoring in pump mode closer to PIU scoring,
+		--    which does not award points for held checkpoints, but
+		--    only penalizes missed checkpoints.
+
 		ITG = {
 			PercentScoreWeightW1=5,
 			PercentScoreWeightW2=4,
@@ -236,8 +283,9 @@ SL = {
 			PercentScoreWeightW5=-6,
 			PercentScoreWeightMiss=-12,
 			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=5,
+			PercentScoreWeightHeld=IsGame("pump") and 0 or 5,
 			PercentScoreWeightHitMine=-6,
+			PercentScoreWeightCheckpointHit=0,
 
 			GradeWeightW1=5,
 			GradeWeightW2=4,
@@ -246,8 +294,9 @@ SL = {
 			GradeWeightW5=-6,
 			GradeWeightMiss=-12,
 			GradeWeightLetGo=0,
-			GradeWeightHeld=5,
+			GradeWeightHeld=IsGame("pump") and 0 or 5,
 			GradeWeightHitMine=-6,
+			GradeWeightCheckpointHit=0,
 
 			LifePercentChangeW1=0.008,
 			LifePercentChangeW2=0.008,
@@ -258,6 +307,8 @@ SL = {
 			LifePercentChangeLetGo=IsGame("pump") and 0.000 or -0.080,
 			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
 			LifePercentChangeHitMine=-0.050,
+
+			InitialValue=0.5,
 		},
 		["FA+"] = {
 			PercentScoreWeightW1=5,
@@ -267,8 +318,9 @@ SL = {
 			PercentScoreWeightW5=0,
 			PercentScoreWeightMiss=-12,
 			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=5,
+			PercentScoreWeightHeld=IsGame("pump") and 0 or 5,
 			PercentScoreWeightHitMine=-6,
+			PercentScoreWeightCheckpointHit=0,
 
 			GradeWeightW1=5,
 			GradeWeightW2=5,
@@ -277,8 +329,9 @@ SL = {
 			GradeWeightW5=0,
 			GradeWeightMiss=-12,
 			GradeWeightLetGo=0,
-			GradeWeightHeld=5,
+			GradeWeightHeld=IsGame("pump") and 0 or 5,
 			GradeWeightHitMine=-6,
+			GradeWeightCheckpointHit=0,
 
 			LifePercentChangeW1=0.008,
 			LifePercentChangeW2=0.008,
@@ -286,9 +339,11 @@ SL = {
 			LifePercentChangeW4=0.004,
 			LifePercentChangeW5=0,
 			LifePercentChangeMiss=-0.1,
-			LifePercentChangeLetGo=-0.08,
-			LifePercentChangeHeld=0.008,
+			LifePercentChangeLetGo=IsGame("pump") and 0.000 or -0.080,
+			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
 			LifePercentChangeHitMine=-0.05,
+
+			InitialValue=0.5,
 		},
 		ECFA = {
                         PercentScoreWeightW1=10,

@@ -23,6 +23,8 @@ end
 
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
+-- scores are not aligned symmetrically around screen.cx for aesthetic reasons
+-- and this is the cause of many code-induced headaches
 local pos = {
 	[PLAYER_1] = { x=(_screen.cx - clamp(_screen.w, 640, 854)/4.3),  y=56 },
 	[PLAYER_2] = { x=(_screen.cx + clamp(_screen.w, 640, 854)/2.75), y=56 },

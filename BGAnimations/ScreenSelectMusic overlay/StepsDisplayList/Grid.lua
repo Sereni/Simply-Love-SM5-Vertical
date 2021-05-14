@@ -52,6 +52,7 @@ local t = Def.ActorFrame{
 			self:playcommand("Unset")
 		end
 	end,
+}
 
 	-- - - - - - - - - - - - - -
 
@@ -165,7 +166,7 @@ for RowNumber=1,num_rows do
 	}
 
 	Grid[#Grid+1] = LoadFont("Common Bold")..{
-		Name="Meter_"..RowNumber,
+		Name="Meter_"..(RowNumber + 3),
 		InitCommand=function(self)
 			self:horizalign(right)
 			self:y(RowNumber * RowHeight)

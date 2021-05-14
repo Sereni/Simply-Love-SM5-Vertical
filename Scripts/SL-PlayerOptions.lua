@@ -38,7 +38,7 @@ end
 -- when to use Choices() vs. Values()
 --
 -- Each OptionRow needs stringified choices to present to the player.  Sometimes using hardcoded strings
--- is okay. For example, SpeedModType choices (x, C, M) are the same in English as in French.
+-- is okay. For example, SpeedModType choices (X, C, M) are the same in English as in French.
 --
 -- Other times, we need to be able to localize the choices presented to the player but also
 -- maintain an internal value that code within the theme can rely on regardless of language.
@@ -86,7 +86,7 @@ local Overrides = {
 
 	-------------------------------------------------------------------------
 	SpeedModType = {
-		Choices = { "X", "C", "M" },
+		Values = { "X", "C", "M" },
 		ExportOnChange = true,
 		LayoutType = "ShowOneInRow",
 		SaveSelections = function(self, list, pn)
@@ -94,7 +94,7 @@ local Overrides = {
 				if list[i] then
 					-- Broadcast a message that ./BGAnimations/ScreenPlayerOptions overlay.lua will be listening for
 					-- so it can hackishly modify the single BitmapText actor used in the SpeedMod optionrow
-					MESSAGEMAN:Broadcast('SpeedModType'..ToEnumShortString(pn)..'Set', {SpeedModType=self.Choices[i], Player=pn})
+					MESSAGEMAN:Broadcast('SpeedModType'..ToEnumShortString(pn)..'Set', {SpeedModType=self.Values[i], Player=pn})
 				end
 			end
 		end
@@ -141,6 +141,35 @@ local Overrides = {
 						"retrobar-o2jam", "retrobar-razor", "retrobar-razor_o2"
 					}
 				}
+
+				-- additional SM 5.3 stock note skins
+				if IsSMVersion(5, 3) then
+					local stockOutfox = {
+						dance = {
+							"defaultsm5", "delta2019", "outfox-itg", "outfox-note",
+							"paw"
+						},
+						pump = {
+							"defaultsm5", "pawprint", "rhythmsm5"
+						},
+						global = {
+							"broadhead", "crystal", "crystal4k", "exact3d", "fourv2",
+							"glider-note", "paws", "shadowtip"
+						}
+					}
+
+					if stockOutfox[game] then
+						for name in ivalues(stockOutfox[game]) do
+							table.insert(stock[game], name)
+						end
+					end
+					if stock[game] then
+						for name in ivalues(stockOutfox.global) do
+							table.insert(stock[game], name)
+						end
+					end
+				end
+
 				if stock[game] then
 					for stock_noteskin in ivalues(stock[game]) do
 						for i=1,#all do
@@ -165,7 +194,7 @@ local Overrides = {
 				if list[i] then mods.NoteSkin = val; break end
 			end
 			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the NoteSkin preview
-			MESSAGEMAN:Broadcast('NoteSkinChanged', {Player=pn, NoteSkin=mods.NoteSkin})
+			MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=pn, Name="NoteSkin", Value=mods.NoteSkin})
 			playeroptions:NoteSkin( mods.NoteSkin )
 		end
 	},
@@ -181,7 +210,7 @@ local Overrides = {
 				if list[i] then mods.JudgmentGraphic = val; break end
 			end
 			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the Judgment preview
-			MESSAGEMAN:Broadcast("JudgmentGraphicChanged", {Player=pn, JudgmentGraphic=StripSpriteHints(mods.JudgmentGraphic)})
+			MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=pn, Name="JudgmentGraphic", Value=StripSpriteHints(mods.JudgmentGraphic)})
 		end
 	},
 	-------------------------------------------------------------------------
@@ -196,7 +225,7 @@ local Overrides = {
 				if list[i] then mods.HoldJudgment = val; break end
 			end
 			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the HoldJudgment preview
-			MESSAGEMAN:Broadcast("HoldJudgmentChanged", {Player=pn, HoldJudgment=StripSpriteHints(mods.HoldJudgment)})
+			MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=pn, Name="HoldJudgment", Value=StripSpriteHints(mods.HoldJudgment)})
 		end
 	},
 	-------------------------------------------------------------------------
@@ -210,7 +239,7 @@ local Overrides = {
 				if list[i] then mods.ComboFont = val; break end
 			end
 			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can change the ComboFont preview
-			MESSAGEMAN:Broadcast("ComboFontChanged", {Player=pn, ComboFont=mods.ComboFont})
+			MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=pn, Name="ComboFont", Value=mods.ComboFont})
 		end
 	},
 	-------------------------------------------------------------------------
@@ -282,6 +311,9 @@ local Overrides = {
 			end
 
 			MESSAGEMAN:Broadcast("MusicRateChanged")
+			-- Broadcast a message that ./Graphics/OptionRow Frame.lua will be listening for so it can update ActorProxies
+			-- in the MusicRate OptionRow for split BPMs if needed
+			MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=pn, Name="MusicRate", Value=""})
 		end
 	},
 	-------------------------------------------------------------------------
@@ -397,9 +429,9 @@ local Overrides = {
 			if (not IsUltraWide and style and style:GetName() ~= "single")
 			-- if ultrawide, StepStats only in single and versus (not double)
 			or (IsUltraWide and style and not (style:GetName()=="single" or style:GetName()=="versus"))
-			-- if the notefield takes up more than half the screen width (e.g. single + Center1Player + 4:3)
-					or (notefieldwidth and notefieldwidth > _screen.w/2)
-			-- if the notefield is centered with 4:3 aspect ratio (probably don't need both these conditions)
+			-- if the notefield takes up more than half the screen width
+			or (notefieldwidth and notefieldwidth > _screen.w/2)
+			-- if the notefield is centered with 4:3 aspect ratio
 			or (mpn and GetNotefieldX(mpn) == _screen.cx and not IsUsingWideScreen())
 			then
 				table.remove(choices, 3)
@@ -410,7 +442,16 @@ local Overrides = {
 	},
 	-------------------------------------------------------------------------
 	TargetScore = {
-		Values = { 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A-', 'A', 'A+', 'S-', 'S', 'S+', '☆', '☆☆', '☆☆☆', '☆☆☆☆', 'Machine best', 'Personal best' },
+		Values = function()
+			local t = {}
+			-- "GradeTier16" to "GradeTier01"
+			for i=16,1,-1 do
+				table.insert(t, ("GradeTier%02d"):format(i))
+			end
+			table.insert(t, "Machine best")
+			table.insert(t, "Personal best")
+			return t
+		end,
 		LoadSelections = function(self, list, pn)
 			local i = tonumber(SL[ToEnumShortString(pn)].ActiveModifiers.TargetScore) or 11
 			list[i] = true
@@ -432,6 +473,14 @@ local Overrides = {
 		Values = function()
 			return { "ColumnFlashOnMiss", "SubtractiveScoring", "Pacemaker", "MissBecauseHeld", "NPSGraphAtTop", "DoNotJudgeMe" }
 		end,
+	},
+	ErrorBar = {
+		Values = { "None", "Colorful", "Monochrome", "Text" },
+	},
+	-------------------------------------------------------------------------
+	ErrorBarOptions = {
+		SelectType = "SelectMultiple",
+		Values = { "ErrorBarUp", "ErrorBarMultiTick" },
 	},
 	-------------------------------------------------------------------------
 	MeasureCounter = {
@@ -478,7 +527,7 @@ local Overrides = {
 			for i=1,#list do
 				if list[i] then
 					gmods.TimingWindows = self.Values[i]
-					for w=1,5 do
+					for w=1,NumJudgmentsAvailable() do
 						if self.Values[i][w] then
 							PREFSMAN:SetPreference("TimingWindowSecondsW"..w, SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..w])
 						else

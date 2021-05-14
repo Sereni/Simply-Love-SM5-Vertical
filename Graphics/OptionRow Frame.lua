@@ -26,58 +26,94 @@ t[#t+1] = Def.Quad {
 	end
 }
 
--- This feels pretty hackish.  But it works.  And is less work than writing my own options system in pure Lua.
+-- -----------------------------------------------------------------------
+-- Here's where the "magic" for visual previews in OptionRows happens.  D:
 --
--- ScreenPlayerOptions overlay.lua has all the necessary NoteSkin actors, Judgment Font actors, and Combo Font actors
--- loaded but not showing.
+-- This feels pretty hackish.  But it works.  And is less work than writing my own options
+-- system in pure Lua.
 --
--- Here, we're adding one ActorProxy per-player per-OptionRow.
+-- ScreenPlayerOptions overlay.lua has all the necessary NoteSkin actors, Judgment Font
+-- actors, and Combo Font actors loaded but not showing.  That asset-loading code is over
+-- in ./BGAnimations/ScreenPlayerOptions overlay/OptionRowPreviews/
 --
--- Out of the box, ActorProxies don't do or show anything, but they can be used to draw what some other actor is
--- already drawing.  This has the effect of visually duplicating one actor into two (the actor + the ActorProxy).
+-- Here, we're adding one ActorProxy per-player per-OptionRow and using them to draw
+-- the NoteSkin, Judgment Font, Combo Font, etc. assets loaded elsewhere.  These
+-- ActorProxies are what the player sees in each OptionRow.
 --
--- ActorProxy actors are typically handy in scripted simfiles, where they can be used to visually duplicate the entire
--- Player ActorFrame or the LifeMeter or some other visual element of ScreenGameplay that is defined outside the context
--- of the simfile scripting.
+------ WHAT DO ACTORPROXIES DO?
+-- Out of the box, ActorProxies don't do or show anything, but they can be used to draw what
+-- some other actor is already drawing.  This has the effect of visually duplicating one
+-- actor into two (the actor + the ActorProxy).
 --
--- From the Lua of a scripted simfile, you can't say "I want there to be five copies of the playfield when the screen
--- initializes" because by the time your simfile's Lua is evaluated, the screen has already initialized and the Actors
--- are in place.  ActorProxies are generic.  You pass them a referernce to an already-existing actor via SetTarget() and
--- they'll draw it.
+-- ActorProxy actors are typically handy in scripted simfiles, where they can be used to
+-- visually duplicate the entire Player ActorFrame or the LifeMeter or some other visual
+-- element of ScreenGameplay that is defined outside the context of the simfile scripting.
 --
--- As noted, this is more obviously handy in scripted simfiles.  In theming, if you need two of some actor, you can usually
--- just write your own theme code so that there are two of that Actor.
+-- From the Lua of a scripted simfile, you can't say "I want there to be five copies of the
+-- playfield when the screen initializes" because by the time your simfile's Lua is
+-- evaluated, the screen has already initialized and the Actors are in place.  ActorProxies
+-- are generic.  You pass them a reference to an already-existing actor via SetTarget()
+-- and they'll draw it.
 --
--- ScreenPlayerOptions uses the "OptionRow" system provided by the StepMania engine.  It's a generic framework that allows players
--- to scroll between multiple rows where each row has multiple things to choose from.  I like OptionRows because it manages
--- nearly all input handling out of the box, including 3Key input (traditional DDR arcade cabs), 4Key input (ITG dedicabs),
--- keyboard input, etc.  Handling input is complicated and tedious at best (see ScreenSelectMusicCasual if you want an example).
+-- As noted, this is more obviously handy in scripted simfiles.  In theming, if you need
+-- two of some actor, you can usually just write your own theme code so that there are two
+-- of that Actor.
 --
--- But the OptionRow system only supports text as choices.  Not visual representations of NoteSkins, not judgment graphic textures.
--- Just text.  I really like being able to *show* players what the NoteSkin looks instead of just tellig the name of it, but OptionRow
+------ WHAT ARE OPTIONROWS?
+-- ScreenPlayerOptions uses the "OptionRow" system provided by the StepMania engine.  It's
+-- a generic framework that allows players to scroll between multiple rows where each row has
+-- multiple things to choose from.
+--
+------ HOW ARE OPTIONROWS LIMITED?
+-- The OptionRow system only supports text as choices.  Not visual representations of
+-- NoteSkins, not judgment graphic textures. Just text.  I really like being able to *show*
+-- players what the NoteSkin looks like instead of just telling the name of it, but OptionRows
 -- can only show text.
 --
--- So, I stuffed one ActorProxy per player into each OptionRow Frame and devised a hackish system to have them draw
--- NoteSkins in the NoteSkin row, and judgment textures in the Judgment Font row, and etc.
+------ WHY USE OPTIONROWS IF THEY'RE SO LIMITED?
+-- I like OptionRows because, as a system, it manages nearly all input handling out of the box,
+-- including 3Key input (traditional DDR arcade cabs), 4Key input(ITG dedicabs), keyboard
+-- input, etc. Handling input is complicated and tedious at best.
+-- See ScreenSelectMusicCasual if you want an example.
 --
--- Note because this file (OptionRow Frame.lua) is generic and used to define the background of every OptionRow, the PlayerOptions
--- screen ends up getting a lot of ActorProxies that it doesn't actually need.  The frame for the SpeedMod row has these ActorProxies
--- though it doesn't use them.  As does the SpeedModType.  As does the background filter.  Etc.
+------ HOW ARE YOU USING ACTORPROXIES TO DRAW VISUALS IN OPTIONROWS?
+-- So, I stuffed one ActorProxy per-player into each OptionRow Frame and devised a hackish
+-- system to have them draw NoteSkins in the NoteSkin row, and judgment textures in the
+-- Judgment Font row, and etc.
 --
--- I can't only add ActorProxies to rows that need them because this file is generic and supposed to be used to tell
--- StepMania what to make all OptionRows look like.  Once the screen and each OptionRow are initialized (OnCommand), it is possible
--- to check what this Frame's parent OptionRow's name is and, from there, call hibernate(math.huge) on the ActorProxies we don't need.
+-- Note that because this file (OptionRow Frame.lua) is generic and used to define the
+-- background of *every* OptionRow, the PlayerOptions screen ends up getting a lot of
+-- ActorProxies that it doesn't actually need.  The frame for the SpeedMod row has these
+-- ActorProxies though it doesn't use them.  As does the SpeedModType.  As does the
+-- background filter.  Etc.
 --
--- If the parent OptionRow's name is "NoteSkin" or "JudgmentGraphic" or "ComboFont", we leave it drawing and allow different Message commands
--- broadcast from ./Scripts/SL-PlayerOptoions.lua to make this generic ActorProxy look like a NoteSkin or a JudgementGraphic or a ComboFont.
+-- I can't only add ActorProxies to rows that need them because this file is generic
+-- and supposed to be used to tell StepMania what to make *all* OptionRows look like.
+-- Once the screen and each OptionRow are initialized (OnCommand), it is possible to check
+-- what this Frame's parent OptionRow's name is and, from there, call hibernate(math.huge)
+-- on the ActorProxies we don't need.
+--
+-- If the parent OptionRow's name is "NoteSkin" or "JudgmentGraphic" or "ComboFont", we leave
+-- it drawing and allow different Message commands broadcast from ./Scripts/SL-PlayerOptions.lua
+-- to make this generic ActorProxy look like a NoteSkin or a JudgementGraphic or a ComboFont.
+--
+------ CONCLUSION
+-- It's a hack, but it works.
+--
+-- It's less effort than writing my own options menu system in Lua.
+-- It's also less effort than extending the engine's OptionRow system to handle more than text.
+--
+-- If you think this system/code is Bad and in need of a proper fix — I agree!  Please put
+-- in the hours to implement a proper fix and the community will surely be better for it. :)
+-- -----------------------------------------------------------------------
 
-local rows_with_proxies = { "NoteSkin", "JudgmentGraphic", "ComboFont", "HoldJudgment" }
+local rows_with_proxies = { "NoteSkin", "JudgmentGraphic", "ComboFont", "HoldJudgment", "MusicRate" }
 
 for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 	local pn = ToEnumShortString(player)
 
 	local proxy = Def.ActorProxy{
-		Name="OptionRowProxy" ..pn,
+		Name="VisualActorProxy" .. pn,
 		OnCommand=function(self)
 			local optrow = self:GetParent():GetParent():GetParent()
 
@@ -95,52 +131,45 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 		end
 	}
 
-	-- NoteSkinChanged is broadcast by the SaveSelections() function for the NoteSkin OptionRow definition
+	-- RefreshActorProxy is broadcast by SaveSelections() for various OptionRow definitions
 	-- in ./Scripts/SL-PlayerOptions.lua
-	proxy.NoteSkinChangedMessageCommand=function(self, params)
+	proxy.RefreshActorProxyMessageCommand=function(self, params)
 		if player ~= params.Player then return end
+		if not (params.Name and params.Value) then return end
 
 		local optrow = self:GetParent():GetParent():GetParent()
+		if optrow and optrow:GetName() == params.Name then
 
-		if optrow and optrow:GetName() == "NoteSkin" then
-			-- attempt to find the hidden NoteSkin actor added by ./BGAnimations/ScreenPlayerOptions overlay.lua
-			local noteskin_actor = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("NoteSkin_"..params.NoteSkin)
-			-- ensure that that NoteSkin actor exists before attempting to set it as the target of this ActorProxy
-			if noteskin_actor then self:SetTarget( noteskin_actor ) end
+			local offscreen_actor_name
+			if params.Name=="ComboFont" or params.Name=="MusicRate" then
+				-- the BitmapTexts for ComboFont and MusicRate helper text need to be able to
+				-- display different values per-player, so I prefixed the relevant Actors in
+				--     ./BGA/ScreenPlayerOptions overlay/OptionRowPreviews/ComboFont.lua
+				--     ./BGA/ScreenPlayerOptions overlay/OptionRowPreviews/MusicRate.lua
+				-- with "P1_" or "P2_"
+				offscreen_actor_name = ("%s_%s_%s"):format(pn, params.Name, params.Value)
+			else
+				offscreen_actor_name = ("%s_%s"):format(params.Name, params.Value)
+			end
+
+			-- attempt to find the offscreen actor added by ./BGAnimations/ScreenPlayerOptions overlay.lua
+			local offscreen_actor = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild(offscreen_actor_name)
+			-- ensure that that actor exists before attempting to set it as the target of this ActorProxy
+			if offscreen_actor then self:SetTarget( offscreen_actor ) end
 		end
 	end
 
-	proxy.JudgmentGraphicChangedMessageCommand=function(self, params)
-		if player ~= params.Player then return end
-
+	proxy.RefreshBPMRangeMessageCommand=function(self, params)
 		local optrow = self:GetParent():GetParent():GetParent()
-
-		if optrow and optrow:GetName() == "JudgmentGraphic" then
-			local judgment_sprite = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("JudgmentGraphic_"..params.JudgmentGraphic)
-			if judgment_sprite then self:SetTarget( judgment_sprite ) end
+		if optrow and optrow:GetName() ~= "MusicRate" then return end
+		if #GAMESTATE:GetHumanPlayers() <= 1 then
+			self:visible(false)
+			return
 		end
-	end
 
-	proxy.ComboFontChangedMessageCommand=function(self, params)
-		if player ~= params.Player then return end
-
-		local optrow = self:GetParent():GetParent():GetParent()
-
-		if optrow and optrow:GetName() == "ComboFont" then
-			local combofont_bmt = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild(pn.."_ComboFont_"..params.ComboFont)
-			if combofont_bmt then self:SetTarget( combofont_bmt ) end
-		end
-	end
-
-	proxy.HoldJudgmentChangedMessageCommand=function(self, params)
-		if player ~= params.Player then return end
-
-		local optrow = self:GetParent():GetParent():GetParent()
-
-		if optrow and optrow:GetName() == "HoldJudgment" then
-			local hj_sprite = SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("HoldJudgment_"..params.HoldJudgment)
-			if hj_sprite then self:SetTarget( hj_sprite ) end
-		end
+		-- only show the MusicRate actorproxy when both players are joined
+		-- and split BPMs are in effect
+		self:visible( params[1] ~= params[2] )
 	end
 
 	table.insert(t, proxy)

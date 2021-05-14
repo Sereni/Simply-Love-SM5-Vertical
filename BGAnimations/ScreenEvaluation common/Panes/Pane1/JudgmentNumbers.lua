@@ -1,4 +1,4 @@
-local player, side = unpack(...)
+local player, controller = unpack(...)
 
 local pn = ToEnumShortString(player)
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
@@ -66,14 +66,16 @@ for index, RCType in ipairs(RadarCategories.Types) do
 
 	local performance = pss:GetRadarActual():GetValue( "RadarCategory_"..RCType )
 	local possible = pss:GetRadarPossible():GetValue( "RadarCategory_"..RCType )
+	possible = clamp(possible, 0, 999)
 
 	-- player performance value
+	-- use a RollingNumber to animate the count tallying up for visual effect
 	t[#t+1] = Def.RollingNumbers{
 		Font="Wendy/_ScreenEvaluation numbers",
 		InitCommand=function(self) self:zoom(0.5):horizalign(right):Load("RollingNumbersEvaluationB") end,
 		BeginCommand=function(self)
 			self:y(y_position)
-			self:x( x_position )
+			self:x(x_position)
 			self:targetnumber(performance)
 		end
 	}

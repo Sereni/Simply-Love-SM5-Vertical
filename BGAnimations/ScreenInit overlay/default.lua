@@ -15,7 +15,7 @@ local arrow_x =		(IsVerticalScreen() and 35 or 50)
 -- semitransparent black quad as background for 7 decorative arrows
 af[#af+1] = Def.Quad{
 	InitCommand=function(self) self:zoomto(_screen.w,0):diffuse(Color.Black) end,
-	OnCommand=function(self) self:accelerate(0.3):zoomtoheight(128):diffusealpha(0.9):sleep(2.5) end,
+	OnCommand=function(self) self:accelerate(0.3):zoomtoheight(128):diffusealpha(0.9):sleep(2.1) end,
 	OffCommand=function(self) self:accelerate(0.3):zoomtoheight(0) end
 }
 
@@ -26,7 +26,7 @@ for i=1,7 do
 		InitCommand=function(self) self:x((i-4) * arrow_x):diffusealpha(0) end,
 		OnCommand=function(self)
 			-- thonk
-			if ThemePrefs.Get("VisualTheme")=="Thonk" then
+			if ThemePrefs.Get("VisualStyle")=="Thonk" then
 				self:diffusealpha(1):rotationy(-90):sleep(i*0.1 + 0.2)
 				self:smooth(0.25):rotationy(0):sleep(0.8):bouncebegin(0.8):y(_screen.h)
 			-- everything else
@@ -46,7 +46,7 @@ for i=1,7 do
 	}
 
 	-- only add Thonk asset if needed
-	if ThemePrefs.Get("VisualTheme")=="Thonk" then
+	if ThemePrefs.Get("VisualStyle")=="Thonk" then
 		arrow[#arrow+1] = LoadActor("thonk.png")..{
 			InitCommand=function(self) self:zoom(arrow_zoom):xy(6,-2) end,
 		}
@@ -54,12 +54,5 @@ for i=1,7 do
 
 	af[#af+1] = arrow
 end
-
-af[#af+1] = LoadFont("Common Normal")..{
-	Text=ScreenString("ThemeDesign"),
-	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0):zoom(0.8) end,
-	OnCommand=function(self) self:sleep(3):linear(0.25):diffusealpha(1) end,
-	OffCommand=function(self) self:linear(0.25):diffusealpha(0) end,
-}
 
 return af

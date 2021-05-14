@@ -1,47 +1,68 @@
-if not IsServiceAllowed(SL.GrooveStats.Leaderboard) then return end
-
 local NumEntries = 13
 local RowHeight = 24
 
-local SetEntryText = function(rank, name, score, actor)
+local SetEntryText = function(rank, name, score, date, actor)
 	if actor == nil then return end
 
 	actor:GetChild("Rank"):settext(rank)
 	actor:GetChild("Name"):settext(name)
 	actor:GetChild("Score"):settext(score)
+	actor:GetChild("Date"):settext(date)
 end
 
-local LeaderboardRequestProcessor = function(res, master)
-	if master == nil then return end
-
-	playerNumber = GAMESTATE:GetMasterPlayerNumber()
-	local leaderboard = master:GetChild("P"..playerNumber.."Leaderboard")
-
-	local playerStr = "player"..playerNumber
+local SetLeaderboardForPlayer = function(player_num, leaderboard, leaderboardData, isRanked)
+	if leaderboard == nil or leaderboardData == nil then return end
+	local playerStr = "player"..player_num
 	local entryNum = 1
 	local rivalNum = 1
-	local data = res["status"] == "success" and res["data"] or nil
 
-	-- First check to see if the leaderboard even exists.
-	if data and data[playerStr] and data[playerStr]["gsLeaderboard"] then
-		for gsEntry in ivalues(data[playerStr]["gsLeaderboard"]) do
-			local entry = leaderboard:GetChild("LeaderboardEntry"..entryNum)
-			entry:diffuse(Color.White)
-			SetEntryText(
-				gsEntry["rank"]..".",
-				gsEntry["name"],
-				string.format("%.2f%%", gsEntry["score"]/100),
-				entry
-			)
-			if gsEntry["isRival"] then
-				entry:diffuse(Color.Black)
-				leaderboard:GetChild("Rival"..rivalNum):y(entry:GetY()):visible(true)
-				rivalNum = rivalNum + 1
-			elseif gsEntry["isSelf"] then
-				entry:diffuse(Color.Black)
-				leaderboard:GetChild("Self"):y(entry:GetY()):visible(true)
+	if leaderboardData then
+		if leaderboardData["Name"] then
+			leaderboard:GetChild("Header"):settext(leaderboardData["Name"])
+		end
+
+		if leaderboardData["Data"] then
+			for gsEntry in ivalues(leaderboardData["Data"]) do
+				local entry = leaderboard:GetChild("LeaderboardEntry"..entryNum)
+				SetEntryText(
+					gsEntry["rank"]..".",
+					gsEntry["name"],
+					string.format("%.2f%%", gsEntry["score"]/100),
+					ParseGroovestatsDate(gsEntry["date"]),
+					entry
+				)
+				if gsEntry["isRival"] then
+					if gsEntry["isFail"] then
+						entry:GetChild("Rank"):diffuse(Color.Black)
+						entry:GetChild("Name"):diffuse(Color.Black)
+						entry:GetChild("Score"):diffuse(Color.Red)
+						entry:GetChild("Date"):diffuse(Color.Black)
+					else
+						entry:diffuse(Color.Black)
+					end
+					leaderboard:GetChild("Rival"..rivalNum):y(entry:GetY()):visible(true)
+					rivalNum = rivalNum + 1
+				elseif gsEntry["isSelf"] then
+					if gsEntry["isFail"] then
+						entry:GetChild("Rank"):diffuse(Color.Black)
+						entry:GetChild("Name"):diffuse(Color.Black)
+						entry:GetChild("Score"):diffuse(Color.Red)
+						entry:GetChild("Date"):diffuse(Color.Black)
+					else
+						entry:diffuse(Color.Black)
+					end
+					leaderboard:GetChild("Self"):y(entry:GetY()):visible(true)
+				else
+					entry:diffuse(Color.White)
+				end
+
+				-- Why does this work for normal entries but not for Rivals/Self where
+				-- I have to explicitly set the colors for each child??
+				if gsEntry["isFail"] then
+					entry:GetChild("Score"):diffuse(Color.Red)
+				end
+				entryNum = entryNum + 1
 			end
-			entryNum = entryNum + 1
 		end
 	end
 
@@ -52,16 +73,81 @@ local LeaderboardRequestProcessor = function(res, master)
 		local entry = leaderboard:GetChild("LeaderboardEntry"..i)
 		-- We didn't get any scores if i is still == 1.
 		if i == 1 then
-			if res["status"] == "success" then
-				SetEntryText("", "No Scores Available", "", entry)
-			elseif res["status"] == "fail" then
-				SetEntryText("", "Failed to Load 😞", "", entry)
-			elseif res["status"] == "disabled" then
-				SetEntryText("", "Leaderboard Disabled", "", entry)
+			if isRanked then
+				SetEntryText("", "No Scores", "", "", entry)
+			else
+				SetEntryText("", "Chart Not Ranked", "", "", entry)
 			end
 		else
 			-- Empty out the remaining rows.
-			SetEntryText("", "", "", entry)
+			SetEntryText("", "", "", "", entry)
+		end
+	end
+end
+
+local LeaderboardRequestProcessor = function(res, master)
+	if master == nil then return end
+	local data = res["status"] == "success" and res["data"] or nil
+
+	for i=1, 2 do
+		local playerStr = "player"..i
+		local pn = "P"..i
+		local leaderboard = master:GetChild(pn.."Leaderboard")
+		local leaderboardList = master[pn]["Leaderboards"]
+		if res["status"] == "success" then
+			if data[playerStr] then
+				master[pn].isRanked = data[playerStr]["isRanked"]
+
+				-- First add the main GrooveStats leaderboard.
+				if data[playerStr]["gsLeaderboard"] then
+					leaderboardList[#leaderboardList + 1] = {
+						Name="GrooveStats",
+						Data=DeepCopy(data[playerStr]["gsLeaderboard"])
+					}
+					master[pn]["LeaderboardIndex"] = 1
+				end
+
+				-- Then any additional leaderboards.
+				if data[playerStr]["rpg"] and data[playerStr]["rpg"]["rpgLeaderboard"] then
+					leaderboardList[#leaderboardList + 1] = {
+						Name=data[playerStr]["rpg"]["name"],
+						Data=DeepCopy(data[playerStr]["rpg"]["rpgLeaderboard"])
+					}
+					master[pn]["LeaderboardIndex"] = 1
+				end
+
+				if #leaderboardList > 1 then
+					leaderboard:GetChild("PaneIcons"):visible(true)
+				else
+					leaderboard:GetChild("PaneIcons"):visible(false)
+				end
+			end
+
+			-- We assume that at least one leaderboard has been added.
+			-- If leaderboardData is nil as a result, the SetLeaderboardForPlayer
+			-- function will handle it.
+			local leaderboardData = leaderboardList[1]
+			SetLeaderboardForPlayer(i, leaderboard, leaderboardData, master[pn].isRanked)
+		elseif res["status"] == "fail" then
+			for i=1, NumEntries do
+				local entry = leaderboard:GetChild("LeaderboardEntry"..i)
+				if i == 1 then
+					SetEntryText("", "Failed to Load 😞", "", "", entry)
+				else
+					-- Empty out the remaining rows.
+					SetEntryText("", "", "", "", entry)
+				end
+			end
+		elseif res["status"] == "disabled" then
+			for i=1, NumEntries do
+				local entry = leaderboard:GetChild("LeaderboardEntry"..i)
+				if i == 1 then
+					SetEntryText("", "Leaderboard Disabled", "", "", entry)
+				else
+					-- Empty out the remaining rows.
+					SetEntryText("", "", "", "", entry)
+				end
+			end
 		end
 	end
 end
@@ -71,35 +157,72 @@ local af = Def.ActorFrame{
 	InitCommand=function(self) self:visible(false) end,
 	ShowLeaderboardCommand=function(self)
 		self:visible(true)
+		local pn = "P1"
+		self[pn] = {}
+		self[pn].isRanked = false
+		self[pn].Leaderboards = {}
+		self[pn].LeaderboardIndex = 0
 		MESSAGEMAN:Broadcast("ResetEntry")
 		-- Only make the request when this actor gets actually displayed through the sort menu.
 		self:queuecommand("SendLeaderboardRequest")
 	end,
 	HideLeaderboardCommand=function(self) self:visible(false) end,
+	LeaderboardInputEventMessageCommand=function(self, event)
+		local pn = ToEnumShortString(event.PlayerNumber)
+		if #self[pn].Leaderboards == 0 then return end
+
+		if event.type == "InputEventType_FirstPress" then
+			-- We don't use modulus because #Leaderboards might be zero.
+			if event.GameButton == "MenuLeft" then
+				self[pn].LeaderboardIndex = self[pn].LeaderboardIndex - 1
+
+				if self[pn].LeaderboardIndex == 0 then
+					-- Wrap around if we decremented from 1 to 0.
+					self[pn].LeaderboardIndex = #self[pn].Leaderboards
+				end
+			elseif event.GameButton == "MenuRight" then
+				self[pn].LeaderboardIndex = self[pn].LeaderboardIndex + 1
+
+				if self[pn].LeaderboardIndex > #self[pn].Leaderboards then
+					-- Wrap around if we incremented past #Leaderboards
+					self[pn].LeaderboardIndex = 1
+				end
+			end
+
+			if event.GameButton == "MenuLeft" or event.GameButton == "MenuRight" then
+				local leaderboard = self:GetChild(pn.."Leaderboard")
+				local leaderboardList = self[pn]["Leaderboards"]
+				local leaderboardData = leaderboardList[self[pn].LeaderboardIndex]
+				SetLeaderboardForPlayer("P1" == pn and 1 or 2, leaderboard, leaderboardData, self[pn].isRanked)
+			end
+		end
+	end,
 
 	Def.Quad{ InitCommand=function(self) self:FullScreen():diffuse(0,0,0,0.875) end },
 	LoadFont("Common Normal")..{
-		Text=THEME:GetString("ScreenSelectMusic", "LeaderboardHelpText"),
-		InitCommand=function(self) self:xy(_screen.cx, _screen.h-50):zoom(0.8) end
+		Text=THEME:GetString("Common", "PopupDismissText"),
+		InitCommand=function(self) self:xy(_screen.cx, _screen.h-50):zoom(1.1) end
 	},
 	RequestResponseActor("Leaderboard", 10)..{
 		SendLeaderboardRequestCommand=function(self)
+			if not IsServiceAllowed(SL.GrooveStats.Leaderboard) then return end
+
 			local sendRequest = false
 			local data = {
 				action="groovestats/player-leaderboards",
-				maxLeaderboardResults=13,  -- We have 13 rows of space, but in the worst case we can have 9 scores and 4 "..."s
+				maxLeaderboardResults=NumEntries,
 			}
 
-			playerNumber = GAMESTATE:GetMasterPlayerNumber()
-			local pn = "P"..playerNumber
-			if SL[pn].ApiKey ~= "" and SL[pn].Streams.Hash ~= "" then
-				data["player"..playerNumber] = {
-					chartHash=SL[pn].Streams.Hash,
-					apiKey=SL[pn].ApiKey
-				}
-				sendRequest = true
+			for i=1,2 do
+				local pn = "P"..i
+				if SL[pn].ApiKey ~= "" and SL[pn].Streams.Hash ~= "" then
+					data["player"..i] = {
+						chartHash=SL[pn].Streams.Hash,
+						apiKey=SL[pn].ApiKey
+					}
+					sendRequest = true
+				end
 			end
-
 			-- Only send the request if it's applicable.
 			-- Technically this should always be true since otherwise we wouldn't even get to this screen.
 			if sendRequest then
@@ -122,41 +245,61 @@ for player in ivalues( PlayerNumber ) do
 	af[#af+1] = Def.ActorFrame{
 		Name=ToEnumShortString(player).."Leaderboard",
 		InitCommand=function(self)
-			self:visible(GAMESTATE:IsSideJoined(player))
-			self:xy(_screen.cx, _screen.cy - 15)
+			self:y(_screen.cy - 15)
+			self:queuecommand("Refresh")
 		end,
 		PlayerJoinedMessageCommand=function(self)
-			self:visible(GAMESTATE:IsSideJoined(player))
+			self:queuecommand("Refresh")
 		end,
-		LeaderboardInputEvent=function(self, event)
 
+		RefreshCommand=function(self)
+			self:visible(GAMESTATE:IsSideJoined(player))
+
+			self:xy(_screen.cx, _screen.cy - 15)
+			self:SetWidth(paneWidth)
 		end,
 
 		-- White border
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.White):zoomto(paneWidth + borderWidth, paneHeight + borderWidth)
+				self:diffuse(Color.White)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width + borderWidth, paneHeight + borderWidth)
 			end
 		},
 
 		-- Main black body
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.Black):zoomto(paneWidth, paneHeight)
+				self:diffuse(Color.Black)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, paneHeight)
 			end
 		},
 
 		-- Header border
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.White):zoomto(paneWidth + borderWidth, RowHeight + borderWidth):y(-paneHeight/2 + RowHeight/2)
+				self:diffuse(Color.White):y(-paneHeight/2 + RowHeight/2)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width + borderWidth, RowHeight + borderWidth)
 			end
 		},
 
 		-- Blue Header
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.Blue):zoomto(paneWidth, RowHeight):y(-paneHeight/2 + RowHeight/2)
+				self:diffuse(Color.Blue):y(-paneHeight/2 + RowHeight/2)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, RowHeight)
 			end
 		},
 
@@ -165,7 +308,7 @@ for player in ivalues( PlayerNumber ) do
 			Name="Header",
 			Text="GrooveStats",
 			InitCommand=function(self)
-				self:zoom(0.45)
+				self:zoom(0.5)
 				self:y(-paneHeight/2 + 12)
 			end
 		},
@@ -174,42 +317,104 @@ for player in ivalues( PlayerNumber ) do
 		Def.Quad {
 			Name="Rival1",
 			InitCommand=function(self)
-				self:diffuse(Color.Red):zoomto(paneWidth, RowHeight):visible(false)
+				self:diffuse(color("#BD94FF")):visible(false)
 			end,
 			ResetEntryMessageCommand=function(self)
 				self:visible(false)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, RowHeight)
 			end
 		},
 
 		Def.Quad {
 			Name="Rival2",
 			InitCommand=function(self)
-				self:diffuse(Color.Red):zoomto(paneWidth, RowHeight):visible(false)
+				self:diffuse(color("#BD94FF")):visible(false)
 			end,
 			ResetEntryMessageCommand=function(self)
 				self:visible(false)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, RowHeight)
 			end
 		},
 
 		Def.Quad {
 			Name="Rival3",
 			InitCommand=function(self)
-				self:diffuse(Color.Red):zoomto(paneWidth, RowHeight):visible(false)
+				self:diffuse(color("#BD94FF")):visible(false)
 			end,
 			ResetEntryMessageCommand=function(self)
 				self:visible(false)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, RowHeight)
 			end
 		},
 
 		Def.Quad {
 			Name="Self",
 			InitCommand=function(self)
-				self:diffuse(Color.Green):zoomto(paneWidth, RowHeight):visible(false)
+				self:diffuse(color("#A1FF94")):visible(false)
 			end,
 			ResetEntryMessageCommand=function(self)
 				self:visible(false)
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:zoomto(width, RowHeight)
 			end
 		},
+
+		-- Marker for the additional panes. Hidden by default.
+		Def.ActorFrame{
+			Name="PaneIcons",
+			InitCommand=function(self)
+				self:y(paneHeight/2 - RowHeight/2)
+				self:visible(false)
+			end,
+			ResetEntryMessageCommand=function(self)
+				self:visible(false)
+			end,
+
+			LoadFont("Common Normal").. {
+				Name="LeftIcon",
+				Text="&MENULEFT;",
+				InitCommand=function(self)
+					self:x(-paneWidth/2 + 10)
+				end,
+				OnCommand=function(self) self:queuecommand("Bounce") end,
+				BounceCommand=function(self)
+					self:decelerate(0.5):addx(10):accelerate(0.5):addx(-10)
+					self:queuecommand("Bounce")
+				end,
+			},
+
+			LoadFont("Common Normal").. {
+				Name="Text",
+				Text="More Leaderboards",
+				InitCommand=function(self)
+					self:diffuse(Color.White)
+				end,
+			},
+
+			LoadFont("Common Normal").. {
+				Name="RightIcon",
+				Text="&MENURiGHT;",
+				InitCommand=function(self)
+					self:x(paneWidth/2 - 10)
+				end,
+				OnCommand=function(self) self:queuecommand("Bounce") end,
+				BounceCommand=function(self)
+					self:decelerate(0.5):addx(-10):accelerate(0.5):addx(10)
+					self:queuecommand("Bounce")
+				end,
+			},
+		}
 	}
 
 	local af2 = af[#af]
@@ -218,10 +423,19 @@ for player in ivalues( PlayerNumber ) do
 		af2[#af2+1] = Def.ActorFrame{
 			Name="LeaderboardEntry"..i,
 			InitCommand=function(self)
-				self:y(RowHeight*(i-8) + RowHeight)
+				if NumEntries % 2 == 1 then
+					self:y(RowHeight*(i - (NumEntries+1)/2) )
+				else
+					self:y(RowHeight*(i - NumEntries/2))
+				end
+			end,
+			RefreshCommand=function(self)
+				local width = self:GetParent():GetWidth()
+				self:x(-(width-paneWidth)/2)
+				self:GetChild("Date"):visible(GAMESTATE:GetNumSidesJoined() == 1)
 			end,
 
-			LoadFont("Miso/_miso").. {
+			LoadFont("Common Normal").. {
 				Name="Rank",
 				Text="",
 				InitCommand=function(self)
@@ -236,7 +450,7 @@ for player in ivalues( PlayerNumber ) do
 				end
 			},
 
-			LoadFont("Miso/_miso").. {
+			LoadFont("Common Normal").. {
 				Name="Name",
 				Text=(i==1 and "Loading" or ""),
 				InitCommand=function(self)
@@ -251,12 +465,25 @@ for player in ivalues( PlayerNumber ) do
 				end
 			},
 
-			LoadFont("Miso/_miso").. {
+			LoadFont("Common Normal").. {
 				Name="Score",
 				Text="",
 				InitCommand=function(self)
 					self:horizalign(right)
 					self:x(paneWidth/2-borderWidth)
+					self:diffuse(Color.White)
+				end,
+				ResetEntryMessageCommand=function(self)
+					self:settext("")
+					self:diffuse(Color.White)
+				end
+			},
+			LoadFont("Common Normal").. {
+				Name="Date",
+				Text="",
+				InitCommand=function(self)
+					self:horizalign(right)
+					self:x(paneWidth/2 + 100 - borderWidth)
 					self:diffuse(Color.White)
 				end,
 				ResetEntryMessageCommand=function(self)

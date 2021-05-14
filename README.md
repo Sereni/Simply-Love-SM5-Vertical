@@ -10,7 +10,7 @@ Simply Love Vertical is a Stepmania theme designed for single-player setups with
 
 ## Setup
 
-This theme is based on [quietly-turning's Simply-Love-SM5](https://github.com/quietly-turning/Simply-Love-SM5) and the readme assumes you are familiar with it. If not, check out the original repo.
+This theme is based on [Simply-Love-SM5](https://github.com/Simply-Love/Simply-Love-SM5) and the readme assumes you are familiar with it. If not, check out the original repo.
 
 To install:
 1. Download/clone the repository
@@ -29,7 +29,7 @@ To install:
 - Casual mode is not available
 - Edit mode is not functional
 - Data visualizations and target score graph are not available
-- Other features are up to Simply Love 4.9
+- Other features are up to Simply Love 5.0
 
 ## Additional features
 
@@ -44,7 +44,8 @@ To install:
 See the Issues tab. Most things should work. Bug reports and fixes are welcome!
 
 ## Thanks
+- Sereni for leading the project under her benevolent dictatorship and her eye for _æsthetics_
 - Pluto for "what if we turned it sideways?"
 - Fieoner for relentless feature work and code reviews
-- Roujo for handling World's Biggest Merge, testing, and feedback
+- Roujo for handling the World's Biggest Merge™, testing, merging stuff again, and feedback
 - hurtpiggypig, quietly-turning, and all contributors to Simply Love

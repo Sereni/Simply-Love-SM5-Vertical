@@ -8,6 +8,7 @@ local width = 109
 local height = 18
 
 -- support double, double8, and routine by constraining the UpperNPSGraph to have the same width as in single
+local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 if styletype == "OnePlayerTwoSides" or styletype == "TwoPlayersSharedSides" then
 	width = width/2
 end

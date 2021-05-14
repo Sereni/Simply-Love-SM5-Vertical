@@ -22,13 +22,13 @@ SL_CustomPrefs.Get = function()
 		{
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		NumberOfContinuesAllowed =
 		{
 			Default = 0,
 			Choices = { 0,1,2,3,4,5,6,7,8,9 },
-			Values = { 0,1,2,3,4,5,6,7,8,9 }
+			Values  = { 0,1,2,3,4,5,6,7,8,9 }
 		},
 
 
@@ -36,7 +36,7 @@ SL_CustomPrefs.Get = function()
 		{
 			Default = false,
 			Choices = { THEME:GetString("ThemePrefs", "Show"), THEME:GetString("ThemePrefs", "Hide") },
-			Values 	= { false, true }
+			Values  = { false, true }
 		},
 		MusicWheelStyle =
 		{
@@ -47,7 +47,7 @@ SL_CustomPrefs.Get = function()
 		{
 			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		DefaultGameMode =
 		{
@@ -59,12 +59,12 @@ SL_CustomPrefs.Get = function()
 			},
 			Values 	= {"ITG", "FA+", "ECFA" }
 		},
-		VisualTheme =
+		VisualStyle =
 		{
 			Default = "Hearts",
 			 -- emojis are our lingua franca for the 21st century
-			Choices = { "♡", "↖", "🐻", "🦆", "😺", "🎃", "🌈", "⭐", "🤔" },
-			Values  = { "Hearts", "Arrows", "Bears", "Ducks", "Cats", "Spooky", "Gay", "Stars", "Thonk" },
+			Choices = { "♡", "↖", "🐻", "🦆", "😺", "🎃", "🌈", "⭐", "🤔", "🗡" },
+			Values  = { "Hearts", "Arrows", "Bears", "Ducks", "Cats", "Spooky", "Gay", "Stars", "Thonk", "SRPG5" },
 		},
 		RainbowMode = {
 			Default = false,
@@ -72,7 +72,12 @@ SL_CustomPrefs.Get = function()
 				THEME:GetString("ThemePrefs", "On"),
 				THEME:GetString("ThemePrefs", "Off")
 			},
-			Values 	= { true , false }
+			Values = { true , false }
+		},
+		WriteCustomScores = {
+			Default = false,
+			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
+			Values	= { true, false }
 		},
 		WriteCustomScores = {
 			Default = false,
@@ -87,7 +92,28 @@ SL_CustomPrefs.Get = function()
 			-- a nice pinkish-purple, by default
 			Default = 3,
 			Choices = { 1,2,3,4,5,6,7,8,9,10,11,12 },
-			Values = { 1,2,3,4,5,6,7,8,9,10,11,12 }
+			Values  = { 1,2,3,4,5,6,7,8,9,10,11,12 }
+		},
+
+		-- - - - - - - - - - - - - - - - - - - -
+		-- Save the last seen song in Edit Mode to disk so that ScreenEditMenu
+		-- can load with it already selected, instead of the first song in the
+		-- first pack.  See: ./BGAnimations/ScreenEditMenu underlay.lua
+		EditModeLastSeenSong =
+		{
+			Default = "",
+		},
+		EditModeLastSeenStepsType =
+		{
+			Default = "",
+		},
+		EditModeLastSeenStyleType =
+		{
+			Default = "",
+		},
+		EditModeLastSeenDifficulty =
+		{
+			Default = "",
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -
@@ -95,32 +121,32 @@ SL_CustomPrefs.Get = function()
 		ScreenSelectMusicMenuTimer =
 		{
 			Default = 300,
-			Choices = SecondsToMMSS_range(60, 450, 15),
-			Values = range(60, 450, 15),
+			Choices = map(SecondsToMSS, range(60, 450, 15)),
+			Values  = range(60, 450, 15),
 		},
 		ScreenPlayerOptionsMenuTimer =
 		{
 			Default = 90,
-			Choices = SecondsToMMSS_range(30, 450, 15),
-			Values = range(30, 450, 15),
+			Choices = map(SecondsToMSS, range(30, 450, 15)),
+			Values  = range(30, 450, 15),
 		},
 		ScreenEvaluationMenuTimer =
 		{
 			Default = 60,
-			Choices = SecondsToMMSS_range(15, 450, 15),
-			Values = range(15, 450, 15),
+			Choices = map(SecondsToMSS, range(15, 450, 15)),
+			Values  = range(15, 450, 15),
 		},
 		ScreenEvaluationSummaryMenuTimer =
 		{
 			Default = 60,
-			Choices = SecondsToMMSS_range(30, 450, 15),
-			Values = range(30, 450, 15),
+			Choices = map(SecondsToMSS, range(30, 450, 15)),
+			Values  = range(30, 450, 15),
 		},
 		ScreenNameEntryMenuTimer =
 		{
 			Default = 60,
-			Choices = SecondsToMMSS_range(15, 450, 15),
-			Values = range(15, 450, 15),
+			Choices = map(SecondsToMSS, range(15, 450, 15)),
+			Values  = range(15, 450, 15),
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -
@@ -129,31 +155,31 @@ SL_CustomPrefs.Get = function()
 		{
 			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		AllowScreenSelectColor =
 		{
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		AllowScreenEvalSummary =
 		{
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		AllowScreenGameOver =
 		{
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 		AllowScreenNameEntry =
 		{
 			Default = true,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values 	= { true, false }
+			Values  = { true, false }
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -
@@ -161,7 +187,7 @@ SL_CustomPrefs.Get = function()
 		UseImageCache = {
 			Default = false,
 			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
-			Values	= { true, false }
+			Values  = { true, false }
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -
@@ -172,6 +198,7 @@ SL_CustomPrefs.Get = function()
 			Choices = { THEME:GetString("ThemePrefs","Off"), THEME:GetString("ThemePrefs","On"), THEME:GetString("ThemePrefs","OnWithSound") },
 			Values  = { 0, 1, 2 }
 		},
+
 		-- - - - - - - - - - - - - - - - - - - -
 		-- Default Global Offset.
 		-- If players manipulate Global Offset via Advanced Options, return to this
@@ -181,6 +208,10 @@ SL_CustomPrefs.Get = function()
 		-- existing value in ThemePrefs directly.
 		DefaultGlobalOffsetSeconds = {
 			Default = PREFSMAN:GetPreference("GlobalOffsetSeconds")
+		},
+		LastActiveEvent =
+		{
+			Default = "",
 		},
 	}
 end
@@ -198,13 +229,15 @@ SL_CustomPrefs.Validate = function()
 	if file[theme_name] then
 		-- loop through key/value pairs retrieved and do some basic validation
 		for k,v in pairs( file[theme_name] ) do
-			local pref = sl_prefs[k]
-			if pref then
-				-- if we reach here, the setting exists in both the master definition as well as the user's ThemePrefs.ini
-				-- so perform some rudimentary validation; check for both type mismatch and presence in sl_prefs
-				local valid_values = pref.Values or pref.Choices
-				if type( v ) ~= type( pref.Default )
-				or (valid_values and not FindInTable(v, valid_values))
+			if sl_prefs[k] then
+				-- if we reach here, the setting exists in both the master definition as well
+				-- as the user's ThemePrefs.ini so perform some rudimentary validation; check
+				-- for both type mismatch and presence in sl_prefs
+
+				local values = sl_prefs[k].Values or sl_prefs[k].Choices
+
+				if type( v ) ~= type( sl_prefs[k].Default )
+				or (values and not FindInTable(v, values))
 				then
 					-- overwrite the user's erroneous setting with the default value
 					ThemePrefs.Set(k, sl_prefs[k].Default)

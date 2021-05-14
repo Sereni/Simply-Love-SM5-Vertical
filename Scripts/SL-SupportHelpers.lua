@@ -1,89 +1,66 @@
--- Hi there. 🌊
+-- -----------------------------------------------------------------------
+-- local helper function to transform a StepMania version string ("5.0.12") into a table of numbers { 5, 0, 12 }
+
+local getSMVersion = function()
+	-- get the version string, e.g. "5.0.11" or "5.1.0" or "5.2-git-96f9771" or etc.
+	local version = ProductVersion()
+	if type(version) ~= "string" then return {} end
+
+	-- remove the build suffix from the version string
+	-- debug build are suffixed with "-git-$something" or "-UNKNOWN" if the
+	-- git hash is not available for some reason
+	version = version:gsub("-.*", "")
+
+	-- parse the version string into a table
+	local v = {}
+	for i in version:gmatch("[^%.]+") do
+		table.insert(v, tonumber(i))
+	end
+
+	return v
+end
+
+-- IsSMVersion() accepts multiple number arguments representing StepMania family, major, and minor releases
+-- returns true if the user's StepMania engine version matches arguments
+-- returns false if not
 --
--- If you're here to remove or modify StepManiaVersionIsSupported because the
--- StepMania version you use isn't supported – I get where you're coming from.
+-- all arguments are optional and IsSMVersion() will only check the engine's version number
+-- for as many arguments as are provided
 --
--- It can be frustrating when you just want to play a free game and there seems
--- to be arbitrary walls up preventing that.  I get that that is what this
--- probably feels like.
---
--- For now, Simply Love supports SM5.0.12 and beta releases of SM5.1 from
--- the main StepMania project, which can be found on GitHub at
--- https://github.com/stepmania/stepmania/
---
--- Other forks, older builds, other projects, etc. are blocked here, regardless
--- of their compatibility with Simply Love.  I am only one human person, and I've
--- taken on too much responsibility here with moving the post-ITG community forward
--- in a responsible, open, and inclusvie manner.
---
--- I've done very little with my life that I am proud of, but I am confident that
--- this Simply Love project has helped dance game enthusiasts from all over the world
--- enjoy a silly arrow game together, as a community.
---
--- Regardless of their location or language, regardless of their access to specficic
--- hardware with limited availability, almost anyone can install and use and benefit
--- from Simply Love.  This is a good thing, and I am proud of this.
---
--- Supporting this is not easy. It's almost always easier to do a quick fix that works
--- for one circumstance – one particluar machine, one particular hardware device, one
--- one particular community.  Writing code and designing software that accommodates the
--- broadest community is hard, but it's critically important.  It's the responsibility
--- I've gradually assumed over the years I've worked on Simply Love.
---
--- So, if you're here to remove of modify StepManiaVersionIsSupported as a quick fix,
--- I'll ask you to consider giving back to the broader community instead.
---
--- What features does your fork have that mainline StepMania doesn't?  Can they be
--- brought into mainline StepMania?  Maybe you don't know, maybe you're not a developer,
--- but maybe you know someone who does or is.  Ask.  Get things moving.  Contribute.
--- Everyone will be better off because you helped.
---
--- I appreciate your understanding.  Maybe we can share a dance in the future. :)
---
---                                                                quietly-turning
---                                                                4 July 2020
+-- for example, if the user's SM version is "5.0.12"
+--   IsSMVersion(5, 0, 11) will return false
+--   IsSMVersion(5, 0, 12) will return true
+--   IsSMVersion(5, 0)     will return true
+--   IsSMVersion(5, 1)     will return false
+
+function IsSMVersion(...)
+	local version = getSMVersion()
+
+	for i = 1, select('#', ...) do
+		if select(i, ...) ~= version[i] then
+			return false
+		end
+	end
+
+	return true
+end
+
 
 -- -----------------------------------------------------------------------
 -- use StepManiaVersionIsSupported() to check if Simply Love supports the version of SM5 in use
 
 StepManiaVersionIsSupported = function()
-
-	-- ensure that we're using StepMania
+	-- sanity checks to make sure we're running StepMania
 	if type(ProductFamily) ~= "function" or ProductFamily():lower() ~= "stepmania" then return false end
-
-	-- ensure that a global ProductVersion() function exists before attempting to call it
 	if type(ProductVersion) ~= "function" then return false end
+	if type(ProductVersion()) ~= "string" then return false end
 
-	-- get the version string, e.g. "5.0.11" or "5.1.0" or "5.2-git-96f9771" or etc.
-	local version = ProductVersion()
-	if type(version) ~= "string" then return false end
-
-	-- remove the git hash if one is present in the version string
-	version = version:gsub("-git-.+", "")
-
-	-- split the remaining version string on periods; store each segment in a temp table
-	local t = {}
-	for i in version:gmatch("[^%.]+") do
-		table.insert(t, tonumber(i))
-	end
-
-	-- if we didn't detect SM5.x.x then Something Is Terribly Wrong.
-	if not (t[1] and t[1]==5) then return false end
-
-	-- SM5.0.x is supported
+	-- SM5.0.12 is supported (latest stable release)
 	-- SM5.1.x is supported
-	-- SM5.2 is not supported because it saw significant backwards-incompatible API changes and is now abandoned
-	-- SM5.3 is not supported for now because it is not open source
-	if not (t[2] and (t[2]==0 or t[2]==1)) then return false end
-
-	-- if we're in SM5.0.x, then check for a third segment
-	if t[2]==0 then
-		-- SM5.0.12 is supported because SM5.1 is "still in beta" and many users are reluctant to install beta software
-		-- anything older than SM5.0.12 is not supported
-		if not (t[3] and t[3]==12) then return false end
-	end
-
-	return true
+	-- SM5.2 is not supported because it saw significant
+	--       backwards-incompatible API changes and is now abandoned
+	-- SM5.3.x is supported (beta status because it's not open source yet)
+	return IsSMVersion(5, 0, 12) or IsSMVersion(5, 1) or IsSMVersion(5, 3)
 end
 
 -- -----------------------------------------------------------------------
@@ -105,4 +82,47 @@ CurrentGameIsSupported = function()
 	}
 	-- return true or nil
 	return support[GAMESTATE:GetCurrentGame():GetName()]
+end
+
+-- -----------------------------------------------------------------------
+-- read the theme version from ThemeInfo.ini to display on ScreenTitleMenu underlay
+-- this allows players to more easily identify what version of the theme they are currently using
+
+GetThemeVersion = function()
+	local file = IniFile.ReadFile( THEME:GetCurrentThemeDirectory() .. "ThemeInfo.ini" )
+	if file then
+		if file.ThemeInfo and file.ThemeInfo.Version then
+			return file.ThemeInfo.Version
+		end
+	end
+	return false
+end
+
+-- -----------------------------------------------------------------------
+-- NOTE: This is the preferred way to check for RTT support, but we cannot rely on it to
+--   accurately tell us whether the current system atually supports RTT!
+--   Some players on Linux and [some version of] SM5.1-beta reported that DISPLAY:SupportsRenderToTexture()
+--   returned false, when render to texture was definitely working for them.
+--   I'm leaving this check here, but commented out, both as "inline instruction" for current SM5 themers
+--   and so that it can be easily uncommented and used ~~when we are trees again~~ at a future date.
+
+-- SupportsRenderToTexture = function()
+-- 	-- ensure the method exists and, if so, ensure that it returns true
+-- 	return DISPLAY.SupportsRenderToTexture and DISPLAY:SupportsRenderToTexture()
+-- end
+
+
+-- -----------------------------------------------------------------------
+-- SM5's d3d implementation does not support render to texture. The DISPLAY
+-- singleton has a method to check this but it doesn't seem to be implemented
+-- in RageDisplay_D3D which is, ironically, where it's most needed.  So, this.
+
+SupportsRenderToTexture = function()
+	-- This is not a sensible way to assess this; it is a hack and should be removed at a future date.
+	if HOOKS:GetArchName():lower():match("windows")
+	and PREFSMAN:GetPreference("VideoRenderers"):sub(1,3):lower() == "d3d" then
+		return false
+	end
+
+	return true
 end
