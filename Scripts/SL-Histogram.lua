@@ -12,10 +12,10 @@ local function gen_vertices(player, width, height)
 		Song = GAMESTATE:GetCurrentSong()
 	end
 
-	if not Steps then return {} end
+	if not Steps or not Song then return {} end
 
 	-- This function does no work if we already have the data in SL.Streams cache.
-	ParseChartInfo(Steps, pn) -- TODO(Sereni) now bring in this function and the rest of that file 
+	ParseChartInfo(Steps, pn)
 	PeakNPS = SL[pn].Streams.PeakNPS
 	NPSperMeasure = SL[pn].Streams.NPSperMeasure
 

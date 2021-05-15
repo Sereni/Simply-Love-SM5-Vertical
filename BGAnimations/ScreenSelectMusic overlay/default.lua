@@ -29,9 +29,8 @@ local t = Def.ActorFrame{
 	-- make the MusicWheel appear to cascade down; this should draw underneath P2's PaneDisplay
 	LoadActor("./MusicWheelAnimation.lua"),
 
-	-- elements we need two of (one for each player) that draw underneath the StepsDisplayList
-	-- this includes the stepartist boxes and the PaneDisplays (number of steps, jumps, holds, etc.)
-	LoadActor("./PerPlayer/Under.lua"),
+  -- PaneDisplay (number of steps, jumps, holds, etc.)
+	LoadActor("./PaneDisplay.lua", GAMESTATE:GetMasterPlayerNumber()),
 	-- grid of Difficulty Blocks (normal) or CourseContentsList (CourseMode)
 	LoadActor("./StepsDisplayList/default.lua"),
 
