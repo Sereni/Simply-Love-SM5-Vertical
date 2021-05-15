@@ -1,4 +1,5 @@
 local player = ...
+local pn = ToEnumShortString(player)
 
 local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local PercentDP = stats:GetPercentDancePoints()
@@ -27,7 +28,9 @@ else
 	style = "dance-single"
 end
 
-local hash = GenerateHash(steps, style, difficulty):sub(1, 12)
+-- ParseChartInfo will do no work if the data already exists in the SL.Streams Cache.
+ParseChartInfo(steps, pn)
+local hash = SL[pn].Streams.Hash
 
 local qr_version = SL.GrooveStats.ChartHashVersion
 

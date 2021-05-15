@@ -1,6 +1,7 @@
 local function gen_vertices(player, width, height)
 	local Song, Steps
 	local first_step_has_occurred = false
+	local pn = ToEnumShortString(player)
 
 	if GAMESTATE:IsCourseMode() then
 		local TrailEntry = GAMESTATE:GetCurrentTrail(player):GetTrailEntry(GAMESTATE:GetCourseSongIndex())
@@ -11,14 +12,25 @@ local function gen_vertices(player, width, height)
 		Song = GAMESTATE:GetCurrentSong()
 	end
 
-	local PeakNPS, NPSperMeasure = GetNPSperMeasure(Song, Steps)
-	-- broadcast this for any other actors on the current screen that rely on knowing the peak nps
-	MESSAGEMAN:Broadcast("PeakNPSUpdated", {PeakNPS=PeakNPS})
+	if not Steps then return {} end
 
-	-- also, store the PeakNPS in GAMESTATE:Env()[pn.."PeakNPS"] in case both players are joined
+	-- This function does no work if we already have the data in SL.Streams cache.
+	ParseChartInfo(Steps, pn) -- TODO(Sereni) now bring in this function and the rest of that file 
+	PeakNPS = SL[pn].Streams.PeakNPS
+	NPSperMeasure = SL[pn].Streams.NPSperMeasure
+
+	-- store the PeakNPS in GAMESTATE:Env()[pn.."PeakNPS"] in case both players are joined
 	-- their charts may have different peak densities, and if they both want histograms,
 	-- we'll need to be able to compare densities and scale one of the graphs vertically
-	GAMESTATE:Env()[ToEnumShortString(player).."PeakNPS"] = PeakNPS
+	GAMESTATE:Env()[pn.."PeakNPS"] = PeakNPS
+
+	-- use MESSAGEMAN to broadcast that the peak NPS has been calculated (and/or updated in CourseMode)
+	-- and is available.  actors on the current screen can listen for this via something like:
+	--
+	-- PeakNPSUpdatedMessageCommand=function(self)
+	--   local p1peak = GAMESTATE:Env()["P1PeakNPS"]
+	-- end
+	MESSAGEMAN:Broadcast("PeakNPSUpdated")
 
 	local verts = {}
 	local x, y, t
@@ -86,14 +98,16 @@ end
 
 function NPS_Histogram(player, width, height)
 	local amv = Def.ActorMultiVertex{
-		Name="DensityGraph_AMV",
 		InitCommand=function(self)
 			self:SetDrawState({Mode="DrawMode_QuadStrip"})
 		end,
-		CurrentSongChangedMessageCommand=function(self)
-			self:playcommand('Update')
+		CurrentStepsP1ChangedMessageCommand=function(self)
+			self:queuecommand("Redraw")
 		end,
-		UpdateCommand=function(self)
+		CurrentStepsP2ChangedMessageCommand=function(self)
+			self:queuecommand("Redraw")
+		end,
+		RedrawCommand=function(self)
 			-- we've reached a new song, so reset the vertices for the density graph
 			-- this will occur at the start of each new song in CourseMode
 			-- and at the start of "normal" gameplay
@@ -111,7 +125,6 @@ function Scrolling_NPS_Histogram(player, width, height)
 	local left_idx, right_idx
 
 	local amv = Def.ActorMultiVertex{
-		Name="ScrollingDensityGraph_AMV",
 		InitCommand=function(self)
 			self:SetDrawState({Mode="DrawMode_QuadStrip"})
 		end,

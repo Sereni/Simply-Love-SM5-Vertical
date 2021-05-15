@@ -1,5 +1,5 @@
-local show = true
 local player = GAMESTATE:GetMasterPlayerNumber()
+local pn = ToEnumShortString(player)
 
 local histogramWidth = 417
 local histogramHeight = 86
@@ -31,7 +31,7 @@ return Def.ActorFrame {
     end,
 
     UpdateGraphStateCommand=function(self, params)
-        if show and not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
+        if not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
             self:stoptweening()
             self:linear(0.1):diffusealpha(0.9)
         else
@@ -52,9 +52,8 @@ return Def.ActorFrame {
     histogram..{
         UpdateGraphStateCommand=function(self)
             self:y(histogramHeight)
-
-            if show and not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
-		    self:playcommand("Update")
+            if not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
+		            self:playcommand("Update")
             end
         end
     },
@@ -82,28 +81,17 @@ return Def.ActorFrame {
                 :Stroke(color("#000000"))
         end,
 
-        CurrentStepsP1ChangedMessageCommand=function(self, params)
-            self:queuecommand("UpdateGraphState")
-        end,
-        CurrentStepsP2ChangedMessageCommand=function(self, params)
-            self:queuecommand("UpdateGraphState")
+        ["CurrentSteps"..pn.."ChangedMessageCommand"]=function(self)
+			       self:queuecommand("UpdateBreakdown")
         end,
 
-        UpdateGraphStateCommand=function(self)
-            if show and not GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentSong() then
-                local steps = GAMESTATE:GetCurrentSteps(player)
-                local steps_type = ToEnumShortString( steps:GetStepsType() ):gsub("_", "-"):lower()
-                local difficulty = ToEnumShortString( steps:GetDifficulty() )
-                local breakdown = GetStreamBreakdown(steps, steps_type, difficulty)
-
-                if breakdown == "" then
-                    self:settext("No streams!")
-                else
-                    self:settext(breakdown)
-                end
-
-                return true
-            end
-        end
+        UpdateBreakdownCommand=function(self)
+        			self:settext(GenerateBreakdownText(pn, 0))
+        			local minimization_level = 1
+        			while self:GetWidth() > (histogramWidth - 10) and minimization_level < 4 do
+        				self:settext(GenerateBreakdownText(pn, minimization_level))
+        				minimization_level = minimization_level + 1
+        			end
+        		end,
     }
 }
