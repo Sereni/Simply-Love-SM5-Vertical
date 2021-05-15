@@ -1,7 +1,7 @@
 if not IsServiceAllowed(SL.GrooveStats.Leaderboard) then return end
 
 local NumEntries = 13
-local RowHeight = 24
+local RowHeight = 18
 
 local SetEntryText = function(rank, name, score, actor)
 	if actor == nil then return end
@@ -14,7 +14,7 @@ end
 local LeaderboardRequestProcessor = function(res, master)
 	if master == nil then return end
 
-	playerNumber = GAMESTATE:GetMasterPlayerNumber()
+	playerNumber = PlayerNumber:Reverse()[GAMESTATE:GetMasterPlayerNumber()]+1
 	local leaderboard = master:GetChild("P"..playerNumber.."Leaderboard")
 
 	local playerStr = "player"..playerNumber
@@ -80,7 +80,7 @@ local af = Def.ActorFrame{
 	Def.Quad{ InitCommand=function(self) self:FullScreen():diffuse(0,0,0,0.875) end },
 	LoadFont("Common Normal")..{
 		Text=THEME:GetString("ScreenSelectMusic", "LeaderboardHelpText"),
-		InitCommand=function(self) self:xy(_screen.cx, _screen.h-50):zoom(0.8) end
+		InitCommand=function(self) self:xy(_screen.cx, _screen.h-80):zoom(0.8) end
 	},
 	RequestResponseActor("Leaderboard", 10)..{
 		SendLeaderboardRequestCommand=function(self)
@@ -90,7 +90,7 @@ local af = Def.ActorFrame{
 				maxLeaderboardResults=13,  -- We have 13 rows of space, but in the worst case we can have 9 scores and 4 "..."s
 			}
 
-			playerNumber = GAMESTATE:GetMasterPlayerNumber()
+			playerNumber = PlayerNumber:Reverse()[GAMESTATE:GetMasterPlayerNumber()]+1
 			local pn = "P"..playerNumber
 			if SL[pn].ApiKey ~= "" and SL[pn].Streams.Hash ~= "" then
 				data["player"..playerNumber] = {
@@ -114,7 +114,7 @@ local af = Def.ActorFrame{
 }
 
 local paneWidth = 230
-local paneHeight = 360
+local paneHeight = 280
 local borderWidth = 2
 
 -- TODO(teejusb): Handle the LeaderboardInputEventMessage to go through the different leaderboards.
@@ -149,14 +149,14 @@ for player in ivalues( PlayerNumber ) do
 		-- Header border
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.White):zoomto(paneWidth + borderWidth, RowHeight + borderWidth):y(-paneHeight/2 + RowHeight/2)
+				self:diffuse(Color.White):zoomto(paneWidth + borderWidth, RowHeight*2 + borderWidth):y(-paneHeight/2 + RowHeight/2)
 			end
 		},
 
 		-- Blue Header
 		Def.Quad {
 			InitCommand=function(self)
-				self:diffuse(Color.Blue):zoomto(paneWidth, RowHeight):y(-paneHeight/2 + RowHeight/2)
+				self:diffuse(Color.Blue):zoomto(paneWidth, RowHeight*2):y(-paneHeight/2 + RowHeight/2)
 			end
 		},
 
@@ -165,8 +165,8 @@ for player in ivalues( PlayerNumber ) do
 			Name="Header",
 			Text="GrooveStats",
 			InitCommand=function(self)
-				self:zoom(0.45)
-				self:y(-paneHeight/2 + 12)
+				self:zoom(0.35)
+				self:y(-paneHeight/2 + 9)
 			end
 		},
 
@@ -213,12 +213,13 @@ for player in ivalues( PlayerNumber ) do
 	}
 
 	local af2 = af[#af]
+	local textZoom = 0.7
 	for i=1, NumEntries do
 		--- Each entry has a Rank, Name, and Score subactor.
 		af2[#af2+1] = Def.ActorFrame{
 			Name="LeaderboardEntry"..i,
 			InitCommand=function(self)
-				self:y(RowHeight*(i-8) + RowHeight)
+				self:y(RowHeight*(i-6)-RowHeight/2)
 			end,
 
 			LoadFont("Miso/_miso").. {
@@ -229,6 +230,7 @@ for player in ivalues( PlayerNumber ) do
 					self:maxwidth(30)
 					self:x(-paneWidth/2 + 30 + borderWidth)
 					self:diffuse(Color.White)
+					self:zoom(textZoom)
 				end,
 				ResetEntryMessageCommand=function(self)
 					self:settext("")
@@ -244,6 +246,7 @@ for player in ivalues( PlayerNumber ) do
 					self:maxwidth(130)
 					self:x(-paneWidth/2 + 100)
 					self:diffuse(Color.White)
+					self:zoom(textZoom)
 				end,
 				ResetEntryMessageCommand=function(self)
 					self:settext(i==1 and "Loading" or "")
@@ -256,8 +259,9 @@ for player in ivalues( PlayerNumber ) do
 				Text="",
 				InitCommand=function(self)
 					self:horizalign(right)
-					self:x(paneWidth/2-borderWidth)
+					self:x(paneWidth/2-borderWidth-10)
 					self:diffuse(Color.White)
+					self:zoom(textZoom)
 				end,
 				ResetEntryMessageCommand=function(self)
 					self:settext("")
