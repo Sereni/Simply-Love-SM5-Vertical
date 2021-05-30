@@ -97,10 +97,7 @@ local af = Def.ActorFrame {
 				local _, valid = ValidForGrooveStats(player)
 				local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
-				if GAMESTATE:IsHumanPlayer(player) and
-						-- not stats:GetFailed() and
-						valid and
-						SL[pn].IsPadPlayer then
+				if valid and not stats:GetFailed() and SL[pn].IsPadPlayer then
 					local percentDP = stats:GetPercentDancePoints()
 					local score = FormatPercentScore(percentDP)
 					score = tonumber(score:gsub("%%", "") * 100)
@@ -142,7 +139,6 @@ af[#af+1] = LoadActor("./RpgOverlay.lua")
 af[#af+1] = LoadFont("Miso/_miso").. {
 	Name="SubmitText",
 	Text="",
-	Condition=GAMESTATE:IsSideJoined(PLAYER_1),
 	InitCommand=function(self)
 		self:xy(_screen.cx, _screen.h - 10)
 		self:diffuse(ThemePrefs.Get("RainbowMode") and Color.Black or Color.White)
@@ -157,6 +153,7 @@ af[#af+1] = LoadFont("Miso/_miso").. {
 	end,
 	SubmitFailedCommand=function(self)
 		self:settext("Submit Failed 😞")
+		DiffuseEmojis(self)
 	end,
 	ServiceDisabledCommand=function(self)
 		self:settext("Submit Disabled")

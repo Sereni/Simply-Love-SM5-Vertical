@@ -261,6 +261,17 @@ ValidForGrooveStats = function(player)
 		 0.008,  -- Held
 		-0.050,  -- Hit Mine
 	}
+	local ExpectedScoreWeight = {
+		 5,  -- Fantastics
+		 4,  -- Excellents
+		 2,  -- Greats
+		 0,  -- Decents
+		-6,  -- Way Offs
+		-12,  -- Miss
+		 0,  -- Let Go
+		 5,  -- Held
+		-6,  -- Hit Mine
+	}
 	local LifeWindows = { "W1", "W2", "W3", "W4", "W5", "Miss", "LetGo", "Held", "HitMine" }
 
 	-- Originally verify the ComboToRegainLife metrics.
@@ -285,6 +296,7 @@ ValidForGrooveStats = function(player)
 
 		for i, window in ipairs(LifeWindows) do
 			valid[7] = valid[7] and FloatEquals(THEME:GetMetric("LifeMeterBar", "LifePercentChange"..window), ExpectedLife[i])
+			valid[7] = valid[7] and THEME:GetMetric("ScoreKeeperNormal", "PercentScoreWeight"..window) == ExpectedScoreWeight[i]
 		end
 	elseif SL.Global.GameMode == "FA+" then
 		for i, window in ipairs(TimingWindows) do
@@ -316,8 +328,10 @@ ValidForGrooveStats = function(player)
 			local idx = (i < 6 and i-1 or i)
 			if i == 1 then
 				valid[7] = valid[7] and FloatEquals(THEME:GetMetric("LifeMeterBar", "LifePercentChange"..window), ExpectedLife[1])
+				valid[7] = valid[7] and THEME:GetMetric("ScoreKeeperNormal", "PercentScoreWeight"..window) == ExpectedScoreWeight[1]
 			else
 				valid[7] = valid[7] and FloatEquals(THEME:GetMetric("LifeMeterBar", "LifePercentChange"..window), ExpectedLife[idx])
+				valid[7] = valid[7] and THEME:GetMetric("ScoreKeeperNormal", "PercentScoreWeight"..window) == ExpectedScoreWeight[idx]
 			end
 		end
 	end
@@ -350,6 +364,9 @@ ValidForGrooveStats = function(player)
 
 	-- only FailTypes "Immediate" and "ImmediateContinue" are valid for GrooveStats
 	valid[11] = (po:FailSetting() == "FailType_Immediate" or po:FailSetting() == "FailType_ImmediateContinue")
+
+	-- AutoPlay is not allowed
+	valid[12] = not IsAutoplay(player)
 
 	-- ------------------------------------------
 	-- return the entire table so that we can let the player know which settings,
