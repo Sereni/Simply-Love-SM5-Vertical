@@ -2,29 +2,12 @@
 
 local player, side = unpack(...)
 
--- ------------------------------------------
--- ValidForGrooveStats.lua contains various checks requested by Archi
--- to determine whether the score should be permitted on GrooveStats
--- and returns a table of booleans, one per check.
---
--- Obviously, this is trivial to circumvent and not meant to keep
--- malicious users out of GrooveStats. It is intended to prevent
--- well-intentioned-but-unaware players from accidentally submitting
--- invalid scores to GrooveStats.
-
-local checks = LoadActor("./ValidForGrooveStats.lua", player)
-
--- reduce the table of booleans to single value; the score is valid or it isn't
-local ValidForGrooveStats = true
-for _, passed_check in ipairs(checks) do
-	if not passed_check then ValidForGrooveStats = false; break end
-end
-
+local checks, allChecksPassed = ValidForGrooveStats(player)
 local url, text = nil, ""
 local X_HasBeenBlinked = false
 
 -- GrooveStatsURL.lua returns a formatted URL with some parameters in the query string
-if ValidForGrooveStats then
+if allChecksPassed then
 	url = LoadActor("./GrooveStatsURL.lua", player)
 	text = ScreenString("QRInstructions")
 
@@ -54,8 +37,9 @@ local qrcode_size = 122
 -- ------------------------------------------
 
 local pane = Def.ActorFrame{
+	Name="QRPane",
 	PaneSwitchCommand=function(self)
-		if self:GetVisible() and not ValidForGrooveStats and not X_HasBeenBlinked then
+		if self:GetVisible() and not allChecksPassed and not X_HasBeenBlinked then
 			self:queuecommand("BlinkX")
 		end
 	end
@@ -69,13 +53,14 @@ local code_x_offset = -21
 local code_y_offset = 189
 
 pane[#pane+1] = qrcode_amv( url, qrcode_size )..{
+	Name="QRCode",
 	OnCommand=function(self)
 		self:xy(code_x_offset,code_y_offset)
 	end
 }
 
 -- red X to visually cover the QR code if the score was invalid
-if not ValidForGrooveStats then
+if not allChecksPassed then
 	pane[#pane+1] = LoadActor("x.png")..{
 		InitCommand=function(self)
 			self:zoom(0.77):align(0,0):xy(code_x_offset,code_y_offset)
@@ -101,11 +86,12 @@ pane[#pane+1] = Def.Quad{
 
 -- localized help text, either "use your phone to scan" or "here's why your score was invalid"
 pane[#pane+1] = LoadFont("Common Normal")..{
+	Name="HelpText",
 	Text=text,
 	InitCommand=function(self)
 		self:zoom(text_body_size):xy(text_x_offset,text_y_offset+27):align(0,0):vertspacing(-4):wrapwidthpixels(text_width/text_body_size):MaskDest()
 
-		local z = ValidForGrooveStats and 0.8 or 0.675
+		local z = allChecksPassed and 0.8 or 0.675
 		-- FIXME: Oof.
 		if THEME:GetCurLanguage() == "ja" then self:_wrapwidthpixels( scale(96, 0,0.8, 0,z)/z ) end
 	end,

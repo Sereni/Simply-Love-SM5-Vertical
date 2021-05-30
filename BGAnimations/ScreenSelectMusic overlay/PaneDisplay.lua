@@ -287,58 +287,68 @@ local af = Def.ActorFrame{
 	end
 }
 
--- Only add the GrooveStats request actor if it's relevant.
-if IsServiceAllowed(SL.GrooveStats.GetScores) then
-	af[#af+1] = RequestResponseActor("GetScores", 10)..{
-		OnCommand=function(self)
-			-- Create variables for both players, even if they're not currently active.
-			-- NOTE: For reasons unknown to me, failing to include P1/2 here and going with
-			-- a single player assumption makes you receive TWO updates per change, which hangs
-			-- Stepmania on queuecommand("ChartParsed"). Beware. -- Sereni
-			self.IsParsing = {false, false}
-		end,
-		-- Broadcasted from DensityGraph.lua
-		P1ChartParsingMessageCommand=function(self) self.IsParsing[1] = true end,
-		P2ChartParsingMessageCommand=function(self) self.IsParsing[2] = true end,
-		P1ChartParsedMessageCommand=function(self)
-			self.IsParsing[1] = false
-			self:queuecommand("ChartParsed")
-		end,
-		P2ChartParsedMessageCommand=function(self)
-			self.IsParsing[2] = false
-			self:queuecommand("ChartParsed")
-		end,
-		ChartParsedCommand=function(self)
-			-- Make sure we're still not parsing either chart.
-			if self.IsParsing[1] or self.IsParsing[2] then return end
-			--
-			-- This makes sure that the Hash in the ChartInfo cache exists.
-			local sendRequest = false
-			local data = {
-				action="groovestats/player-scores",
-			}
-
-			local pn = ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())
-			local playerIndex = PlayerNumber:Reverse()[GAMESTATE:GetMasterPlayerNumber()]+1
-			if SL[pn].ApiKey ~= "" and SL[pn].Streams.Hash ~= "" then
-				data["player"..playerIndex] = {
-					chartHash=SL[pn].Streams.Hash,
-					apiKey=SL[pn].ApiKey
-				}
-				sendRequest = true
-			end
-
-			-- Only send the request if it's applicable.
-			if sendRequest then
-				MESSAGEMAN:Broadcast("GetScores", {
-					data=data,
-					args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplay"),
-					callback=GetScoresRequestProcessor
-				})
+af[#af+1] = RequestResponseActor("GetScores", 10)..{
+	OnCommand=function(self)
+		-- Create variables for both players, even if they're not currently active.
+		-- NOTE: For reasons unknown to me, failing to include P1/2 here and going with
+		-- a single player assumption makes you receive TWO updates per change, which hangs
+		-- Stepmania on queuecommand("ChartParsed"). Beware. -- Sereni
+		self.IsParsing = {false, false}
+		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+			-- If a profile is joined for this player, try and fetch the API key.
+			-- A non-valid API key will have the field set to the empty string.
+			if PROFILEMAN:GetProfile(player) then
+				ParseGrooveStatsIni(player)
 			end
 		end
-	}
-end
+	end,
+	PlayerJoinedMessageCommand=function(self, params)
+		if GAMESTATE:IsHumanPlayer(params.Player) and PROFILEMAN:GetProfile(params.Player) then
+			ParseGrooveStatsIni(params.Player)
+		end
+	end,
+	-- Broadcasted from DensityGraph.lua
+	P1ChartParsingMessageCommand=function(self) self.IsParsing[1] = true end,
+	P2ChartParsingMessageCommand=function(self) self.IsParsing[2] = true end,
+	P1ChartParsedMessageCommand=function(self)
+		self.IsParsing[1] = false
+		self:queuecommand("ChartParsed")
+	end,
+	P2ChartParsedMessageCommand=function(self)
+		self.IsParsing[2] = false
+		self:queuecommand("ChartParsed")
+	end,
+	ChartParsedCommand=function(self)
+		if not IsServiceAllowed(SL.GrooveStats.GetScores) then return end
+		-- Make sure we're still not parsing either chart.
+		if self.IsParsing[1] or self.IsParsing[2] then return end
+		--
+		-- This makes sure that the Hash in the ChartInfo cache exists.
+		local sendRequest = false
+		local data = {
+			action="groovestats/player-scores",
+		}
+
+		local pn = ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())
+		local playerIndex = PlayerNumber:Reverse()[GAMESTATE:GetMasterPlayerNumber()]+1
+		if SL[pn].ApiKey ~= "" and SL[pn].Streams.Hash ~= "" then
+			data["player"..playerIndex] = {
+				chartHash=SL[pn].Streams.Hash,
+				apiKey=SL[pn].ApiKey
+			}
+			sendRequest = true
+		end
+
+		-- Only send the request if it's applicable.
+		if sendRequest then
+			MESSAGEMAN:Broadcast("GetScores", {
+				data=data,
+				args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("PaneDisplay"),
+				callback=GetScoresRequestProcessor
+			})
+		end
+	end
+}
 
 -- colored background for chart statistics
 af[#af+1] = Def.Quad{
@@ -364,12 +374,14 @@ af[#af+1] = Def.Quad{
 	InitCommand=function(self, params)
 		self:zoomto(quadWidth/2 + 20, quadHeight*3/4)
 		self:xy(quadX+quadWidth/4-10 ,quadY+quadHeight*3/4+7)
-		self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 		self:diffuse(color("#888888"))
 		if ThemePrefs.Get("RainbowMode") then
 			self:diffusealpha(0.75)
 		end
-	end
+	end,
+	OnCommand=function(self)
+		self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
+	end,
 }
 
 for key, item in pairs(PaneItems) do
@@ -504,6 +516,8 @@ af[#af+1] = LoadFont("Common Normal")..{
 				self:zoom(zoom_factor):diffuse(Color.Black):maxwidth(30):horizalign(left)
 				self:x(dataX_col2 + labelSpacing)
 				self:y(rowOneY + rowHeight * (i+3) + 10)
+			end,
+			OnCommand=function(self)
 				self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 			end,
 			SetCommand=function(self)
@@ -518,6 +532,8 @@ af[#af+1] = LoadFont("Common Normal")..{
 				self:zoom(zoom_factor):diffuse(Color.Black):horizalign(right)
 				self:x(labelX_col2 - labelSpacing)
 				self:y(rowOneY + rowHeight * (i+3) + 10)
+			end,
+			OnCommand=function(self)
 				self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 			end,
 			SetCommand=function(self)
