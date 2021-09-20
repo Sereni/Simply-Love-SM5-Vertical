@@ -162,15 +162,21 @@ Branch.AfterSelectMusic = function()
 				local group_name = song:GetGroupName()
 
 				-- Using an unknown profile, just go straight to ScreenGameplay.
-				if PlayerIsUpper() == nil then
+				if GetDivision() == nil then
 					return "ScreenGameplay"
 				end
 
-				if (PlayerIsUpper() and
-						((ECS.Mode == "ECS" and group_name == "ECS9 - Upper") or
-						(ECS.Mode == "Marathon" and group_name == "ECS9 - Upper Marathon")) or
-					(not PlayerIsUpper() and
-						group_name == "ECS9 - Lower")) then
+				if (
+					(GetDivision() == "upper" and
+						((ECS.Mode == "ECS" and group_name == "ECS10 - Upper") or
+						(ECS.Mode == "Marathon" and group_name == "ECS10 - Upper Marathon"))) or
+					(GetDivision() == "mid" and
+						((ECS.Mode == "ECS" and group_name == "ECS10 - Mid") or
+						(ECS.Mode == "Marathon" and group_name == "ECS10 - Mid Marathon"))) or
+					(GetDivision() == "lower" and
+						((ECS.Mode == "ECS" and group_name == "ECS10 - Lower") or
+						(ECS.Mode == "Marathon" and group_name == "ECS10 - Lower Marathon")))
+					) then
 					-- Only go to ScreenEquipRelics if it's a valid song for the player.
 					return "ScreenEquipRelics"
 				else

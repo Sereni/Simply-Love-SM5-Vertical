@@ -12,13 +12,17 @@ local CreateScoreFile = function(day, month_string, year, seconds, hour, minute,
 	local group_name = song:GetGroupName()
 	local song_name = song:GetMainTitle()
 
-	if PlayerIsUpper() == nil then return end
+	if GetDivision() == nil then return end
 
-	if PlayerIsUpper() then
-		if ECS.Mode == "ECS" and group_name ~= "ECS9 - Upper" then return end
-		if ECS.Mode == "Marathon" and group_name ~= "ECS9 - Upper Marathon" then return end
+	if GetDivision() == "upper" then
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Upper" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Upper Marathon" then return end
+	elseif GetDivision() == "mid" then
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Mid" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Mid Marathon" then return end
 	else
-		if group_name ~= "ECS9 - Lower" then return end
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Lower" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Lower Marathon" then return end
 	end
 
 	-- ----------------------------------------------------------
@@ -51,13 +55,17 @@ local CreateRelicFile = function(day, month_string, year, seconds)
 	local song = GAMESTATE:GetCurrentSong()
 	local group_name = song:GetGroupName()
 
-	if PlayerIsUpper() == nil then return end
+	if GetDivision() == nil then return end
 
-	if PlayerIsUpper() then
-		if ECS.Mode == "ECS" and group_name ~= "ECS9 - Upper" then return end
-		if ECS.Mode == "Marathon" and group_name ~= "ECS9 - Upper Marathon" then return end
+	if GetDivision() == "upper" then
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Upper" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Upper Marathon" then return end
+	elseif GetDivision() == "mid" then
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Mid" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Mid Marathon" then return end
 	else
-		if group_name ~= "ECS9 - Lower" then return end
+		if ECS.Mode == "ECS" and group_name ~= "ECS10 - Lower" then return end
+		if ECS.Mode == "Marathon" and group_name ~= "ECS10 - Lower Marathon" then return end
 	end
 
 	local path = THEME:GetCurrentThemeDirectory().."ECSData/"..day..month_string..year.."-"..seconds.."-"..ECS.Players[profile_name].id.."-".."RELIC"..".txt"
@@ -230,7 +238,13 @@ local IsPlayingMarathon = function()
 	local song = GAMESTATE:GetCurrentSong()
 	local group_name = song:GetGroupName()
 	local song_name = song:GetMainTitle()
-	return group_name == "ECS9 - Upper Marathon" and song_name == "Stratospheric Intricacy"
+	if GetDivision() == "upper" then
+		return group_name == "ECS10 - Upper Marathon" and song_name == "In Memoriam"
+	elseif GetDivision() == "mid" then
+		return group_name == "ECS10 - Mid Marathon" and song_name == "ECS Classics (Side B-A)"
+	else
+		return group_name == "ECS10 - Lower Marathon" and song_name == "ECS Classics (Side A)"
+	end
 end
 
 if ECS.Mode == "Marathon" and FaustsScalpelIsActive() and IsPlayingMarathon() then

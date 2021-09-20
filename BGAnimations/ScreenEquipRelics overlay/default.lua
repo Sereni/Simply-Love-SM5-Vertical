@@ -341,7 +341,16 @@ t[#t+1] = LoadFont("Common Normal")..{
 	OnCommand=function(self)
 		if ECS.Mode == "ECS" then
 			local song = GAMESTATE:GetCurrentSong()
-			local song_info = PlayerIsUpper() and ECS.SongInfo.Upper or ECS.SongInfo.Lower
+			local song_info = nil
+
+			if GetDivision() == "upper" then
+				song_info = ECS.SongInfo.Upper
+			elseif GetDivision() == "mid" then
+				song_info = ECS.SongInfo.Mid
+			else
+				song_info = ECS.SongInfo.Lower
+			end
+
 			local song_name = song:GetDisplayFullTitle()
 			local song_data = FindEcsSong(song_name, song_info)
 			self:settext(tostring(song_data.dp + song_data.ep + song_data.rp))

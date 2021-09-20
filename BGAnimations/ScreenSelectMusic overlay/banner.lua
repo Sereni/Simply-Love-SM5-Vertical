@@ -70,13 +70,25 @@ local SetSongPointText = function(self)
 		return
 	end
 	local group_name = song:GetGroupName()
-	if (group_name ~= "ECS9 - Upper" and
-		group_name ~= "ECS9 - Lower" and
-		group_name ~= "ECS9 - Upper Marathon") then
-		self:settext("Min Song Points:")
+	if (group_name ~= "ECS10 - Upper" and
+		group_name ~= "ECS10 - Mid" and
+		group_name ~= "ECS10 - Lower" and
+		group_name ~= "ECS10 - Upper Marathon" and
+		group_name ~= "ECS10 - Mid Marathon" and
+		group_name ~= "ECS10 - Lower Marathon") then
+			self:settext("Min Song Points:")
 		return
 	end
-	local song_info = PlayerIsUpper() and ECS.SongInfo.Upper or ECS.SongInfo.Lower
+	local song_info = nil
+
+	if GetDivision() == "upper" then
+		song_info = ECS.SongInfo.Upper
+	elseif GetDivision() == "mid" then
+		song_info = ECS.SongInfo.Mid
+	else
+		song_info = ECS.SongInfo.Lower
+	end
+
 	local song_name = song:GetDisplayFullTitle()
 	local song_data = FindEcsSong(song_name, song_info)
 	if song_data == nil then
@@ -101,8 +113,9 @@ t[#t+1] = Def.ActorFrame{
 			return
 		end
 		local group_name = song:GetGroupName()
-		if ((group_name == "ECS9 - Upper" and PlayerIsUpper()) or
-			(group_name == "ECS9 - Lower" and not PlayerIsUpper())) then
+		if ((group_name == "ECS10 - Upper" and GetDivision() == "upper") or
+			(group_name == "ECS10 - Mid" and GetDivision() == "mid") or
+			(group_name == "ECS10 - Lower" and GetDivision() == "lower")) then
 			self:visible(true)
 		else
 			self:visible(false)
