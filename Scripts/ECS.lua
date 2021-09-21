@@ -15,6 +15,27 @@ InitializeECS = function()
 	}
 end
 
+local BowEquipped = function(relics_used)
+	for relic in ivalues(relic_used) do
+		local name = relic.name
+		if (name == "Short Bow" or name == "Composite Bow" or name == "Long Bow" or name == "Twisted Bow" or
+			name == "Splintered Bow" or name == "Amos' Bow" or name == "Yoichi Bow") then
+			return true
+		end
+	end
+	return false
+end
+
+local ArrowEquipped = function(relics_used)
+	for relic in ivalues(relic_used) do
+		local name = relic.name
+		if (name == "Stone Arrow" or name == "Bronze Arrow" or name == "Mythril Arrow" or name == "Dragon Arrow") then
+			return true
+		end
+	end
+	return false
+end
+
 -- the master list
 ECS.Relics = {
 	{
@@ -25,8 +46,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="stoneblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.1)
+		end,
 	},
 	{
 		id=1,
@@ -36,8 +59,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="stoneknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.1)
+		end,
 	},
 	{
 		id=2,
@@ -47,8 +72,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="stoneaxe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.1)
+		end,
 	},
 	{
 		id=3,
@@ -58,8 +85,11 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="shortbow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- Technically returns 0 regardless of if arrow is equpped or not.
+			return 0
+		end,
 	},
 	{
 		id=4,
@@ -69,8 +99,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="stonearrow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if BowEquipped(relics_used) then
+				return 125
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=5,
@@ -80,8 +116,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="bronzeblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.2)
+		end,
 	},
 	{
 		id=6,
@@ -91,8 +129,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="bronzeknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.2)
+		end,
 	},
 	{
 		id=7,
@@ -102,8 +142,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="bronzeaxe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.2)
+		end,
 	},
 	{
 		id=8,
@@ -113,8 +155,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="compositebow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) then
+				return 50
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=9,
@@ -124,8 +172,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="bronzearrow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if BowEquipped(relics_used) then
+				return 225
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=10,
@@ -135,8 +189,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mythrilblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.3)
+		end,
 	},
 	{
 		id=11,
@@ -146,8 +202,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mythrilknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.3)
+		end,
 	},
 	{
 		id=12,
@@ -157,8 +215,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mythrilaxe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.3)
+		end,
 	},
 	{
 		id=13,
@@ -168,8 +228,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="longbow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) then
+				return 100
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=14,
@@ -179,8 +245,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="mythrilarrow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if BowEquipped(relics_used) then
+				return 300
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=15,
@@ -190,8 +262,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="crystalsword.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.4)
+		end,
 	},
 	{
 		id=16,
@@ -201,8 +275,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="diamondsword.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.5)
+		end,
 	},
 	{
 		id=17,
@@ -212,8 +288,18 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="silverstopwatch.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+				local failed = pss:GetFailed()
+				if not failed then
+					ECS.BreakTimer = ECS.BreakTimer + 45
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=18,
@@ -223,8 +309,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="accuracypotion.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=19,
@@ -234,8 +323,35 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mammon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- Determine Rank 1 gold by checking every player
+			local all_gold_amounts = {}
+			for name, player in pairs(ECS.Players) do
+				all_gold_amounts[#all_gold_amounts + 1] = player.lifetime_song_gold
+			end
+			table.sort(all_gold_amounts)
+
+			local max_gold = all_gold_amounts[#all_gold_amounts]
+			if max_gold == nil then return 0 end
+
+			-- We need the 2nd highest as well for those that weren't rank 1
+			local second_highest = nil
+			for i = #all_gold_amounts, 1, -1 do
+				if all_gold_amounts[i] < max_gold then
+					second_highest = all_gold_amounts[i]
+					break
+				end
+			end
+
+			if max_gold == ecs_player.lifetime_song_gold then
+				return 500
+			else
+				local second_highest = all_gold_amounts[#all_gold_amounts-1]
+				if second_highest == nil then return 0 end
+				return math.floor(300 * (ecs_player.lifetime_song_gold / second_highest))
+			end
+		end,
 	},
 	{
 		id=20,
@@ -245,8 +361,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="baguette.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(100 * (song_data.adj_stream ^ 3))
+		end,
 	},
 	{
 		id=21,
@@ -256,8 +374,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="painviennois.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(200 * (song_data.adj_stream ^ 3))
+		end,
 	},
 	{
 		id=22,
@@ -267,8 +387,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="painbrioche.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(300 * (song_data.adj_stream ^ 3))
+		end,
 	},
 	{
 		id=23,
@@ -278,8 +400,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="fougasse.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(400 * (song_data.adj_stream ^ 3))
+		end,
 	},
 	{
 		id=24,
@@ -289,8 +413,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="faluche.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(500 * (song_data.adj_stream ^ 3))
+		end,
 	},
 	{
 		id=25,
@@ -300,8 +426,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="burger.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=26,
@@ -311,8 +439,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="crystalaxe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.4)
+		end,
 	},
 	{
 		id=27,
@@ -322,8 +452,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="diamondaxe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.5)
+		end,
 	},
 	{
 		id=28,
@@ -333,8 +465,12 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=true,
 		img="lanceoflonginus.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- NOTE(teejusb): MP Relics will only show up during the marathon so
+			-- returning the actual MP points is fine.
+			return 3000
+		end,
 	},
 	{
 		id=29,
@@ -344,8 +480,18 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="ornatehourglass.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+				local failed = pss:GetFailed()
+				if not failed then
+					ECS.BreakTimer = ECS.BreakTimer + 45
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=30,
@@ -355,8 +501,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="staminapotion.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=31,
@@ -366,8 +515,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="longboi.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.length * 45)
+		end,
 	},
 	{
 		id=32,
@@ -377,8 +528,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="crystaldagger.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.4)
+		end,
 	},
 	{
 		id=33,
@@ -388,8 +541,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="diamonddagger.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.5)
+		end,
 	},
 	{
 		id=34,
@@ -399,8 +554,15 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="twistedbow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) then
+				local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+				return math.floor(song_data.rp/(max_division_rp/1000) * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=35,
@@ -410,8 +572,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="dragonarrow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if BowEquipped(relics_used) then
+				return math.floor(song_data.dp * 0.3) + 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=36,
@@ -421,8 +589,35 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="gildedgallows.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- Determine Rank 1 JP by checking every player
+			local all_jp_amounts = {}
+			for name, player in pairs(ECS.Players) do
+				all_jp_amounts[#all_jp_amounts + 1] = player.lifetime_jp
+			end
+			table.sort(all_jp_amounts)
+
+			local max_jp = all_jp_amounts[#all_jp_amounts]
+			if max_jp == nil then return 0 end
+
+			-- We need the 2nd highest as well for those that weren't rank 1
+			local second_highest = nil
+			for i = #all_jp_amounts, 1, -1 do
+				if all_jp_amounts[i] < max_gold then
+					second_highest = all_jp_amounts[i]
+					break
+				end
+			end
+
+			if max_jp == ecs_player.lifetime_song_jp then
+				return 600
+			else
+				local second_highest = all_jp_amounts[#all_jp_amounts-1]
+				if second_highest == nil then return 0 end
+				return math.floor(300 * (ecs_player.lifetime_song_jp / second_highest))
+			end
+		end,
 	},
 	{
 		id=37,
@@ -432,8 +627,18 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="antiquesundial.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+				local failed = pss:GetFailed()
+				if not failed then
+					ECS.BreakTimer = ECS.BreakTimer + 45
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=38,
@@ -443,8 +648,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="agilitypotion.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=39,
@@ -454,8 +662,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="swiftabaddon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local bp = 0
+			if song_data.bpm_tier == 290 then
+				bp = bp + 150
+			end
+			return bp + math.floor(song_data.dp * 0.6)
+		end,
 	},
 	{
 		id=40,
@@ -465,8 +679,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="spiralheartmoonrod.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return ecs_player.tier_skill[song_data.bpm_tier]
+		end,
 	},
 	{
 		id=41,
@@ -476,8 +692,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="dryrottedstaff.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 130 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=42,
@@ -487,8 +709,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="princessguard.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 130 then
+				return 100 + math.floor(song_data.dp_ep * 0.1)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=43,
@@ -498,8 +726,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="claustrum.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 130 then
+				return 100 + math.floor(song_data.ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=44,
@@ -509,8 +743,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="crappygloves.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 140 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=45,
@@ -520,8 +760,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="ehrgeiz.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 140 then
+				return 100 + math.floor(song_data.dp_ep * 0.1)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=46,
@@ -531,8 +777,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="godhands.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 140 then
+				return 100 + math.floor(song_data.ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=47,
@@ -542,8 +794,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="fragileknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 150 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=48,
@@ -553,8 +811,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="magemasher.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 150 then
+				return 100 + math.floor(song_data.dp_ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=49,
@@ -564,8 +828,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mandau.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 150 then
+				return 150 + math.floor(song_data.ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=50,
@@ -575,8 +845,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="frayedlasso.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 160 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=51,
@@ -586,8 +862,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="dragonwhip.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 160 then
+				return 100 + math.floor(song_data.dp_ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=52,
@@ -597,8 +879,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="vampirekiller.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 160 then
+				return 150 + math.floor(song_data.ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=53,
@@ -608,8 +896,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="damagedzweihander.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 170 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=54,
@@ -619,8 +913,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="flamberge.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 170 then
+				return 100 + math.floor(song_data.dp_ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=55,
@@ -630,8 +930,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="pandemonium.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 170 then
+				return 100 + math.floor(song_data.ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=56,
@@ -641,8 +947,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="splinteredbow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) and song_data.bpm_tier == 180 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=57,
@@ -652,8 +964,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="amosbow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) and song_data.bpm_tier == 180 then
+				return 100 + math.floor(song_data.dp_ep * 0.2)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=58,
@@ -663,8 +981,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="yoichibow.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if ArrowEquipped(relics_used) and song_data.bpm_tier == 180 then
+				return 100 + math.floor(song_data.ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=59,
@@ -674,8 +998,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="faultyblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 190 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=60,
@@ -685,8 +1015,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="almace.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 190 then
+				return 100 + math.floor(song_data.dp_ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=61,
@@ -696,8 +1032,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="excalibur.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 190 then
+				return 150 + math.floor(song_data.ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=62,
@@ -707,8 +1049,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="crackedzanbato.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 200 then
+				return 150
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=63,
@@ -718,8 +1066,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="dragonslayer.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 200 then
+				return 100 + math.floor(song_data.dp_ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=64,
@@ -729,8 +1083,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="yoru.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 200 then
+				return 150 + math.floor(song_data.ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=65,
@@ -740,8 +1100,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="fracturedsword.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 210 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=66,
@@ -751,8 +1117,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="dainsleif.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 210 then
+				return 150 + math.floor(song_data.dp_ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=67,
@@ -762,8 +1134,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="ridill.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 210 then
+				return 200 + math.floor(song_data.ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=68,
@@ -773,8 +1151,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="bustedscythe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 220 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=69,
@@ -784,8 +1168,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="vassalscythe.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 220 then
+				return 150 + math.floor(song_data.dp_ep * 0.3)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=70,
@@ -795,8 +1185,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="gracefuldahlia.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 220 then
+				return 150 + math.floor(song_data.ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=71,
@@ -806,8 +1202,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="loosehatchet.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 230 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=72,
@@ -817,8 +1219,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="kulutues.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 230 then
+				return 150 + math.floor(song_data.dp_ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=73,
@@ -828,8 +1236,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="divineaxerhitta.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 230 then
+				return 200 + math.floor(song_data.ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=74,
@@ -839,8 +1253,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="brokenkatana.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 240 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=75,
@@ -850,8 +1270,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="enma.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 240 then
+				return 150 + math.floor(song_data.dp_ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=76,
@@ -861,8 +1287,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="masamune.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 240 then
+				return 200 + math.floor(song_data.ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=77,
@@ -872,8 +1304,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="cleftspear.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 250 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=78,
@@ -883,8 +1321,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="silenceglaive.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 250 then
+				return 150 + math.floor(song_data.dp_ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=79,
@@ -894,8 +1338,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="murakumogiri.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 250 then
+				return 150 + math.floor(song_data.ep * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=80,
@@ -905,8 +1355,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="wornkunai.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 260 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=81,
@@ -916,8 +1372,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="kikoku.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 260 then
+				return 150 + math.floor(song_data.dp_ep * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=82,
@@ -927,8 +1389,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="yagyudarkblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 260 then
+				return 150 + math.floor(song_data.ep * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=83,
@@ -938,8 +1406,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="shatteredgreatsword.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 270 then
+				return 200
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=84,
@@ -949,8 +1423,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="atmaweapon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 270 then
+				return 150 + math.floor(song_data.dp_ep * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=85,
@@ -960,8 +1440,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="ultimaweapon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 270 then
+				return 200 + math.floor(song_data.ep * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=86,
@@ -971,8 +1457,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="tauret.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 280 then
+				return 100 + math.floor(song_data.dp * 0.4)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=87,
@@ -982,8 +1474,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="twashtar.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			if song_data.bpm_tier == 280 then
+				return 150 + math.floor(song_data.dp_ep * 0.5)
+			else
+				return 0
+			end
+		end,
 	},
 	{
 		id=88,
@@ -993,8 +1491,17 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="armajejjon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				ECS.BreakTimer = ECS.BreakTimer - 30
+				if ECS.BreakTimer < 0 then
+					ECS.BreakTimer = 0
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 700
+		end,
 	},
 	{
 		id=89,
@@ -1004,8 +1511,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="marioforpleasure.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=90,
@@ -1015,8 +1524,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="juicermario.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=91,
@@ -1026,8 +1537,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="anointedmario.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=92,
@@ -1037,8 +1550,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="momsknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 50
+		end,
 	},
 	{
 		id=93,
@@ -1048,8 +1563,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="chickenknife.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.rp/(max_division_rp/1000) * 0.5)
+		end,
 	},
 	{
 		id=94,
@@ -1059,8 +1576,23 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="speedshoes.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 1.2) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 1.2)
+					SM("Set to Life 3")
+				end
+			end
+
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenGameplay" then
+				local songOptions = GAMESTATE:GetSongOptionsObject("ModsLevel_Preferred")
+				songOptions:MusicRate(1.05)
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=95,
@@ -1070,8 +1602,19 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="pendulumblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 0.8) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 0.8)
+					SM("Set to Life 5")
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return 200 + math.floor(song_data.rp/(max_division_rp/1000) * 0.4)
+		end,
 	},
 	{
 		id=96,
@@ -1081,8 +1624,53 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="shieldrod.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			for relic in ivalues(relics_used) do
+				if name == "Alucard Shield" then
+					if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+						local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+						local failed = pss:GetFailed()
+						if not failed then
+							local length = GAMESTATE:GetCurrentSong():MusicLengthSeconds()
+							if length then
+								-- BreakTimer is in seconds.
+								ECS.BreakTimer = ECS.BreakTimer + (length * 0.13)
+							end
+						end
+					end
+				end
+				if name == "Aegis" then
+					if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+						local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+						if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 1.6) then
+							PREFSMAN:SetPreference("LifeDifficultyScale", 1.6)
+							SM("Set to Life 1")
+						end
+					end
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local bp = 100
+
+			for relic in ivalues(relics_used) do
+				local name = relic.name
+				if name == "Scrupulous Shield" then
+					bp = bp + math.floor(ap * 1.2)
+				end
+				if name == "Alacritous Aspis" then
+					bp = bp + math.floor(song_data.dp * 1.1)
+				end
+				if name == " Indefatigable Escutcheon" then
+					bp = bp + math.floor(song_data.ep * 1.2)
+				end
+				if name == "Alucard Shield" then
+					bp = bp + math.floor(song_data.length * 30)
+				end
+			end
+
+			return bp
+		end,
 	},
 	{
 		id=97,
@@ -1092,8 +1680,13 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="alucardshield.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+
+			return (math.floor(song_data.ep * 0.1) + math.floor(song_data.dp * 0.1) +
+					math.floor(song_data.rp/(max_division_rp/1000) * 0.1) + math.floor(ap * 0.1))
+		end,
 	},
 	{
 		id=98,
@@ -1103,8 +1696,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="corpsknightuniform.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return 100 + math.floor(song_data.rp/(max_division_rp/1000)*0.1)
+		end,
 	},
 	{
 		id=99,
@@ -1114,8 +1710,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="corpscaptainuniform.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return 100 + math.floor(song_data.rp/(max_division_rp/1000)*0.2)
+		end,
 	},
 	{
 		id=100,
@@ -1125,8 +1724,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="corpsgeneraluniform.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local max_division_rp = 1000 * (1 + (song_info.MaxBlockLevel-song_info.MinBlockLevel))
+			return 100 + math.floor(song_data.rp/(max_division_rp/1000)*0.3)
+		end,
 	},
 	{
 		id=101,
@@ -1136,8 +1738,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="cultistrobes.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=102,
@@ -1147,8 +1752,12 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=true,
 		img="claiomhsolais.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- NOTE(teejusb): MP Relics will only show up during the marathon so
+			-- returning the actual MP points is fine.
+			return 2000
+		end,
 	},
 	{
 		id=103,
@@ -1158,8 +1767,18 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="aegis.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 1.2) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 1.2)
+					SM("Set to Life 3")
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=104,
@@ -1169,8 +1788,18 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=true,
 		img="throne.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 1.2) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 1.2)
+					SM("Set to Life 3")
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=105,
@@ -1180,8 +1809,18 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="perish.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 0.8) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 0.8)
+					SM("Set to Life 5")
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 700
+		end,
 	},
 	{
 		id=106,
@@ -1191,8 +1830,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="championbelt.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 100
+		end,
 	},
 	{
 		id=107,
@@ -1202,8 +1843,16 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="protectring.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				local cur_life_scale = PREFSMAN:GetPreference("LifeDifficultyScale")
+				if cur_life_scale == 1.0 or (cur_life_scale ~= 1.0 and cur_life_scale < 1.6) then
+					PREFSMAN:SetPreference("LifeDifficultyScale", 1.6)
+					SM("Set to Life 1")
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score) end,
 	},
 	{
 		id=108,
@@ -1213,8 +1862,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="pandemoniumzero.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(250*(ecs_player.level / 100))
+		end,
 	},
 	{
 		id=109,
@@ -1224,8 +1875,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="bronzetrophy.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=110,
@@ -1235,8 +1888,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="mythriltrophy.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=111,
@@ -1246,8 +1901,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="crystaltrophy.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=112,
@@ -1257,8 +1914,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="ivorytrophy.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=113,
@@ -1268,8 +1927,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="tpastandard.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=114,
@@ -1279,8 +1941,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="scrupulousshield.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(ap * 0.2)
+		end,
 	},
 	{
 		id=115,
@@ -1290,8 +1954,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="virtueblade.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local bp = 0
+			if score >= 0.99 then
+				bp = bp + 100
+			end
+			return bp + math.floor(ap * 0.3)
+		end,
 	},
 	{
 		id=116,
@@ -1301,8 +1971,14 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=true,
 		img="astralring.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEquipRelics" then
+				SL.Global.ActiveModifiers.TimingWindows = {true,true,true,false,false}
+				PREFSMAN:SetPreference("TimingWindowSecondsW4", SL.Preferences.ITG.TimingWindowSecondsW3)
+				PREFSMAN:SetPreference("TimingWindowSecondsW5", SL.Preferences.ITG.TimingWindowSecondsW3)
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score) end,
 	},
 	{
 		id=117,
@@ -1312,8 +1988,14 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="flawlessiluvatar.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			local bp = 0
+			if score >= 0.99 then
+				bp = bp + 200
+			end
+			return bp + math.floor(ap * 0.6)
+		end,
 	},
 	{
 		id=118,
@@ -1323,8 +2005,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="memepeaceberet.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=119,
@@ -1334,8 +2019,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="alacritousaspis.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.dp * 0.3)
+		end,
 	},
 	{
 		id=120,
@@ -1345,8 +2032,15 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="principia.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenGameplay" then
+				local songOptions = GAMESTATE:GetSongOptionsObject("ModsLevel_Preferred")
+				songOptions:MusicRate(1.02)
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 200 + math.floor(song_data.dp * 0.3)
+		end,
 	},
 	{
 		id=121,
@@ -1356,8 +2050,12 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=true,
 		img="arvinsgambit.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			-- NOTE(teejusb): Handled in Graphics/_header.lua
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=122,
@@ -1367,8 +2065,15 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="almagest.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenGameplay" then
+				local songOptions = GAMESTATE:GetSongOptionsObject("ModsLevel_Preferred")
+				songOptions:MusicRate(1.05)
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 500 + math.floor(song_data.dp * 0.7)
+		end,
 	},
 	{
 		id=123,
@@ -1378,8 +2083,11 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="slimebadge.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			-- End of set relics are handled in ScreenGameOver
+			return 0
+		end,
 	},
 	{
 		id=124,
@@ -1389,8 +2097,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="indefatigableescutcheon.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.ep * 0.2)
+		end,
 	},
 	{
 		id=125,
@@ -1400,8 +2110,22 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="vampiriclongsword.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+				local failed = pss:GetFailed()
+				if not failed then
+					local length = GAMESTATE:GetCurrentSong():MusicLengthSeconds()
+					if length then
+						-- BreakTimer is in seconds.
+						ECS.BreakTimer = ECS.BreakTimer + (length * 0.09)
+					end
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.length * 20)
+		end,
 	},
 	{
 		id=126,
@@ -1411,8 +2135,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=true,
 		img="faustsscalpel.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=127,
@@ -1422,8 +2148,22 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="muramasa.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used)
+			if SCREENMAN:GetTopScreen():GetName() == "ScreenEvaluationStage" then
+				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(GAMESTATE:GetMasterPlayerNumber())
+				local failed = pss:GetFailed()
+				if not failed then
+					local length = GAMESTATE:GetCurrentSong():MusicLengthSeconds()
+					if length then
+						-- BreakTimer is in seconds.
+						ECS.BreakTimer = ECS.BreakTimer + (length * 0.18)
+					end
+				end
+			end
+		end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return math.floor(song_data.length * 50)
+		end,
 	},
 	{
 		id=128,
@@ -1433,8 +2173,10 @@ ECS.Relics = {
 		is_consumable=true,
 		is_marathon=false,
 		img="orderofambrosia.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 	{
 		id=129,
@@ -1444,8 +2186,10 @@ ECS.Relics = {
 		is_consumable=false,
 		is_marathon=false,
 		img="godfatherstoken.png",
-		action=function() end,
-		score=function(ecs_player, song_data, relics_used, dp, ep, rp, ap) end,
+		action=function(relics_used) end,
+		score=function(ecs_player, song_info, song_data, relics_used, ap, score)
+			return 0
+		end,
 	},
 }
 
@@ -1478,6 +2222,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=1,
 			name="Discovery",
+			stepartist="StoryTime",
 			pack="StoryTime Chapter 1",
 			difficulty=12,
 			steps=1931,
@@ -1491,6 +2236,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=2,
 			name="The Ones We Loved (Dogzilla Remix)",
+			stepartist="t0ni",
 			pack="TranceMania 3",
 			difficulty=12,
 			steps=1927,
@@ -1504,6 +2250,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=3,
 			name="Crazy Loop (Mm Ma Ma)",
+			stepartist="Xynn",
 			pack="Xynn's LVTS 2",
 			difficulty=12,
 			steps=1457,
@@ -1517,6 +2264,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=4,
 			name="I'm Coming",
+			stepartist="sorae",
 			pack="Big Waves",
 			difficulty=12,
 			steps=1113,
@@ -1530,6 +2278,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=5,
 			name="Higanbana (Autobahn Remix)",
+			stepartist="t3a",
 			pack="moimoimoimoimoi",
 			difficulty=12,
 			steps=1784,
@@ -1543,6 +2292,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=6,
 			name="Pernicious Deed",
+			stepartist="Nav",
 			pack="Nav's Spicy Singles",
 			difficulty=12,
 			steps=1892,
@@ -1556,6 +2306,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=7,
 			name="Wastelands",
+			stepartist="Janus5k",
 			pack="Mozee Metal",
 			difficulty=12,
 			steps=1807,
@@ -1569,6 +2320,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=8,
 			name="Zi-Zi's Journey",
+			stepartist="Okami",
 			pack="Lindsey Stirling",
 			difficulty=12,
 			steps=1373,
@@ -1582,6 +2334,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=9,
 			name="The Sampling Paradise (Extended)",
+			stepartist="Rems",
 			pack="SlowStreamz",
 			difficulty=12,
 			steps=2126,
@@ -1595,6 +2348,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=10,
 			name="Lifelight (Camellia's Hardstyle Bootleg)",
+			stepartist="Okami",
 			pack="StS",
 			difficulty=12,
 			steps=1435,
@@ -1608,6 +2362,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=11,
 			name="Blood Is Pumpin' (Hard)",
+			stepartist="Rems",
 			pack="SlowStreamz",
 			difficulty=12,
 			steps=1891,
@@ -1621,6 +2376,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=12,
 			name="Wheelpower & Go",
+			stepartist="Zaia",
 			pack="Eurobeat Is Fantastic",
 			difficulty=12,
 			steps=1528,
@@ -1634,6 +2390,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=13,
 			name="Drink",
+			stepartist="Janus5k",
 			pack="Squirrel Metal II",
 			difficulty=12,
 			steps=1612,
@@ -1647,6 +2404,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=14,
 			name="Gimme Your Desire (Hard)",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic - Second Stage",
 			difficulty=12,
 			steps=1273,
@@ -1660,6 +2418,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=15,
 			name="When the Sun Goes Down (Medium)",
+			stepartist="Arvin",
 			pack="Eurobeat Is Fantastic",
 			difficulty=12,
 			steps=1638,
@@ -1673,6 +2432,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=16,
 			name="Stay Awake (Hard)",
+			stepartist="ITGAlex",
 			pack="Hospitality",
 			difficulty=12,
 			steps=1114,
@@ -1686,6 +2446,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=17,
 			name="Deep Jungle Walk",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=13,
 			steps=3478,
@@ -1699,6 +2460,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=18,
 			name="Alone Tonight (Ronski Speed Remix)",
+			stepartist="Rems",
 			pack="SlowStreamz",
 			difficulty=13,
 			steps=3305,
@@ -1712,6 +2474,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=19,
 			name="No Shields",
+			stepartist="Fietsemaker",
 			pack="SlowStreamz",
 			difficulty=13,
 			steps=2290,
@@ -1725,6 +2488,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=20,
 			name="March of the ants",
+			stepartist="Tuuc",
 			pack="The Starter Pack of Stamina",
 			difficulty=13,
 			steps=1652,
@@ -1738,6 +2502,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=21,
 			name="Sa'eed",
+			stepartist="Okami",
 			pack="SlowStreamz",
 			difficulty=13,
 			steps=2881,
@@ -1751,6 +2516,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=22,
 			name="Set Me On Fire (Novice)",
+			stepartist="Archi",
 			pack="Pendulum Act III",
 			difficulty=13,
 			steps=2391,
@@ -1764,6 +2530,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=23,
 			name="Virtual Pilgrim",
+			stepartist="Okami",
 			pack="StS",
 			difficulty=13,
 			steps=2146,
@@ -1777,6 +2544,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=24,
 			name="Switch !",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic",
 			difficulty=13,
 			steps=2259,
@@ -1790,6 +2558,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=25,
 			name="Aphasia",
+			stepartist="Okami",
 			pack="Team Grimoire",
 			difficulty=13,
 			steps=2057,
@@ -1803,6 +2572,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=26,
 			name="Deja Vu",
+			stepartist="Arvin & Rems",
 			pack="Eurobeat Is Fantastic",
 			difficulty=13,
 			steps=1996,
@@ -1816,6 +2586,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=27,
 			name="CHAOS",
+			stepartist="Okami",
 			pack="Cytus II",
 			difficulty=13,
 			steps=1732,
@@ -1829,6 +2600,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=28,
 			name="Louder",
+			stepartist="Kyy",
 			pack="Hardbass Madness",
 			difficulty=13,
 			steps=2021,
@@ -1842,6 +2614,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=29,
 			name="Uh...Man",
+			stepartist="StoryTime",
 			pack="Jayrocking",
 			difficulty=13,
 			steps=1890,
@@ -1855,6 +2628,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=30,
 			name="Fright March",
+			stepartist="StarrySergal",
 			pack="itg! Rhythm is just a step away",
 			difficulty=13,
 			steps=1280,
@@ -1868,6 +2642,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=31,
 			name="P.L.U.C.K. (Medium)",
+			stepartist="Aoreo",
 			pack="System of a Down",
 			difficulty=13,
 			steps=1520,
@@ -1881,6 +2656,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=32,
 			name="The Top",
+			stepartist="Zaia",
 			pack="Eurobeat Is Fantastic",
 			difficulty=13,
 			steps=1457,
@@ -1894,6 +2670,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=33,
 			name="Timeleap",
+			stepartist="Rems",
 			pack="Comiket 95",
 			difficulty=13,
 			steps=2023,
@@ -1907,6 +2684,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=34,
 			name="Alphaseeker",
+			stepartist="ITGAlex",
 			pack="Bass Chasers",
 			difficulty=13,
 			steps=1194,
@@ -1920,6 +2698,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=35,
 			name="Sakura Fubuki (Ata Remix)",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=13,
 			steps=1237,
@@ -1933,6 +2712,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=36,
 			name="Come & Get It",
+			stepartist="StoryTime",
 			pack="Hospitality",
 			difficulty=13,
 			steps=1267,
@@ -1946,6 +2726,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=37,
 			name="Eskimo & Icebird Megamix",
+			stepartist="Xynn",
 			pack="Xynn's LVTS 2",
 			difficulty=14,
 			steps=8302,
@@ -1959,6 +2740,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=38,
 			name="Dreamenddischarger",
+			stepartist="Okami",
 			pack="SlowStreamz",
 			difficulty=14,
 			steps=4638,
@@ -1972,6 +2754,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=39,
 			name="Dog Days Bliss (Album Edit)",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=14,
 			steps=4436,
@@ -1985,6 +2768,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=40,
 			name="Moscow 3980",
+			stepartist="Al_Isa",
 			pack="SlowStreamz",
 			difficulty=14,
 			steps=4273,
@@ -1998,6 +2782,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=41,
 			name="Mala",
+			stepartist="Rems",
 			pack="SlowStreamz",
 			difficulty=14,
 			steps=3508,
@@ -2011,6 +2796,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=42,
 			name="Full Circle",
+			stepartist="Fietsemaker",
 			pack="Big Waves",
 			difficulty=14,
 			steps=3459,
@@ -2024,6 +2810,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=43,
 			name="Gas Gas Gas",
+			stepartist="Honk",
 			pack="Eurobeat Is Fantastic",
 			difficulty=14,
 			steps=2443,
@@ -2037,6 +2824,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=44,
 			name="Granblaze",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Singles",
 			difficulty=14,
 			steps=2113,
@@ -2050,6 +2838,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=45,
 			name="Grimoire of Blue",
+			stepartist="Okami",
 			pack="Team Grimoire",
 			difficulty=14,
 			steps=1784,
@@ -2063,6 +2852,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=46,
 			name="Katamari on the Rocks",
+			stepartist="Xynn",
 			pack="Xynn's LVTS 2",
 			difficulty=14,
 			steps=3144,
@@ -2076,6 +2866,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=47,
 			name="Hooligans",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic",
 			difficulty=14,
 			steps=2100,
@@ -2089,6 +2880,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=48,
 			name="80808",
+			stepartist="Loak",
 			pack="Death Grips",
 			difficulty=14,
 			steps=1797,
@@ -2102,6 +2894,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=49,
 			name="Adrenaline",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic - Second Stage",
 			difficulty=14,
 			steps=1663,
@@ -2115,6 +2908,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=50,
 			name="Akatsuki",
+			stepartist="Janus5k",
 			pack="Squirrel Metal II",
 			difficulty=14,
 			steps=2533,
@@ -2128,6 +2922,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=51,
 			name="kagetsu",
+			stepartist="Benpai",
 			pack="Stamina Showcase 2",
 			difficulty=14,
 			steps=2554,
@@ -2141,6 +2936,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=52,
 			name="Black Church",
+			stepartist="Zaia",
 			pack="Cirque du Miura",
 			difficulty=14,
 			steps=1862,
@@ -2154,6 +2950,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=53,
 			name="Tension",
+			stepartist="StoryTime",
 			pack="Hospitality",
 			difficulty=14,
 			steps=1811,
@@ -2167,6 +2964,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=54,
 			name="Way Away",
+			stepartist="Aoreo",
 			pack="Big Waves",
 			difficulty=14,
 			steps=1846,
@@ -2180,6 +2978,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=55,
 			name="squartatrice",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=14,
 			steps=2338,
@@ -2193,6 +2992,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=56,
 			name="Digital Warrior",
+			stepartist="ITGAlex",
 			pack="Bass Chasers",
 			difficulty=14,
 			steps=1614,
@@ -2206,6 +3006,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=57,
 			name="Vertex ALPHA (Hard)",
+			stepartist="Rems",
 			pack="BaguetteStreamz 2",
 			difficulty=14,
 			steps=1830,
@@ -2219,6 +3020,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=58,
 			name="Trance Trance Revolution",
+			stepartist="Implode & Rems & Zaia",
 			pack="Barber Cuts 3",
 			difficulty=15,
 			steps=16677,
@@ -2232,6 +3034,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=59,
 			name="kunkka-kunkka",
+			stepartist="Rikame",
 			pack="All The Rounds 4",
 			difficulty=15,
 			steps=4991,
@@ -2245,6 +3048,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=60,
 			name="G e n g a o z o -Noize of Nocent-",
+			stepartist="Redzone",
 			pack="Stamina Secret Santa 2019",
 			difficulty=15,
 			steps=4500,
@@ -2258,6 +3062,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=61,
 			name="Night Of Fire v2",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic",
 			difficulty=15,
 			steps=2919,
@@ -2271,6 +3076,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=62,
 			name="REASON for RED (Hard)",
+			stepartist="Janus5k",
 			pack="Stamina Showcase 2",
 			difficulty=15,
 			steps=2628,
@@ -2284,6 +3090,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=63,
 			name="GENE",
+			stepartist="sorae",
 			pack="fsorae's fstamina ffuckeronis",
 			difficulty=15,
 			steps=3260,
@@ -2297,6 +3104,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=64,
 			name="Ice Angel",
+			stepartist="StoryTime",
 			pack="StoryTime Chapter 1",
 			difficulty=15,
 			steps=3305,
@@ -2310,6 +3118,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=65,
 			name="Zusammengehorigkeit Hommarju Remix",
+			stepartist="Rems",
 			pack="BaguetteStreamz",
 			difficulty=15,
 			steps=3176,
@@ -2323,6 +3132,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=66,
 			name="Battle Train -HOT SOTA MIX-",
+			stepartist="Xynn",
 			pack="Xynn's LVTS 2",
 			difficulty=15,
 			steps=2793,
@@ -2336,6 +3146,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=67,
 			name="Salt in the Wounds",
+			stepartist="Archi",
 			pack="Pendulum Act III",
 			difficulty=15,
 			steps=3117,
@@ -2349,6 +3160,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=68,
 			name="Wrong (Muzzy Remix)",
+			stepartist="Rems",
 			pack="Hospitality",
 			difficulty=15,
 			steps=3146,
@@ -2362,6 +3174,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=69,
 			name="Dimension Ninja",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=15,
 			steps=2425,
@@ -2375,6 +3188,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=70,
 			name="Satellite (Sewerslvt Edit)",
+			stepartist="ITGAlex",
 			pack="Bass Chasers",
 			difficulty=15,
 			steps=1638,
@@ -2388,6 +3202,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=71,
 			name="Get Over the Barrier! (-Evolution!!-)",
+			stepartist="Arvin",
 			pack="Trails of Cold Stream II",
 			difficulty=15,
 			steps=2017,
@@ -2401,6 +3216,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=72,
 			name="Epimedium",
+			stepartist="ITGAlex",
 			pack="Bass Chasers",
 			difficulty=15,
 			steps=1652,
@@ -2414,6 +3230,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=73,
 			name="A Town With An Ocean View (el Poco Maro Remix)",
+			stepartist="Rust",
 			pack="Hospitality",
 			difficulty=15,
 			steps=1748,
@@ -2427,6 +3244,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=74,
 			name="Virtual Paradise",
+			stepartist="StarrySergal",
 			pack="The Joy of Streaming",
 			difficulty=15,
 			steps=1376,
@@ -2440,6 +3258,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=75,
 			name="Dawn Of Victory",
+			stepartist="Rems",
 			pack="BaguetteStreamz 2",
 			difficulty=15,
 			steps=2630,
@@ -2453,6 +3272,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=76,
 			name="Wolves Standing Towards Enemies",
+			stepartist="sorae",
 			pack="The Joy of Streaming",
 			difficulty=15,
 			steps=1560,
@@ -2466,6 +3286,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=77,
 			name="AO-INFINITY",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=15,
 			steps=1747,
@@ -2479,6 +3300,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=78,
 			name="Unreliable Narrator",
+			stepartist="Admiral M&Ms",
 			pack="Resistance Device",
 			difficulty=15,
 			steps=1362,
@@ -2492,6 +3314,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=79,
 			name="The Epic of Zektbach",
+			stepartist="ITGAlex",
 			pack="Big Waves",
 			difficulty=16,
 			steps=10035,
@@ -2505,6 +3328,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=80,
 			name="Eurobeat Is Fantastic ~Part 3~",
+			stepartist="Rems",
 			pack="Eurobeat Is Fantastic",
 			difficulty=16,
 			steps=5614,
@@ -2518,6 +3342,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=81,
 			name="Eastern Dream",
+			stepartist="Reyllyoc",
 			pack="Demetori ACT 1",
 			difficulty=16,
 			steps=5762,
@@ -2531,6 +3356,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=82,
 			name="Entity",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=16,
 			steps=4797,
@@ -2544,6 +3370,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=83,
 			name="unnatural",
+			stepartist="ZoG- & StarrySergal",
 			pack="Goreshit 2020",
 			difficulty=16,
 			steps=3939,
@@ -2557,6 +3384,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=84,
 			name="Meteor Shower",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=16,
 			steps=3719,
@@ -2570,6 +3398,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=85,
 			name="Just One Second",
+			stepartist="Rems",
 			pack="Hospitality",
 			difficulty=16,
 			steps=3392,
@@ -2583,6 +3412,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=86,
 			name="United (L.A.O.S. Remix)",
+			stepartist="StoryTime",
 			pack="Hospitality",
 			difficulty=16,
 			steps=3124,
@@ -2596,6 +3426,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=87,
 			name="Crush",
+			stepartist="Archi",
 			pack="Pendulum Act III",
 			difficulty=16,
 			steps=1921,
@@ -2609,6 +3440,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=88,
 			name="I'm Not Crazy",
+			stepartist="NAOKI",
 			pack="The Joy of Streaming 2",
 			difficulty=16,
 			steps=4312,
@@ -2622,6 +3454,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=89,
 			name="Cybernecia Catharsis",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Singles",
 			difficulty=16,
 			steps=2512,
@@ -2635,6 +3468,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=90,
 			name="Fly Away",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=16,
 			steps=2283,
@@ -2648,6 +3482,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=91,
 			name="Heretic Witch",
+			stepartist="Archi",
 			pack="SHARPNELSTREAMZ v3 Part 2",
 			difficulty=16,
 			steps=2155,
@@ -2661,6 +3496,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=92,
 			name="Night sky",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=16,
 			steps=2708,
@@ -2674,6 +3510,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=93,
 			name="Salvation",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=16,
 			steps=2674,
@@ -2687,6 +3524,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=94,
 			name="Say Hello to HOLLOWood feat. Nene Akagawa",
+			stepartist="Okami",
 			pack="BaguetteStreamz 2",
 			difficulty=16,
 			steps=2520,
@@ -2700,6 +3538,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=95,
 			name="Aragami",
+			stepartist="Zaia",
 			pack="xi preview",
 			difficulty=16,
 			steps=1909,
@@ -2713,6 +3552,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=96,
 			name="Heaven's Fall 2016 Rebuild",
+			stepartist="Zaia",
 			pack="Helblinde 2016",
 			difficulty=16,
 			steps=2623,
@@ -2726,6 +3566,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=97,
 			name="BroGamer (Extended Mix)",
+			stepartist="Okami",
 			pack="BaguetteStreamz 2.5",
 			difficulty=16,
 			steps=1991,
@@ -2739,6 +3580,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=98,
 			name="Deus ex Machina",
+			stepartist="Zaia",
 			pack="Cirque du Enzo",
 			difficulty=16,
 			steps=1877,
@@ -2752,6 +3594,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=99,
 			name="Liberator feat. blaxervant",
+			stepartist="Admiral M&Ms",
 			pack="Resistance Device",
 			difficulty=16,
 			steps=1655,
@@ -2765,6 +3608,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=100,
 			name="Space Box",
+			stepartist="@@",
 			pack="Scrapyard Kent",
 			difficulty=17,
 			steps=9735,
@@ -2778,6 +3622,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=101,
 			name="Bio Tunnel Magnetic Transport",
+			stepartist="Rems",
 			pack="Hospitality",
 			difficulty=17,
 			steps=5743,
@@ -2791,6 +3636,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=102,
 			name="Toxic Shock (Novice)",
+			stepartist="Archi",
 			pack="Pendulum Act IV",
 			difficulty=17,
 			steps=5139,
@@ -2804,6 +3650,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=103,
 			name="Lift Off FB 179",
+			stepartist="@@",
 			pack="Scrapyard Kent",
 			difficulty=17,
 			steps=4570,
@@ -2817,6 +3664,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=104,
 			name="Global Down",
+			stepartist="ITGAlex",
 			pack="Bass Chasers",
 			difficulty=17,
 			steps=4742,
@@ -2830,6 +3678,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=105,
 			name="Destination Talos",
+			stepartist="Zaia",
 			pack="Cranked Pastry",
 			difficulty=17,
 			steps=4937,
@@ -2843,6 +3692,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=106,
 			name="Signal (Girl's Vocal Mix)",
+			stepartist="Rems",
 			pack="BaguetteStreamz 2",
 			difficulty=17,
 			steps=4253,
@@ -2856,6 +3706,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=107,
 			name="Asereje (Speed Mix)",
+			stepartist="Aoreo",
 			pack="Jimmy Jawns 4",
 			difficulty=17,
 			steps=3349,
@@ -2869,6 +3720,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=108,
 			name="Denjin K Megamix (Restep)",
+			stepartist="Archi",
 			pack="Big Waves",
 			difficulty=17,
 			steps=14147,
@@ -2882,6 +3734,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=109,
 			name="I Miss You",
+			stepartist="Honk",
 			pack="Trails of Cold Stream",
 			difficulty=17,
 			steps=3868,
@@ -2895,6 +3748,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=110,
 			name="Rebirth the end (Part I - Sasanqua)",
+			stepartist="ITGAlex",
 			pack="Noah",
 			difficulty=17,
 			steps=3967,
@@ -2908,6 +3762,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=111,
 			name="La Morale De La Fable",
+			stepartist="ExJam09",
 			pack="ExJam09 Jams",
 			difficulty=17,
 			steps=3888,
@@ -2921,6 +3776,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=112,
 			name="Difficulty-G",
+			stepartist="TYLR",
 			pack="SHARPNELSTREAMZ v3 Part 2",
 			difficulty=17,
 			steps=2815,
@@ -2934,6 +3790,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=113,
 			name="Whispers In The Dark",
+			stepartist="Chief Skittles",
 			pack="Skittles Stream Collection",
 			difficulty=17,
 			steps=3489,
@@ -2947,6 +3804,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=114,
 			name="Little Lies",
+			stepartist="ITGAlex & Aoreo",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=17,
 			steps=3072,
@@ -2960,6 +3818,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=115,
 			name="Yui & I",
+			stepartist="Zaia",
 			pack="Helblinde PDTA",
 			difficulty=17,
 			steps=3158,
@@ -2973,6 +3832,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=116,
 			name="New Odyssey",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=17,
 			steps=2945,
@@ -2986,6 +3846,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=117,
 			name="Unsainted",
+			stepartist="Aoreo",
 			pack="Jimmy Jawns 4",
 			difficulty=17,
 			steps=2380,
@@ -2999,6 +3860,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=118,
 			name="Outbreak (P*Light & DJ Myosuke Remix)",
+			stepartist="Okami",
 			pack="Stamina Selects",
 			difficulty=17,
 			steps=2414,
@@ -3012,6 +3874,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=119,
 			name="Zap Your Channel",
+			stepartist="Zaia",
 			pack="Rebuild of Sharpnel",
 			difficulty=17,
 			steps=2125,
@@ -3025,6 +3888,7 @@ ECS.SongInfo.Lower = {
 		{
 			id=120,
 			name="Goblin Humpa",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=17,
 			steps=1739,
@@ -3037,7 +3901,6 @@ ECS.SongInfo.Lower = {
 		},
 	}
 }
-
 
 ECS.SongInfo.Mid = {
 	-- These values will be calculated and set below.
@@ -3052,6 +3915,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=1,
 			name="Sukure",
+			stepartist="@@",
 			pack="Big Waves",
 			difficulty=17,
 			steps=5266,
@@ -3065,6 +3929,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=2,
 			name="Exelion FB 178",
+			stepartist="Sefirot",
 			pack="The Joy of Streaming",
 			difficulty=17,
 			steps=4091,
@@ -3078,6 +3943,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=3,
 			name="The Star of Collapse Acts I & II",
+			stepartist="Chief Skittles",
 			pack="Skittles Stream Collection",
 			difficulty=17,
 			steps=4447,
@@ -3091,6 +3957,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=4,
 			name="Extends Levant",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Singles ep.1",
 			difficulty=17,
 			steps=4174,
@@ -3104,6 +3971,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=5,
 			name="Terminal Slam",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=17,
 			steps=3273,
@@ -3117,6 +3985,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=6,
 			name="Denjin K Megamix (Restep)",
+			stepartist="Archi",
 			pack="Big Waves",
 			difficulty=17,
 			steps=14147,
@@ -3130,6 +3999,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=7,
 			name="Strawberry Crisis !",
+			stepartist="Rems",
 			pack="BaguetteStreamz 2",
 			difficulty=17,
 			steps=2675,
@@ -3143,6 +4013,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=8,
 			name="fleshbound",
+			stepartist="StarrySergal",
 			pack="Goreshit 2020",
 			difficulty=17,
 			steps=3086,
@@ -3156,6 +4027,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=9,
 			name="Orca",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Safari",
 			difficulty=17,
 			steps=2583,
@@ -3169,6 +4041,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=10,
 			name="The Story of Mob",
+			stepartist="BasedHonk & ChasePines",
 			pack="The Joy of Streaming",
 			difficulty=17,
 			steps=3947,
@@ -3182,6 +4055,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=11,
 			name="Brooklyn Underground",
+			stepartist="Nav",
 			pack="Psychedelia 2",
 			difficulty=17,
 			steps=3804,
@@ -3195,6 +4069,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=12,
 			name="Saikyo Stronger",
+			stepartist="Mango",
 			pack="Mango's Microrave Samplur",
 			difficulty=17,
 			steps=2734,
@@ -3208,6 +4083,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=13,
 			name="Midnight City",
+			stepartist="StarrySergal",
 			pack="Enjou Stamina Package",
 			difficulty=17,
 			steps=1903,
@@ -3221,6 +4097,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=14,
 			name="One Shot",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=17,
 			steps=1860,
@@ -3234,6 +4111,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=15,
 			name="Colliding Skies - Dawn",
+			stepartist="Raijin",
 			pack="The Joy of Streaming 2",
 			difficulty=18,
 			steps=16000,
@@ -3247,6 +4125,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=16,
 			name="Eurobeat Is Fantastic ~Part 2~ FB 183",
+			stepartist="Zaia & ITGAlex & YourVinished",
 			pack="Eurobeat Is Fantastic - Second Stage",
 			difficulty=18,
 			steps=8755,
@@ -3260,6 +4139,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=17,
 			name="Trails of Cold Stream SC (Part 1) FP 186",
+			stepartist="YourVinished & Janus5k",
 			pack="Trails of Cold Stream II",
 			difficulty=18,
 			steps=6474,
@@ -3273,6 +4153,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=18,
 			name="ESCAPE",
+			stepartist="yutsi",
 			pack="Dark Psychungus",
 			difficulty=18,
 			steps=5584,
@@ -3286,6 +4167,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=19,
 			name="Precious Song Dedicated to the Stars",
+			stepartist="ITGAlex",
 			pack="ITGAlex's Stamina Singles ep.2",
 			difficulty=18,
 			steps=5302,
@@ -3299,6 +4181,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=20,
 			name="Embrace the Endless Ocean",
+			stepartist="Janus5k",
 			pack="Squirrel Metal II",
 			difficulty=18,
 			steps=4092,
@@ -3312,6 +4195,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=21,
 			name="Cheatreal Remake",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=18,
 			steps=3729,
@@ -3325,6 +4209,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=22,
 			name="Fly",
+			stepartist="nv & yutsi",
 			pack="Chimichangas",
 			difficulty=18,
 			steps=3776,
@@ -3338,6 +4223,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=23,
 			name="one way to hannover",
+			stepartist="StarrySergal",
 			pack="Goreshit 2020",
 			difficulty=18,
 			steps=2903,
@@ -3351,6 +4237,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=24,
 			name="Aaron",
+			stepartist="StarrySergal",
 			pack="StarrySergal's Flamin Hot Munchies",
 			difficulty=18,
 			steps=3378,
@@ -3364,6 +4251,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=25,
 			name="Rocking Bye",
+			stepartist="StarrySergal",
 			pack="The Joy of Streaming",
 			difficulty=18,
 			steps=3507,
@@ -3377,6 +4265,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=26,
 			name="What a Horrible Night to Have a Curse",
+			stepartist="zaniel",
 			pack="Junts 2",
 			difficulty=18,
 			steps=2845,
@@ -3390,6 +4279,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=27,
 			name="Go To Hell",
+			stepartist="ExJam09",
 			pack="ExJam09 Jams 2",
 			difficulty=18,
 			steps=2294,
@@ -3403,6 +4293,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=28,
 			name="Usseewa (DJKurara Remix)",
+			stepartist="Mango",
 			pack="Mango Showcase",
 			difficulty=18,
 			steps=2375,
@@ -3416,6 +4307,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=29,
 			name="Enjoy The Flight (Side B) (Restep) FB 194",
+			stepartist="Rems",
 			pack="Hospitality",
 			difficulty=19,
 			steps=14292,
@@ -3429,6 +4321,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=30,
 			name="You Touched The Kore, and Now You're Going to Die",
+			stepartist="Xynn",
 			pack="The Joy of Streaming 2",
 			difficulty=19,
 			steps=7444,
@@ -3442,6 +4335,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=31,
 			name="After End Start Before FP 198",
+			stepartist="@@",
 			pack="Scrapyard Kent",
 			difficulty=19,
 			steps=6864,
@@ -3455,6 +4349,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=32,
 			name="5H4D0W",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=19,
 			steps=6537,
@@ -3468,6 +4363,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=33,
 			name="Cold Fusion",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=19,
 			steps=5649,
@@ -3481,6 +4377,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=34,
 			name="Peyotech",
+			stepartist="Nav",
 			pack="Psychedelia 2",
 			difficulty=19,
 			steps=4964,
@@ -3494,6 +4391,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=35,
 			name="In my life, my mind (Restep)",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=19,
 			steps=4012,
@@ -3507,6 +4405,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=36,
 			name="Yosakoi Rave Fuck That!!! (Overdrive)",
+			stepartist="Archi",
 			pack="Masochisma Mk 1",
 			difficulty=19,
 			steps=3755,
@@ -3520,6 +4419,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=37,
 			name="Momentary Life",
+			stepartist="Zaia",
 			pack="Saitama's Ultimate Weapon",
 			difficulty=19,
 			steps=2673,
@@ -3533,6 +4433,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=38,
 			name="Coffin Dance (Astronomia Frenchcore Remix)",
+			stepartist="zaniel",
 			pack="Simfile Torah",
 			difficulty=19,
 			steps=2916,
@@ -3546,6 +4447,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=39,
 			name="Big Blue",
+			stepartist="Zaia",
 			pack="Saitama's Ultimate Weapon",
 			difficulty=19,
 			steps=2945,
@@ -3559,6 +4461,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=40,
 			name="ENAMEL",
+			stepartist="StoryTime",
 			pack="Jayrocking",
 			difficulty=19,
 			steps=2356,
@@ -3572,6 +4475,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=41,
 			name="BGM 04",
+			stepartist="StarrySergal",
 			pack="Videogame Streamables 2",
 			difficulty=19,
 			steps=1682,
@@ -3585,6 +4489,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=42,
 			name="Sky High",
+			stepartist="nv",
 			pack="streammania IIDX",
 			difficulty=19,
 			steps=1400,
@@ -3598,6 +4503,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=43,
 			name="Ha(Ne)rdcore OTAKU Connectionz zane & feedbacker's OP",
+			stepartist="zaniel & feedbacker",
 			pack="Junts 2",
 			difficulty=20,
 			steps=20511,
@@ -3611,6 +4517,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=44,
 			name="Trails of Cold Stream FC (Part 1) FB 204",
+			stepartist="YourVinished",
 			pack="Trails of Cold Stream II",
 			difficulty=20,
 			steps=7994,
@@ -3624,6 +4531,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=45,
 			name="Naruto RMX FP 208",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=20,
 			steps=7451,
@@ -3637,6 +4545,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=46,
 			name="Repeating Memories",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=20,
 			steps=4424,
@@ -3650,6 +4559,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=47,
 			name="Sounds of Life (Medium)",
+			stepartist="Aoreo",
 			pack="Pendulum Act III",
 			difficulty=20,
 			steps=4199,
@@ -3663,6 +4573,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=48,
 			name="the end",
+			stepartist="StarrySergal",
 			pack="Goreshit 2020",
 			difficulty=20,
 			steps=3940,
@@ -3676,6 +4587,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=49,
 			name="Suwa Foughten Field",
+			stepartist="Archi",
 			pack="Big Waves",
 			difficulty=20,
 			steps=3811,
@@ -3689,6 +4601,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=50,
 			name="The Sound Of Hard",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=20,
 			steps=3947,
@@ -3702,6 +4615,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=51,
 			name="Counter Hunter Stage (Megaman X2)",
+			stepartist="StarrySergal",
 			pack="Enjou Stamina Package",
 			difficulty=20,
 			steps=2241,
@@ -3715,6 +4629,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=52,
 			name="Lust SIN II",
+			stepartist="Chief Skittles",
 			pack="Skittles Stream Collection",
 			difficulty=20,
 			steps=3563,
@@ -3728,6 +4643,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=53,
 			name="Voltaic Black Knight",
+			stepartist="Mango",
 			pack="Mango Showcase",
 			difficulty=20,
 			steps=2805,
@@ -3741,6 +4657,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=54,
 			name="Scarlet Tempest (Medium) Super Arrange",
+			stepartist="Chief Skittles",
 			pack="Trails of Cold Stream IV",
 			difficulty=20,
 			steps=2570,
@@ -3754,6 +4671,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=55,
 			name="Heavenly caress",
+			stepartist="ITGAlex",
 			pack="Noah",
 			difficulty=20,
 			steps=1633,
@@ -3767,6 +4685,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=56,
 			name="Spirit Of Children",
+			stepartist="Kyy",
 			pack="Kyypakkaus",
 			difficulty=20,
 			steps=1491,
@@ -3780,6 +4699,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=57,
 			name="stamina training",
+			stepartist="YUZU",
 			pack="Enjou Stamina Package",
 			difficulty=21,
 			steps=20678,
@@ -3793,6 +4713,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=58,
 			name="goretrance x (serbian fuckboy edition) (Side A) FP 216",
+			stepartist="zaniel",
 			pack="Goreshit 2020",
 			difficulty=21,
 			steps=7065,
@@ -3806,6 +4727,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=59,
 			name="Ride the Centaurus FB 218",
+			stepartist="@@",
 			pack="Scrapyard Kent",
 			difficulty=21,
 			steps=6820,
@@ -3819,6 +4741,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=60,
 			name="The Body Cosmic",
+			stepartist="Chief Skittles",
 			pack="Skittles Stream Collection",
 			difficulty=21,
 			steps=6952,
@@ -3832,6 +4755,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=61,
 			name="Stay Safe",
+			stepartist="yutsi",
 			pack="Dark Psychungus",
 			difficulty=21,
 			steps=6346,
@@ -3845,6 +4769,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=62,
 			name="Cyberware Factory",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=21,
 			steps=4326,
@@ -3858,6 +4783,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=63,
 			name="Venus Fire (Hard)",
+			stepartist="YourVinished",
 			pack="Saitama's Ultimate Weapon",
 			difficulty=21,
 			steps=4517,
@@ -3871,6 +4797,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=64,
 			name="CAFO (Hard)",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=21,
 			steps=4617,
@@ -3884,6 +4811,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=65,
 			name="Cerveau (Pattern J Remix) FB 234",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=21,
 			steps=3536,
@@ -3897,6 +4825,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=66,
 			name="Murder Liner",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=21,
 			steps=2933,
@@ -3910,6 +4839,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=67,
 			name="Jesus is the Answer",
+			stepartist="zaniel",
 			pack="Junts 2",
 			difficulty=21,
 			steps=2708,
@@ -3923,6 +4853,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=68,
 			name="Soul Surrender",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=21,
 			steps=1967,
@@ -3936,6 +4867,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=69,
 			name="The Morning After The Storm (Hard)",
+			stepartist="Chief Skittles",
 			pack="Trails of Cold Stream IV",
 			difficulty=21,
 			steps=2739,
@@ -3949,6 +4881,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=70,
 			name="Witches Brew",
+			stepartist="Aoreo",
 			pack="Content Cop - Tachyon Epsilon",
 			difficulty=21,
 			steps=1262,
@@ -3962,6 +4895,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=71,
 			name="Nachmancore",
+			stepartist="nv & ChasePines & StarrySergal",
 			pack="Big Waves",
 			difficulty=22,
 			steps=13281,
@@ -3975,6 +4909,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=72,
 			name="Spacetime FB 220",
+			stepartist="Nav",
 			pack="Big Waves",
 			difficulty=22,
 			steps=8449,
@@ -3988,6 +4923,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=73,
 			name="Lunar Butterfly FB 227",
+			stepartist="Nav",
 			pack="Big Waves",
 			difficulty=22,
 			steps=7834,
@@ -4001,6 +4937,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=74,
 			name="Sujetjas Tanjec",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=22,
 			steps=9367,
@@ -4014,6 +4951,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=75,
 			name="Robot Brain Era FB 230",
+			stepartist="Zaia",
 			pack="Cirque du Huayra",
 			difficulty=22,
 			steps=5535,
@@ -4027,6 +4965,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=76,
 			name="Ralph Wiggum",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=22,
 			steps=2690,
@@ -4040,6 +4979,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=77,
 			name="Plastic Love (Night Tempo 100% Pure Remastered)",
+			stepartist="Zaia",
 			pack="City Pop",
 			difficulty=22,
 			steps=3210,
@@ -4053,6 +4993,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=78,
 			name="Nyan-Nyan Naughty Night",
+			stepartist="nv",
 			pack="epic",
 			difficulty=22,
 			steps=2156,
@@ -4066,6 +5007,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=79,
 			name="Tragedy",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=22,
 			steps=2589,
@@ -4079,6 +5021,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=80,
 			name="Musician (mitei bootleg)",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=22,
 			steps=2954,
@@ -4092,6 +5035,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=81,
 			name="Truckers Delight (Hard)",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=22,
 			steps=2391,
@@ -4105,6 +5049,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=82,
 			name="Yamada Stream",
+			stepartist="Zaia",
 			pack="Content Cop - Tachyon Epsilon",
 			difficulty=22,
 			steps=1679,
@@ -4118,6 +5063,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=83,
 			name="Fergalicious For Businalicious 261",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=22,
 			steps=2567,
@@ -4131,6 +5077,7 @@ ECS.SongInfo.Mid = {
 		{
 			id=84,
 			name="Illegal Function Call (Hard)",
+			stepartist="yutsi",
 			pack="streammania IIDX",
 			difficulty=22,
 			steps=1550,
@@ -4143,7 +5090,6 @@ ECS.SongInfo.Mid = {
 		},
 	}
 }
-
 
 ECS.SongInfo.Upper = {
 	-- These values will be calculated and set below.
@@ -4158,6 +5104,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=1,
 			name="Nachmancore",
+			stepartist="nv & ChasePines & StarrySergal",
 			pack="Big Waves",
 			difficulty=22,
 			steps=13281,
@@ -4171,6 +5118,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=2,
 			name="Spacetime FB 220",
+			stepartist="Nav",
 			pack="Big Waves",
 			difficulty=22,
 			steps=8449,
@@ -4184,6 +5132,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=3,
 			name="Lunar Butterfly FB 227",
+			stepartist="Nav",
 			pack="Big Waves",
 			difficulty=22,
 			steps=7834,
@@ -4197,6 +5146,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=4,
 			name="Sujetjas Tanjec",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=22,
 			steps=9367,
@@ -4210,6 +5160,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=5,
 			name="Robot Brain Era FB 230",
+			stepartist="Zaia",
 			pack="Cirque du Huayra",
 			difficulty=22,
 			steps=5535,
@@ -4223,6 +5174,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=6,
 			name="Ralph Wiggum",
+			stepartist="yutsi",
 			pack="selected yutsi works",
 			difficulty=22,
 			steps=2690,
@@ -4236,6 +5188,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=7,
 			name="Plastic Love (Night Tempo 100% Pure Remastered)",
+			stepartist="Zaia",
 			pack="City Pop",
 			difficulty=22,
 			steps=3210,
@@ -4249,6 +5202,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=8,
 			name="Nyan-Nyan Naughty Night",
+			stepartist="nv",
 			pack="epic",
 			difficulty=22,
 			steps=2156,
@@ -4262,6 +5216,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=9,
 			name="Tragedy",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=22,
 			steps=2589,
@@ -4275,6 +5230,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=10,
 			name="Musician (mitei bootleg)",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=22,
 			steps=2954,
@@ -4288,6 +5244,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=11,
 			name="Truckers Delight (Hard)",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=22,
 			steps=2391,
@@ -4301,6 +5258,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=12,
 			name="Yamada Stream",
+			stepartist="Zaia",
 			pack="Content Cop - Tachyon Epsilon",
 			difficulty=22,
 			steps=1679,
@@ -4314,6 +5272,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=13,
 			name="Fergalicious For Businalicious 261",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=22,
 			steps=2567,
@@ -4327,6 +5286,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=14,
 			name="Illegal Function Call (Hard)",
+			stepartist="yutsi",
 			pack="streammania IIDX",
 			difficulty=22,
 			steps=1550,
@@ -4340,6 +5300,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=15,
 			name="Animu Music Triad FB 230",
+			stepartist="Archi",
 			pack="Big Waves",
 			difficulty=23,
 			steps=24155,
@@ -4353,6 +5314,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=16,
 			name="Stars FB 237",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=23,
 			steps=6317,
@@ -4366,6 +5328,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=17,
 			name="Nose Feeder",
+			stepartist="yutsi",
 			pack="yutsi-type beats",
 			difficulty=23,
 			steps=4200,
@@ -4379,6 +5342,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=18,
 			name="Descendant of Genos",
+			stepartist="ITGAlex",
 			pack="Trails of Cold Stream III",
 			difficulty=23,
 			steps=2893,
@@ -4392,6 +5356,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=19,
 			name="Raven",
+			stepartist="Kyy",
 			pack="Kyypakkaus 2",
 			difficulty=23,
 			steps=2444,
@@ -4405,6 +5370,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=20,
 			name="Writhe in Pain",
+			stepartist="nv",
 			pack="epic",
 			difficulty=23,
 			steps=2115,
@@ -4418,6 +5384,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=21,
 			name="Free Will",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=23,
 			steps=1633,
@@ -4431,6 +5398,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=22,
 			name="Dear You",
+			stepartist="StarrySergal",
 			pack="itg! Rhythm is just a step away",
 			difficulty=23,
 			steps=1642,
@@ -4444,6 +5412,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=23,
 			name="Bad Guy",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=23,
 			steps=1325,
@@ -4457,6 +5426,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=24,
 			name="Accel Zero FB 245",
+			stepartist="Chief Skittles",
 			pack="Big Waves",
 			difficulty=24,
 			steps=15940,
@@ -4470,6 +5440,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=25,
 			name="promise",
+			stepartist="nv",
 			pack="epic",
 			difficulty=24,
 			steps=4014,
@@ -4483,6 +5454,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=26,
 			name="Over The Fullerene Acid Trip (mashup by glory limited)",
+			stepartist="Rust",
 			pack="Feelin' Rusty 4",
 			difficulty=24,
 			steps=3072,
@@ -4496,6 +5468,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=27,
 			name="Molten Crater",
+			stepartist="yutsi",
 			pack="the",
 			difficulty=24,
 			steps=2978,
@@ -4509,6 +5482,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=28,
 			name="Fuuga",
+			stepartist="Zaia",
 			pack="Saitama's Ultimate Weapon",
 			difficulty=24,
 			steps=3642,
@@ -4522,6 +5496,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=29,
 			name="Liquid (Hard) (Paul Rosenthal Remix)",
+			stepartist="yutsi",
 			pack="itg! Rhythm is just a step away",
 			difficulty=24,
 			steps=2192,
@@ -4535,6 +5510,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=30,
 			name="Fur and Claw",
+			stepartist="Aoreo",
 			pack="Big Waves",
 			difficulty=24,
 			steps=1797,
@@ -4548,6 +5524,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=31,
 			name="Amor de Verao",
+			stepartist="nv",
 			pack="streammania IIDX",
 			difficulty=24,
 			steps=1628,
@@ -4561,6 +5538,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=32,
 			name="Fire Hive (Hard)",
+			stepartist="yutsi",
 			pack="itg! Rhythm is just a step away",
 			difficulty=24,
 			steps=1286,
@@ -4574,6 +5552,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=33,
 			name="Get Deaded (Rerestep) FP 240",
+			stepartist="Nav & Zaia & StarrySergal & Levitas",
 			pack="Big Waves",
 			difficulty=25,
 			steps=18045,
@@ -4587,6 +5566,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=34,
 			name="Paranoid",
+			stepartist="Levitas",
 			pack="Big Waves",
 			difficulty=25,
 			steps=4548,
@@ -4600,6 +5580,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=35,
 			name="Image Material <Version 0>",
+			stepartist="nv",
 			pack="itg! Rhythm is just a step away",
 			difficulty=25,
 			steps=5071,
@@ -4613,6 +5594,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=36,
 			name="Avid (Ayatori DnB Edit)",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=25,
 			steps=3918,
@@ -4626,6 +5608,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=37,
 			name="Ashes on The Fire",
+			stepartist="Zaia",
 			pack="Big Waves",
 			difficulty=25,
 			steps=3174,
@@ -4639,6 +5622,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=38,
 			name="Scias",
+			stepartist="Chief Skittles",
 			pack="Trails of Cold Stream IV",
 			difficulty=25,
 			steps=2838,
@@ -4652,6 +5636,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=39,
 			name="Ruby Illusions",
+			stepartist="Zaia",
 			pack="The Sound of Speed",
 			difficulty=25,
 			steps=1984,
@@ -4665,6 +5650,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=40,
 			name="Oblivion ~Rockin' Night Style~",
+			stepartist="Zaia",
 			pack="fof 2",
 			difficulty=25,
 			steps=1359,
@@ -4678,6 +5664,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=41,
 			name="PARANOIA survivor MAX",
+			stepartist="Zaia",
 			pack="Dump Dump Revolution",
 			difficulty=25,
 			steps=1418,
@@ -4691,6 +5678,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=42,
 			name="Apocalyptic Dawn",
+			stepartist="Zaia & Archi & StarrySergal",
 			pack="Big Waves",
 			difficulty=26,
 			steps=16956,
@@ -4704,6 +5692,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=43,
 			name="Hunting For Your Dream",
+			stepartist="Levitas",
 			pack="Big Waves",
 			difficulty=26,
 			steps=4805,
@@ -4717,6 +5706,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=44,
 			name="Scarlet Devil",
+			stepartist="Chief Skittles",
 			pack="Bigger Waves",
 			difficulty=26,
 			steps=4520,
@@ -4730,6 +5720,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=45,
 			name="Gens d'Leges 5",
+			stepartist="Arvin",
 			pack="fof",
 			difficulty=26,
 			steps=2717,
@@ -4743,6 +5734,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=46,
 			name="Doomsday Zone",
+			stepartist="StarrySergal",
 			pack="The Sound of Speed",
 			difficulty=26,
 			steps=2100,
@@ -4756,6 +5748,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=47,
 			name="Soar ~Stay With Me~",
+			stepartist="Zaia",
 			pack="fof 2",
 			difficulty=26,
 			steps=1977,
@@ -4769,6 +5762,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=48,
 			name="Southcoast Calling (Medium)",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=26,
 			steps=2750,
@@ -4782,6 +5776,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=49,
 			name="SpaceRage",
+			stepartist="Levitas",
 			pack="Theoretical Chiptune Pack",
 			difficulty=26,
 			steps=1947,
@@ -4795,6 +5790,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=50,
 			name="untitled djkurara mix FB 265",
+			stepartist="Rust & Zaia & Zaniel",
 			pack="Big Waves",
 			difficulty=27,
 			steps=17783,
@@ -4808,6 +5804,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=51,
 			name="Lovelyteks FP 184",
+			stepartist="Levitas",
 			pack="Theoretical Sharpnel Pack",
 			difficulty=27,
 			steps=4998,
@@ -4821,6 +5818,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=52,
 			name="Pushing Onwards",
+			stepartist="Levitas",
 			pack="Theoretical Chiptune Pack",
 			difficulty=27,
 			steps=3790,
@@ -4834,6 +5832,7 @@ ECS.SongInfo.Upper = {
 		{
 			id=53,
 			name="Bye Bye Baby Balloon",
+			stepartist="Aoreo",
 			pack="BangerZ 3",
 			difficulty=27,
 			steps=2465,
@@ -15529,12 +16528,12 @@ CalculateScoreForSong = function(ecs_player, song_name, score, relics_used, fail
 		return math.ceil((score^4) * 1000)
 	end
 
-	local BP = function(ecs_player, song_info, song_data, relics_used, ap)
+	local BP = function(ecs_player, song_info, song_data, relics_used, ap, score)
 		local bp = 0
 		-- Handle relics first
 		for relic in ivalues(relics_used) do
 			if relic.name ~= "(nothing)" then
-				bp = bp + relic.score(ecs_player, song_info, song_data, relics_used, ap)
+				bp = bp + relic.score(ecs_player, song_info, song_data, relics_used, ap, score)
 			end
 		end
 
@@ -15586,7 +16585,7 @@ CalculateScoreForSong = function(ecs_player, song_name, score, relics_used, fail
 		local ep = song_data.ep
 		local rp = song_data.rp
 		local ap = AP(score)
-		local bp = BP(ecs_player, song_info, song_data, relics_used, ap)
+		local bp = BP(ecs_player, song_info, song_data, relics_used, ap, score)
 		return (dp + ep + rp + ap + bp), song_data
 	end
 
@@ -15608,12 +16607,14 @@ AddPlayedSong = function(ecs_player, song_name, score, relics_used, failed)
 
 	ECS.Player.SongsPlayed[index] = {
 		name=song_data.name,
+		stepartist=song_data.stepartist,
 		points=points,
 		steps=song_data.steps,
 		bpm=song_data.bpm,
 		bpm_tier=song_data.bpm_tier,
 		failed=failed,
 		relics_used=DeepCopy(relics_used)
+		score=score,
 	}
 
 	local SortByPointsDesc = function(a, b)

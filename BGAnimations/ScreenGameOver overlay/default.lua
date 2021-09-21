@@ -41,7 +41,13 @@ if isECS then
 
 				-- Add best 7 scores and also check which end of set relics were active.
 				local total_points = 0
-				local slime_badge, agility_potion, stamina_potion = false, false, false
+				local slime_badge = false
+				local agility_potion = false
+				local stamina_potion = false
+				local accuracy_potion = false
+				local tpa_standard = false
+				local memepeace_beret = false
+				local cultist_robes = false
 
 				for i=1,7 do
 					local song_played = ECS.Player.SongsPlayed[i]
@@ -59,6 +65,18 @@ if isECS then
 								if relic.name == "Stamina Potion" then
 									stamina_potion = true
 								end
+								if relic.name == "Accuracy Potion" then
+									accuracy_potion = true
+								end
+								if relic.name == "TPA Standard" then
+									tpa_standard = true
+								end
+								if relic.name == "Memepeace Beret" then
+									memepeace_beret = true
+								end
+								if relic.name == "Cultist Robes" then
+									cultist_robes = true
+								end
 							end
 						end
 					end
@@ -69,6 +87,9 @@ if isECS then
 				local total_bpm = 0
 				local tiers = {}
 				local total_steps = 0
+				local total_score = 0
+				local total_over_95 = 0
+				local cultist_songs = 0
 				for song_played in ivalues(ECS.Player.SongsPlayed) do
 					if not song_played.failed then
 						total_bpm = total_bpm + song_played.bpm
@@ -78,14 +99,41 @@ if isECS then
 						tiers[song_played.bpm_tier] = tiers[song_played.bpm_tier] + 1
 						total_steps = total_steps + song_played.steps
 						songs_passed = songs_passed + 1
+						total_score = total_score + song_played.score
+						if song_played.score >= 0.95 then
+							total_over_95 = total_over_95 + 1
+						end
+
+						if (song_played.stepartist:find("Archi") or
+							song_played.stepartist:find("@@") or
+							song_played.stepartist:find("Zaia") or
+							song_played.stepartist:find("Aoreo") or
+							song_played.stepartist:find("YourVinished") or
+							song_played.stepartist:find("ITGAlex") or
+							song_played.stepartist:find("Rems")) then
+							cultist_songs = cultist_songs + 1
+						end
 					end
 				end
-				local total_tiers = 0
-				for _ in pairs(tiers) do total_tiers = total_tiers + 1 end
+				local slime_tiers = 0
+				local beret_tiers = 0
+				for tier, num in pairs(tiers) do
+					-- Slime badge only considers tiers below 210 now.
+					if tier < 210 then
+						slime_tiers = slime_tiers + 1
+					-- While the Memepeace beret only considers tiers 210 and above
+					else
+						beret_tiers = beret_tiers + 1
+					end
+				end
 
-				if slime_badge then total_points = total_points + 100 * total_tiers end
+				if slime_badge then total_points = total_points + 100 * slime_tiers end
 				if agility_potion then total_points = total_points + math.floor(((total_bpm / songs_passed) - 120)^1.3) end
 				if stamina_potion then total_points = total_points + math.floor(total_steps / 75) end
+				if accuracy_potion then total_points = total_points + math.max(math.floor(1000^(total_score / songs_passed)-250), 0) end
+				if tpa_standard then total_points = total_points + 100 * total_over_95 end
+				if beret_tiers then total_points = total_points + 100 * beret_tiers end
+				if cultist_robes then total_points = total_points + 75 * cultist_songs
 
 				self:settext(tostring(total_points))
 			elseif ECS.Mode == "Marathon" then

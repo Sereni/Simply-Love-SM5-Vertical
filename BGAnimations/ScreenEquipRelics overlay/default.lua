@@ -286,7 +286,7 @@ local t = Def.ActorFrame{
 			for active_relic in ivalues(active_relics) do
 				if active_relic.name ~= "(nothing)" then
 					table.insert(ECS.Player.Relics, active_relic)
-					active_relic.action()
+					active_relic.action(active_relics)
 				end
 			end
 		end
