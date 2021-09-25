@@ -241,14 +241,14 @@ return Def.ActorFrame{
 				},
 
 				LoadFont("Common Normal")..{
-					Name="SRPG4 Level",
+					Name="SRPG5 Level",
 					InitCommand=function(self)
 						self:align(0,0):xy(info.padding*1.25,-97):zoom(0.65):vertspacing(-2)
 						self:maxwidth((info.w-info.padding*2.5)/self:GetZoom())
 					end,
 					SetCommand=function(self, params)
 						if params then
-							self:visible(true):settext(params.level and ("SRPG4 Level: "..params.level) or "")
+							self:visible(true):settext(params.level and ("SRPG5 Level: "..params.level) or "")
 						else
 							self:visible(false):settext("")
 						end
