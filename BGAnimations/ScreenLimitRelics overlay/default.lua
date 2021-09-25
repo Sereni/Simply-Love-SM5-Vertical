@@ -214,6 +214,7 @@ local t = Def.ActorFrame{
 		ECS.Players[profile_name].relics = all_relics
 	end,
 	TransitionBackCommand=function(self)
+		ECS.Players[profile_name].relics = DeepCopy(ECS.Players[profile_name].default_relics)
 		SCREENMAN:GetTopScreen():PostScreenMessage("SM_GoToPrevScreen",0)
 	end,
 	RelicActivatedMessageCommand=function(self, params)
