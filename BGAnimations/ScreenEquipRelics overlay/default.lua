@@ -353,7 +353,8 @@ t[#t+1] = LoadFont("Common Normal")..{
 
 			local song_name = song:GetDisplayFullTitle()
 			local song_data = FindEcsSong(song_name, song_info)
-			self:settext(tostring(song_data.dp + song_data.ep + song_data.rp))
+			score, _ = CalculateScoreForSong(ECS.Players[PROFILEMAN:GetPlayerName(GAMESTATE:GetMasterPlayerNumber())], song_name, 0, {}, false)
+			self:settext(tostring(score))
 		end
 	end,
 	UpdateECSScoreMessageCommand=function(self, t)

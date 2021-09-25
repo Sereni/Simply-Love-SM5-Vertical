@@ -95,7 +95,8 @@ local SetSongPointText = function(self)
 		self:settext("Min Song Points:")
 		return
 	end
-	self:settext("Min Song Points: " .. tostring(song_data.dp + song_data.ep + song_data.rp))
+	score, _ = CalculateScoreForSong(ECS.Players[PROFILEMAN:GetPlayerName(GAMESTATE:GetMasterPlayerNumber())], song_name, 0, {}, false)
+	self:settext("Min Song Points: " .. tostring(score))
 end
 
 -- ECS Information

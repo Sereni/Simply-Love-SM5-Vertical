@@ -133,7 +133,7 @@ if isECS then
 				if accuracy_potion then total_points = total_points + math.max(math.floor(1000^(total_score / songs_passed)-250), 0) end
 				if tpa_standard then total_points = total_points + 100 * total_over_95 end
 				if beret_tiers then total_points = total_points + 100 * beret_tiers end
-				if cultist_robes then total_points = total_points + 75 * cultist_songs
+				if cultist_robes then total_points = total_points + 75 * cultist_songs end
 
 				self:settext(tostring(total_points))
 			elseif ECS.Mode == "Marathon" then
