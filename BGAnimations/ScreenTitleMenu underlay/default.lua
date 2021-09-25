@@ -99,7 +99,7 @@ local af = Def.ActorFrame{
 	},
 
 	-- East Coast Stamina logo
-	LoadActor(THEME:GetPathG("", "_logos/ecs (doubleres).png"))..{
+	self:Load(THEME:GetPathG("", "_ECSX/logo (doubleres).png"))..{
 		InitCommand=function(self) self:xy(2,10):zoom(0.25):shadowlength(0.75) end,
 		OffCommand=function(self) self:linear(0.5):shadowlength(0) end
 	}
