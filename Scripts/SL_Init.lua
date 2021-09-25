@@ -272,6 +272,10 @@ function InitializeSimplyLove()
 	SL.P2:initialize()
 	SL.Global:initialize()
 
+	-- Require Event Mode for this theme by default.
+	-- If you change it in the options, then you'll only get the freeplay option.
+	PREFSMAN:SetPreference("EventMode", true)
+
 	-- - - - - - - - - - - - - - - - - - - - -
 	-- Reset global offset to a pre-stored value.
 	if string.format("%.3f", SL.Global.DefaultGlobalOffsetSeconds) ~= string.format("%.3f", PREFSMAN:GetPreference("GlobalOffsetSeconds")) then
