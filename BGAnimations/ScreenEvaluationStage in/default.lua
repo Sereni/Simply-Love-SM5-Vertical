@@ -25,6 +25,7 @@ return Def.ActorFrame {
 
 		-- always undo the effects of any relics that change LifeDifficulty when leaving ScreenEval, even if they weren't active
 		PREFSMAN:SetPreference("LifeDifficultyScale", 1)
+		GAMESTATE:ApplyGameCommand("mod,1xmusic")
 	end,
 	Def.Quad{
 		InitCommand=function(self) self:FullScreen():diffuse(Color.Black) end,
