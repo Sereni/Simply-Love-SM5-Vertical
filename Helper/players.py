@@ -3,7 +3,7 @@ import json
 
 def GetDivision(rank):
 	mid_overrides = [127780, 132032, 76070, 66545, 7737, 66724]
-	upper_overrides = [35619, 66546]
+	upper_overrides = [35619, 66546, 66755, 129083]
 
 	if rank in mid_overrides:
 		return "mid"
