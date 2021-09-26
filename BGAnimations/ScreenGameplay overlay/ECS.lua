@@ -406,7 +406,7 @@ if ECS.Mode == "ECS" and ChickenKnifeIsActive() and IsPlayingECS() then
 				pss:FailPlayer()
 			end
 
-			SCREENMAN:GetTopScreen():SetNextScreenName("ScreenEvaluationStage"):StartTransitioningScreen("SM_GoToNextScreen")
+			SCREENMAN:GetTopScreen():SetNextScreenName("ScreenEvaluationStage"):StartTransitioningScreen("SM_DoNextScreen")
 		end
 	}
 
