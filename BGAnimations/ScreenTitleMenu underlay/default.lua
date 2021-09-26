@@ -99,8 +99,8 @@ local af = Def.ActorFrame{
 	},
 
 	-- East Coast Stamina logo
-	self:Load(THEME:GetPathG("", "_ECSX/logo (doubleres).png"))..{
-		InitCommand=function(self) self:xy(2,10):zoom(0.25):shadowlength(0.75) end,
+	LoadActor(THEME:GetPathG("", "_ECSX/logo (doubleres).png"))..{
+		InitCommand=function(self) self:xy(0,15):zoom(0.08):shadowlength(0.75) end,
 		OffCommand=function(self) self:linear(0.5):shadowlength(0) end
 	}
 }
@@ -109,7 +109,7 @@ local af = Def.ActorFrame{
 if HolidayCheer() then
 	af[#af+1] = Def.Sprite{
 		Texture=THEME:GetPathB("ScreenTitleMenu", "underlay/hat.png"),
-		InitCommand=function(self) self:zoom(0.1):xy( hat_x+48, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,
+		InitCommand=function(self) self:zoom(0.1):xy( hat_x-15, -self:GetHeight()/2 ):rotationz(15):queuecommand("Drop") end,
 		DropCommand=function(self) self:decelerate(hat_decelerate_rate):y(hat_decelerate_y+48) end,
 	}
 end
