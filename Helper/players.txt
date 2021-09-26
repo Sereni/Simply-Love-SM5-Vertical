@@ -691,7 +691,7 @@ ECS.Players["Arvin"] = {
 
 ECS.Players["nico"] = {
 	id=35619,
-	division="mid",
+	division="upper",
 	country="U.S.A.",
 	level=80,
 	exp=656377,
@@ -858,7 +858,7 @@ ECS.Players["Krushrpants"] = {
 
 ECS.Players["Murd"] = {
 	id=66755,
-	division="mid",
+	division="upper",
 	country="Canada",
 	level=87,
 	exp=1127716,
@@ -1008,7 +1008,7 @@ ECS.Players["HISA"] = {
 
 ECS.Players["Cyxsound"] = {
 	id=129083,
-	division="mid",
+	division="upper",
 	country="Canada",
 	level=77,
 	exp=502141,
@@ -2689,7 +2689,7 @@ ECS.Players["COLLETnm7"] = {
 
 ECS.Players["skateinmars"] = {
 	id=66545,
-	division="lower",
+	division="mid",
 	country="France",
 	level=74,
 	exp=382297,
@@ -2865,7 +2865,7 @@ ECS.Players["Badjas"] = {
 
 ECS.Players["PrawnSkunk"] = {
 	id=76070,
-	division="lower",
+	division="mid",
 	country="Canada",
 	level=74,
 	exp=386696,
@@ -3151,7 +3151,7 @@ ECS.Players["gulu"] = {
 
 ECS.Players["DF.CaptainBlack"] = {
 	id=7737,
-	division="lower",
+	division="mid",
 	country="U.S.A.",
 	level=65,
 	exp=188304,
@@ -3181,7 +3181,7 @@ ECS.Players["DF.CaptainBlack"] = {
 
 ECS.Players["tommoda"] = {
 	id=132032,
-	division="lower",
+	division="mid",
 	country="United Kingdom",
 	level=67,
 	exp=222164,
@@ -3262,7 +3262,7 @@ ECS.Players["Jerros"] = {
 
 ECS.Players["Fieoner"] = {
 	id=66724,
-	division="lower",
+	division="mid",
 	country="Spain",
 	level=58,
 	exp=96304,

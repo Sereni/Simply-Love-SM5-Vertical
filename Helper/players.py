@@ -1,13 +1,13 @@
 import csv
 import json
 
-def GetDivision(rank):
+def GetDivision(rank, id):
 	mid_overrides = [127780, 132032, 76070, 66545, 7737, 66724]
-	upper_overrides = [35619, 66546, 66755, 129083]
+	upper_overrides = [35619, 66755, 129083]
 
-	if rank in mid_overrides:
+	if id in mid_overrides:
 		return "mid"
-	elif rank in upper_overrides:
+	elif id in upper_overrides:
 		return "upper"
 	else:
 		if rank <= 12:
@@ -30,7 +30,7 @@ with open("sqldump.json") as f:
 for player in data:
 	print(r"""ECS.Players["%s"] = {""" % player["members_name"])
 	print(r"""	id=%s,""" % player["srpg5_entrants_member_id"])
-	print(r"""	division="%s",""" % (GetDivision(int(player["TPLP_RANK"]))))
+	print(r"""	division="%s",""" % (GetDivision(int(player["TPLP_RANK"]), int(player["srpg5_entrants_member_id"]))))
 	print(r"""	country="%s",""" % player["COUNTRY"])
 	print(r"""	level=%s,""" % player["srpg5_entrants_level"])
 	print(r"""	exp=%s,""" % player["srpg5_entrants_exp"])
