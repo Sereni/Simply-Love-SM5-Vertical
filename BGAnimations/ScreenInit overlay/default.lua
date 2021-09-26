@@ -20,25 +20,17 @@ local quotes = {
 
 local body, author, picture
 local w = 310
-local quote_pics = 0
-local rand_quote
+
 -- ---------------------------------------
 
 local af = Def.ActorFrame{
 InitCommand=function(self)
 	self:Center()
-	rand_quote = math.random(#quotes + quote_pics)
-		if rand_quote <= quote_pics then
-			picture:Load(THEME:GetPathG("", "_VisualStyles/Mario/Quotes/" .. tostring(rand_quote)))
-			body:settext("")
-			author:settext("")
-		else
-			rand_quote = rand_quote - quote_pics
-			local quote = quotes[rand_quote]
-			body:settext(quote[1][1]):xy(quote[1][2],quote[1][3]):zoom(0.8)
-			author:settext(quote[2][1]):xy(quote[2][2],quote[2][3]):zoom(0.8)
-			picture:Load(nil)
-		end
+	local rand_quote = math.random(#quotes)
+		local quote = quotes[rand_quote]
+		body:settext(quote[1][1]):xy(quote[1][2],quote[1][3])
+		author:settext(quote[2][1]):xy(quote[2][2],quote[2][3])
+		picture:Load(nil)
 end
 }
 
@@ -124,12 +116,7 @@ af[#af+1] = Def.Sprite{
 	end,
 	OnCommand=function(self)
 		local zoom_value = math.min(80/self:GetHeight(), 240/self:GetWidth())
-		self:zoom(zoom_value):sleep(2.1):linear(0.25):diffusealpha(1):queuecommand("MaybePlaySound")
-	end,
-	MaybePlaySoundCommand=function(self)
-		if rand_quote == 4 then
-			SOUND:PlayOnce(THEME:GetPathS("", "mario_hey_stinky.ogg"))
-		end
+		self:zoom(zoom_value):sleep(2.1):linear(0.25):diffusealpha(1)
 	end,
 	OffCommand=cmd(accelerate,0.3; zoomtoheight, 0; diffusealpha,0)
 }
