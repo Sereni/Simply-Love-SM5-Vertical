@@ -113,7 +113,7 @@ local WriteRelicDataToDisk = function()
 
 
 		local f = RageFileUtil.CreateRageFile()
-		local path = profile_dir.."Player_Relic_Data.lua"
+		local path = profile_dir .. THEME:GetThemeDisplayName() .. "_Player_Relic_Data.lua"
 
 		if f:Open(path, 2) then
 			f:Write( s )
