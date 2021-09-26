@@ -41,13 +41,13 @@ if isECS then
 
 				-- Add best 7 scores and also check which end of set relics were active.
 				local total_points = 0
-				local slime_badge = false
-				local agility_potion = false
-				local stamina_potion = false
-				local accuracy_potion = false
-				local tpa_standard = false
-				local memepeace_beret = false
-				local cultist_robes = false
+				local slime_badge = 0
+				local agility_potion = 0
+				local stamina_potion = 0
+				local accuracy_potion = 0
+				local tpa_standard = 0
+				local memepeace_beret = 0
+				local cultist_robes = 0
 
 				for i=1,7 do
 					local song_played = ECS.Player.SongsPlayed[i]
@@ -57,25 +57,25 @@ if isECS then
 						if not song_played.failed then
 							for relic in ivalues(song_played.relics_used) do
 								if relic.name == "Slime Badge" then
-									slime_badge = true
+									slime_badge = slime_badge + 1
 								end
 								if relic.name == "Agility Potion" then
-									agility_potion = true
+									agility_potion = agility_potion + 1
 								end
 								if relic.name == "Stamina Potion" then
-									stamina_potion = true
+									stamina_potion = stamina_potion + 1
 								end
 								if relic.name == "Accuracy Potion" then
-									accuracy_potion = true
+									accuracy_potion = accuracy_potion + 1
 								end
 								if relic.name == "TPA Standard" then
-									tpa_standard = true
+									tpa_standard = tpa_standard + 1
 								end
 								if relic.name == "Memepeace Beret" then
-									memepeace_beret = true
+									memepeace_beret = memepeace_beret + 1
 								end
 								if relic.name == "Cultist Robes" then
-									cultist_robes = true
+									cultist_robes = cultist_robes + 1
 								end
 							end
 						end
@@ -127,13 +127,13 @@ if isECS then
 					end
 				end
 
-				if slime_badge then total_points = total_points + 100 * slime_tiers end
-				if agility_potion then total_points = total_points + math.floor(((total_bpm / songs_passed) - 120)^1.3) end
-				if stamina_potion then total_points = total_points + math.floor(total_steps / 75) end
-				if accuracy_potion then total_points = total_points + math.max(math.floor(1000^(total_score / songs_passed)-250), 0) end
-				if tpa_standard then total_points = total_points + 100 * total_over_95 end
-				if beret_tiers then total_points = total_points + 100 * beret_tiers end
-				if cultist_robes then total_points = total_points + 75 * cultist_songs end
+				if slime_badge > 0 then total_points = total_points + (100 * slime_tiers) * slime_badge end
+				if agility_potion > 0 then total_points = total_points + (math.floor(((total_bpm / songs_passed) - 120)^1.3)) * agility_potion end
+				if stamina_potion > 0 then total_points = total_points + (math.floor(total_steps / 75)) * stamina_potion end
+				if accuracy_potion > 0 then total_points = total_points + (math.max(math.floor(1000^(total_score / songs_passed)-250), 0)) * accuracy_potion end
+				if tpa_standard > 0 then total_points = total_points + (100 * total_over_95) * tpa_standard end
+				if memepeace_beret > 0 then total_points = total_points + (100 * beret_tiers) * memepeace_beret end
+				if cultist_robes > 0 then total_points = total_points + (75 * cultist_songs) * cultist_robes end
 
 				self:settext(tostring(total_points))
 			elseif ECS.Mode == "Marathon" then
