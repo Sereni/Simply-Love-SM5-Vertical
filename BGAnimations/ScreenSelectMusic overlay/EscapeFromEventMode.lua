@@ -91,10 +91,13 @@ local af = Def.ActorFrame{
 		local topscreen = SCREENMAN:GetTopScreen()
 		if topscreen then
 			-- Reset relics to default when quitting through ScreenSelectMusic.
-			local mpn = GAMESTATE:GetMasterPlayerNumber()
-			local profile_name = PROFILEMAN:GetPlayerName(mpn)
-			ECS.Players[profile_name].relics = DeepCopy(ECS.Players[profile_name].default_relics)
-			
+			if ECS.Mode == "ECS" or ECS.Mode == "Marathon" then
+				local mpn = GAMESTATE:GetMasterPlayerNumber()
+				local profile_name = PROFILEMAN:GetPlayerName(mpn)
+				-- profile_name will exist if we're already in this mode.
+				ECS.Players[profile_name].relics = DeepCopy(ECS.Players[profile_name].default_relics)
+			end
+
 			-- play the start sound effect
 			sfx.start:play()
 			-- return input handling to the SM5 engine before leaving ScreenSelectMusic
