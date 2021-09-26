@@ -60,10 +60,10 @@ SL_CustomPrefs.Get = function()
 		},
 		VisualTheme =
 		{
-			Default = "Mario",
+			Default = "SRPG5",
 			 -- emojis are our lingua franca for the 21st century
-			Choices = { "Ⓜ️", },
-			Values  = { "Mario" },
+			Choices = { "🗡", },
+			Values  = { "SRPG5" },
 		},
 		RainbowMode = {
 			Default = false,
